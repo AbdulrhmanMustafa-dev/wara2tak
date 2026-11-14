@@ -1,0 +1,323 @@
+<!DOCTYPE html><html lang="en" dir="ltr"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wara2tak — Document Section Translation</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
+globalThis.tailwind = globalThis.tailwind || {};
+globalThis.tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'indigo-deep': '#4F46E5',
+        'blue-soft': '#E0E7FF',
+        'neutral-bg': '#F8FAFC',
+        'text-navy': '#0F172A',
+        'text-slate': '#475569',
+        'success': '#16A34A',
+        'warning': '#F59E0B',
+        'warning-text': '#B45309',
+        'error': '#EF4444',
+        'light-primary': '#4F46E5',
+        'light-on-primary': '#FFFFFF',
+        'light-secondary': '#E0E7FF',
+        'light-on-secondary': '#1E1B4B',
+        'light-surface': '#FFFFFF',
+        'light-on-surface': '#0F172A',
+        'light-surface-variant': '#F1F5F9',
+        'light-on-surface-variant': '#475569',
+        'light-outline': '#CBD5E1',
+        'light-outline-variant': '#E2E8F0',
+      },
+      borderRadius: {
+        'sm': '6px',
+        'md': '10px',
+        'DEFAULT': '12px',
+        'lg': '16px',
+        'xl': '20px',
+        'pill': '9999px',
+      },
+      spacing: {
+        'spacing-2xs': '4px',
+        'spacing-xs': '4px',
+        'spacing-sm': '8px',
+        'spacing-md': '12px',
+        'spacing-base': '16px',
+        'spacing-lg': '20px',
+        'spacing-xl': '24px',
+        'spacing-2xl': '32px',
+        'spacing-3xl': '40px',
+        'gutter-mobile': '16px',
+        'nav-height': '68px',
+        'touch-target-min': '44px',
+      },
+      fontFamily: {
+        'display': ['"Cairo"', 'sans-serif'],
+        'headline': ['"Cairo"', 'sans-serif'],
+        'body': ['"Inter"', 'sans-serif'],
+        'label': ['"Inter"', 'sans-serif'],
+      },
+      fontSize: {
+        'display-lg': ['36px', { lineHeight: '44px', letterSpacing: '-0.5px', fontWeight: '700' }],
+        'display-lg-mobile': ['28px', { lineHeight: '36px', letterSpacing: '-0.25px', fontWeight: '700' }],
+        'headline-lg': ['32px', { lineHeight: '40px', letterSpacing: '-0.25px', fontWeight: '700' }],
+        'headline-lg-mobile': ['24px', { lineHeight: '32px', letterSpacing: '0px', fontWeight: '700' }],
+        'headline-md': ['22px', { lineHeight: '30px', letterSpacing: '0px', fontWeight: '600' }],
+        'headline-sm': ['18px', { lineHeight: '26px', letterSpacing: '0px', fontWeight: '600' }],
+        'body-lg': ['16px', { lineHeight: '24px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-md': ['14px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-sm': ['12px', { lineHeight: '18px', letterSpacing: '0px', fontWeight: '400' }],
+        'label-lg': ['14px', { lineHeight: '20px', letterSpacing: '0.1px', fontWeight: '600' }],
+        'label-md': ['12px', { lineHeight: '16px', letterSpacing: '0.2px', fontWeight: '500' }],
+        'label-sm': ['11px', { lineHeight: '14px', letterSpacing: '0.3px', fontWeight: '500' }],
+      },
+      transitionDuration: {
+        'tap': '120ms',
+        'sheet-slide': '260ms',
+        'status-change': '180ms',
+      },
+      transitionDelay: {
+        'tap': '0ms',
+        'sheet-slide': '0ms',
+        'status-change': '0ms',
+      },
+      transitionTimingFunction: {
+        'tap': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'sheet-slide': 'cubic-bezier(0.16, 1, 0.3, 1)',
+        'status-change': 'ease-out',
+      },
+    },
+  },
+};
+if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet">
+  <style>
+    .material-symbols-outlined {
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      line-height: 1 !important;
+      overflow: hidden;
+      white-space: nowrap;
+      direction: ltr;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body class="bg-neutral-bg text-text-navy min-h-[884px] flex flex-col font-body selection:bg-light-secondary selection:text-indigo-deep pb-6" data-stitch-vh="min-h-[884px]===min-h-screen">
+
+  <!-- Mobile Top Bar -->
+  <div class="w-full pt-3 px-6 flex items-center justify-between text-text-slate z-20 bg-light-surface sticky top-0 border-b border-light-outline-variant">
+    <span class="font-label text-label-sm font-semibold tabular-nums text-text-navy">9:41</span>
+    <div class="flex items-center gap-1.5 text-text-navy">
+      <span class="material-symbols-outlined text-[16px]">signal_cellular_4_bar</span>
+      <span class="material-symbols-outlined text-[16px]">wifi</span>
+      <span class="material-symbols-outlined text-[18px]">battery_full</span>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="px-6 pt-2 pb-3 border-b border-light-outline-variant bg-light-surface shadow-2xs z-10">
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <a href="../document-results/DocumentResultsScreen.html" aria-label="Back to document analysis" class="w-9 h-9 rounded-DEFAULT bg-neutral-bg border border-light-outline-variant text-text-slate hover:text-text-navy flex items-center justify-center transition active:scale-95 shadow-xs shrink-0">
+          <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+        </a>
+        <div class="min-w-0">
+          <h1 class="font-headline text-headline-sm font-bold text-text-navy leading-tight">
+            Translate
+          </h1>
+          <p class="text-[11px] text-text-slate truncate mt-0.5">
+            Global Student Exchange Program 2027.pdf
+          </p>
+        </div>
+      </div>
+
+      <button onclick="toggleErrorDemo()" class="text-[10px] font-semibold text-text-slate hover:text-error px-2 py-1 rounded bg-slate-100">
+        Toggle Error Demo
+      </button>
+    </div>
+
+    <!-- Language Selector Bar with Swap -->
+    <div class="mt-3 p-2 bg-neutral-bg rounded-xl border border-light-outline-variant flex items-center justify-between gap-2">
+      <div class="flex-1 text-center py-1.5 px-3 bg-white rounded-lg border border-light-outline-variant font-label text-xs font-bold text-text-navy shadow-2xs">
+        English (Original)
+      </div>
+      <button type="button" aria-label="Swap translation direction" class="w-8 h-8 rounded-full bg-light-secondary text-indigo-deep flex items-center justify-center hover:bg-light-primary hover:text-white transition active:scale-90 shrink-0">
+        <span class="material-symbols-outlined text-[18px]">swap_horiz</span>
+      </button>
+      <div class="flex-1 text-center py-1.5 px-3 bg-white rounded-lg border border-light-outline-variant font-label text-xs font-bold text-light-primary shadow-2xs">
+        العربية (Arabic)
+      </div>
+    </div>
+  </header>
+
+  <!-- Section Filter Tabs: 5 Options including Custom Text -->
+  <div class="bg-light-surface border-b border-light-outline-variant px-4 py-2 overflow-x-auto no-scrollbar">
+    <div class="flex items-center gap-1.5 whitespace-nowrap">
+      <button onclick="selectTab(&#39;summary&#39;)" id="tab-summary" class="tab-btn px-3 py-1.5 rounded-pill text-xs font-bold bg-light-primary text-light-on-primary">Summary</button>
+      <button onclick="selectTab(&#39;eligibility&#39;)" id="tab-eligibility" class="tab-btn px-3 py-1.5 rounded-pill text-xs font-medium text-text-slate hover:text-text-navy">Eligibility</button>
+      <button onclick="selectTab(&#39;documents&#39;)" id="tab-documents" class="tab-btn px-3 py-1.5 rounded-pill text-xs font-medium text-text-slate hover:text-text-navy">Required Documents</button>
+      <button onclick="selectTab(&#39;deadlines&#39;)" id="tab-deadlines" class="tab-btn px-3 py-1.5 rounded-pill text-xs font-medium text-text-slate hover:text-text-navy">Deadlines &amp; Steps</button>
+      <button onclick="selectTab(&#39;custom&#39;)" id="tab-custom" class="tab-btn px-3 py-1.5 rounded-pill text-xs font-medium text-text-slate hover:text-text-navy flex items-center gap-1">
+        <span class="material-symbols-outlined text-[14px]">edit</span>
+        <span>Custom text</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Scrollable Content -->
+  <main class="flex-1 px-5 py-4 max-w-sm mx-auto w-full space-y-4">
+
+    <!-- Honest Translation Disclaimer (Replaces accuracy claims) -->
+    <div class="p-3 rounded-xl bg-amber-50/70 border border-amber-200/80 text-warning-text flex items-start gap-2.5">
+      <span class="material-symbols-outlined text-[18px] text-warning-text shrink-0 mt-0.5">info</span>
+      <p class="text-xs leading-relaxed">
+        AI translation. Verify against the original document text before making official commitments.
+      </p>
+    </div>
+
+    <!-- Error State Container (Triggerable) -->
+    <div id="translation-error" class="hidden p-4 rounded-xl bg-rose-50 border border-rose-200 text-center space-y-2">
+      <span class="material-symbols-outlined text-[28px] text-error">g_translate</span>
+      <h3 class="font-headline text-label-md font-bold text-error">Translation failed</h3>
+      <p class="text-xs text-text-slate leading-relaxed">
+        Unable to complete machine translation due to a network interruption.
+      </p>
+      <button type="button" onclick="toggleErrorDemo()" class="mt-1 px-4 py-2 rounded-lg bg-light-primary text-white text-xs font-bold hover:opacity-95 transition">
+        Retry Translation
+      </button>
+    </div>
+
+    <!-- Pre-translated Content Views -->
+    <div id="content-standard" class="space-y-4">
+      <!-- Original Text Card -->
+      <section class="bg-light-surface rounded-xl p-4 border border-light-outline-variant shadow-xs space-y-2">
+        <div class="flex items-center justify-between pb-2 border-b border-light-outline-variant">
+          <span class="text-xs font-bold text-text-slate uppercase tracking-wider flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px] text-light-primary">menu_book</span>
+            Original Text (English)
+          </span>
+          <span class="text-[10px] font-semibold text-text-slate bg-neutral-bg px-2 py-0.5 rounded">Source: Page 1</span>
+        </div>
+        <p id="original-text" class="text-xs text-text-navy leading-relaxed">
+          &#34;The IAMC 2027 Student Mobility Initiative provides fully-funded semester placements across 14 European partner universities. Selected candidates receive tuition waivers, a monthly subsistence allowance of €850, and standard health insurance coverage.&#34;
+        </p>
+      </section>
+
+      <!-- Translated Text Card -->
+      <section class="bg-indigo-50/50 rounded-xl p-4 border border-indigo-200 shadow-xs space-y-3">
+        <div class="flex items-center justify-between pb-2 border-b border-indigo-200/80">
+          <span class="text-xs font-bold text-indigo-deep uppercase tracking-wider flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px] text-light-primary">translate</span>
+            الترجمة العربية (Arabic)
+          </span>
+          <button type="button" onclick="copyTranslation()" id="copy-btn" class="text-[11px] font-bold text-light-primary hover:underline flex items-center gap-1 bg-white px-2.5 py-1 rounded-md border border-indigo-200">
+            <span class="material-symbols-outlined text-[14px]">content_copy</span>
+            <span>Copy</span>
+          </button>
+        </div>
+        <p id="translated-text" class="text-xs text-text-navy leading-relaxed font-sans text-right dir-rtl">
+          &#34;توفر مبادرة التبادل الطلابي IAMC 2027 مقاعد دراسية ممولة بالكامل لفصل دراسي واحد عبر 14 جامعة أوروبية شريكة. يحصل المترشحون المقبولون على إعفاء كامل من الرسوم الدراسية، وبدل معيشة شهري قدره 850 يورو، وتغطية تأمين صحي قياسية.&#34;
+        </p>
+      </section>
+    </div>
+
+    <!-- Fifth Tab View: Custom Text Box -->
+    <div id="content-custom" class="hidden space-y-4">
+      <div class="bg-light-surface rounded-xl p-4 border border-light-outline-variant shadow-xs space-y-3">
+        <label class="block text-xs font-bold text-text-navy">
+          Select or paste an excerpt from the document:
+        </label>
+        <textarea id="custom-input" rows="4" placeholder="Paste text excerpt here (e.g. specific scholarship clauses, eligibility paragraphs)..." class="w-full bg-neutral-bg border border-light-outline-variant rounded-xl p-3 text-xs text-text-navy focus:outline-none focus:border-light-primary leading-relaxed"></textarea>
+        <button type="button" onclick="translateCustom()" class="w-full py-2.5 rounded-xl bg-light-primary text-light-on-primary text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm hover:opacity-95 transition">
+          <span class="material-symbols-outlined text-[16px]">translate</span>
+          <span>Translate Custom Excerpt</span>
+        </button>
+      </div>
+
+      <div id="custom-result" class="hidden bg-indigo-50/50 rounded-xl p-4 border border-indigo-200 shadow-xs space-y-2">
+        <div class="flex items-center justify-between pb-1.5 border-b border-indigo-200/80">
+          <span class="text-xs font-bold text-indigo-deep uppercase tracking-wider">Arabic Translation</span>
+          <button onclick="copyCustom()" class="text-[11px] font-bold text-light-primary hover:underline flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">content_copy</span>
+            <span>Copy</span>
+          </button>
+        </div>
+        <p id="custom-output" class="text-xs text-text-navy leading-relaxed font-sans text-right dir-rtl"></p>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    const sampleData = {
+      summary: {
+        en: '"The IAMC 2027 Student Mobility Initiative provides fully-funded semester placements across 14 European partner universities. Selected candidates receive tuition waivers, a monthly subsistence allowance of €850, and standard health insurance coverage."',
+        ar: '"توفر مبادرة التبادل الطلابي IAMC 2027 مقاعد دراسية ممولة بالكامل لفصل دراسي واحد عبر 14 جامعة أوروبية شريكة. يحصل المترشحون المقبولون على إعفاء كامل من الرسوم الدراسية، وبدل معيشة شهري قدره 850 يورو، وتغطية تأمين صحي قياسية."'
+      },
+      eligibility: {
+        en: '"Applicants must hold a minimum cumulative GPA of 3.0/4.0 and have completed at least 2 full semesters of undergraduate study. English proficiency level B2 (IELTS 6.5+ or TOEFL iBT 85+) is strictly mandatory."',
+        ar: '"يجب أن يحمل المتقدمون حداً أدنى للمعدل التراكمي قدره 3.0 من 4.0 مع إتمام فصلين دراسيين جامعيين كاملين على الأقل. يعتبر إتقان اللغة الإنجليزية بمستوى B2 (درجة 6.5 في IELTS أو 85 في TOEFL) شرطاً إلزامياً صارماً."'
+      },
+      documents: {
+        en: '"Required dossier: 1) Official English academic transcript; 2) Valid language certificate; 3) Statement of Purpose (max 800 words); 4) Learning Agreement draft; 5) Academic recommendation letter."',
+        ar: '"الملف المطلوب: 1) بيان درجات أكاديمي رسمي بالإنجليزية؛ 2) شهادة لغة سارية؛ 3) خطاب الغرض من الدراسة (بحد أقصى 800 كلمة)؛ 4) مسودة اتفاقية التعلم؛ 5) خطاب توصية أكاديمي."'
+      },
+      deadlines: {
+        en: '"Submission deadline: November 15, 2026 at 23:59 GMT. Late applications cannot be considered under any circumstances. Internal nominations close October 20, 2026."',
+        ar: '"الموعد النهائي لتقديم الطلبات: 15 نوفمبر 2026 الساعة 23:59 بتوقيت غرينتش. لن يتم النظر في الطلبات المتأخرة تحت أي ظرف. يُغلق باب الترشيح الداخلي في 20 أكتوبر 2026."'
+      }
+    };
+
+    function selectTab(tabKey) {
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.className = 'tab-btn px-3 py-1.5 rounded-pill text-xs font-medium text-text-slate hover:text-text-navy';
+      });
+      const activeBtn = document.getElementById('tab-' + tabKey);
+      if (activeBtn) activeBtn.className = 'tab-btn px-3 py-1.5 rounded-pill text-xs font-bold bg-light-primary text-light-on-primary';
+
+      if (tabKey === 'custom') {
+        document.getElementById('content-standard').classList.add('hidden');
+        document.getElementById('content-custom').classList.remove('hidden');
+      } else {
+        document.getElementById('content-standard').classList.remove('hidden');
+        document.getElementById('content-custom').classList.add('hidden');
+        document.getElementById('original-text').textContent = sampleData[tabKey].en;
+        document.getElementById('translated-text').textContent = sampleData[tabKey].ar;
+      }
+    }
+
+    function toggleErrorDemo() {
+      const err = document.getElementById('translation-error');
+      err.classList.toggle('hidden');
+    }
+
+    function copyTranslation() {
+      const text = document.getElementById('translated-text').textContent;
+      navigator.clipboard.writeText(text);
+      const btn = document.getElementById('copy-btn');
+      btn.innerHTML = '<span class="material-symbols-outlined text-[14px]">check</span><span>Copied!</span>';
+      setTimeout(() => {
+        btn.innerHTML = '<span class="material-symbols-outlined text-[14px]">content_copy</span><span>Copy</span>';
+      }, 1500);
+    }
+
+    function translateCustom() {
+      const input = document.getElementById('custom-input').value.trim();
+      if (!input) return;
+      document.getElementById('custom-output').textContent = 'تمت ترجمة النص المقتطف: "' + input + '" وفق المصطلحات الأكاديمية الرسمية للوثيقة.';
+      document.getElementById('custom-result').classList.remove('hidden');
+    }
+
+    function copyCustom() {
+      const text = document.getElementById('custom-output').textContent;
+      navigator.clipboard.writeText(text);
+    }
+  </script>
+
+
+</body></html>

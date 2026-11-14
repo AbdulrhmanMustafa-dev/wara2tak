@@ -1,0 +1,402 @@
+<!DOCTYPE html><html lang="en" dir="ltr"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wara2tak — Ask About This Document</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
+globalThis.tailwind = globalThis.tailwind || {};
+globalThis.tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'indigo-deep': '#4F46E5',
+        'blue-soft': '#E0E7FF',
+        'neutral-bg': '#F8FAFC',
+        'text-navy': '#0F172A',
+        'text-slate': '#475569',
+        'success': '#16A34A',
+        'warning': '#F59E0B',
+        'warning-text': '#B45309',
+        'error': '#EF4444',
+        'light-primary': '#4F46E5',
+        'light-on-primary': '#FFFFFF',
+        'light-secondary': '#E0E7FF',
+        'light-on-secondary': '#1E1B4B',
+        'light-surface': '#FFFFFF',
+        'light-on-surface': '#0F172A',
+        'light-surface-variant': '#F1F5F9',
+        'light-on-surface-variant': '#475569',
+        'light-outline': '#CBD5E1',
+        'light-outline-variant': '#E2E8F0',
+      },
+      borderRadius: {
+        'sm': '6px',
+        'md': '10px',
+        'DEFAULT': '12px',
+        'lg': '16px',
+        'xl': '20px',
+        'pill': '9999px',
+      },
+      spacing: {
+        'spacing-2xs': '4px',
+        'spacing-xs': '4px',
+        'spacing-sm': '8px',
+        'spacing-md': '12px',
+        'spacing-base': '16px',
+        'spacing-lg': '20px',
+        'spacing-xl': '24px',
+        'spacing-2xl': '32px',
+        'spacing-3xl': '40px',
+        'gutter-mobile': '16px',
+        'nav-height': '68px',
+        'touch-target-min': '44px',
+      },
+      fontFamily: {
+        'display': ['"Cairo"', 'sans-serif'],
+        'headline': ['"Cairo"', 'sans-serif'],
+        'body': ['"Inter"', 'sans-serif'],
+        'label': ['"Inter"', 'sans-serif'],
+      },
+      fontSize: {
+        'display-lg': ['36px', { lineHeight: '44px', letterSpacing: '-0.5px', fontWeight: '700' }],
+        'display-lg-mobile': ['28px', { lineHeight: '36px', letterSpacing: '-0.25px', fontWeight: '700' }],
+        'headline-lg': ['32px', { lineHeight: '40px', letterSpacing: '-0.25px', fontWeight: '700' }],
+        'headline-lg-mobile': ['24px', { lineHeight: '32px', letterSpacing: '0px', fontWeight: '700' }],
+        'headline-md': ['22px', { lineHeight: '30px', letterSpacing: '0px', fontWeight: '600' }],
+        'headline-sm': ['18px', { lineHeight: '26px', letterSpacing: '0px', fontWeight: '600' }],
+        'body-lg': ['16px', { lineHeight: '24px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-md': ['14px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-sm': ['12px', { lineHeight: '18px', letterSpacing: '0px', fontWeight: '400' }],
+        'label-lg': ['14px', { lineHeight: '20px', letterSpacing: '0.1px', fontWeight: '600' }],
+        'label-md': ['12px', { lineHeight: '16px', letterSpacing: '0.2px', fontWeight: '500' }],
+        'label-sm': ['11px', { lineHeight: '14px', letterSpacing: '0.3px', fontWeight: '500' }],
+      },
+      transitionDuration: {
+        'tap': '120ms',
+        'sheet-slide': '260ms',
+        'status-change': '180ms',
+      },
+      transitionDelay: {
+        'tap': '0ms',
+        'sheet-slide': '0ms',
+        'status-change': '0ms',
+      },
+      transitionTimingFunction: {
+        'tap': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'sheet-slide': 'cubic-bezier(0.16, 1, 0.3, 1)',
+        'status-change': 'ease-out',
+      },
+    },
+  },
+};
+if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet">
+  <style>
+    .material-symbols-outlined {
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      line-height: 1 !important;
+      overflow: hidden;
+      white-space: nowrap;
+      direction: ltr;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body class="bg-neutral-bg text-text-navy min-h-[884px] flex flex-col font-body selection:bg-light-secondary selection:text-indigo-deep relative" data-stitch-vh="min-h-[884px]===min-h-screen">
+
+  <!-- Mobile Top Bar -->
+  <div class="w-full pt-3 px-6 flex items-center justify-between text-text-slate z-20 bg-light-surface sticky top-0 border-b border-light-outline-variant">
+    <span class="font-label text-label-sm font-semibold tabular-nums text-text-navy">9:41</span>
+    <div class="flex items-center gap-1.5 text-text-navy">
+      <span class="material-symbols-outlined text-[16px]">signal_cellular_4_bar</span>
+      <span class="material-symbols-outlined text-[16px]">wifi</span>
+      <span class="material-symbols-outlined text-[18px]">battery_full</span>
+    </div>
+  </div>
+
+  <!-- Chat Context Header -->
+  <header class="px-6 pt-2 pb-3 border-b border-light-outline-variant bg-light-surface shadow-2xs z-10 relative">
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <a href="../document-results/DocumentResultsScreen.html" aria-label="Back to document analysis" class="w-9 h-9 rounded-DEFAULT bg-neutral-bg border border-light-outline-variant text-text-slate hover:text-text-navy flex items-center justify-center transition active:scale-95 shadow-xs shrink-0">
+          <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+        </a>
+        <div class="min-w-0">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-pill bg-light-primary animate-pulse"></span>
+            <h1 class="font-headline text-label-lg font-bold text-text-navy leading-tight truncate">
+              Ask About This Document
+            </h1>
+          </div>
+          <!-- Compact Document Context Label -->
+          <div class="flex items-center gap-1 text-[11px] text-text-slate truncate mt-0.5">
+            <span class="material-symbols-outlined text-[13px] text-light-primary">description</span>
+            <span class="truncate">Global Student Exchange Program 2027.pdf</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Header Options Menu -->
+      <div class="relative">
+        <button type="button" onclick="toggleChatMenu()" aria-label="More chat options" class="w-9 h-9 rounded-DEFAULT text-text-slate hover:text-text-navy hover:bg-neutral-bg flex items-center justify-center shrink-0 transition">
+          <span class="material-symbols-outlined text-[20px]">more_vert</span>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div id="chat-dropdown" class="hidden absolute right-0 mt-1 w-48 bg-white rounded-xl shadow-lg border border-light-outline-variant py-1 z-30">
+          <button type="button" onclick="openClearModal()" class="w-full text-left px-3.5 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2">
+            <span class="material-symbols-outlined text-[16px]">delete_sweep</span>
+            <span>Clear conversation</span>
+          </button>
+          <button type="button" onclick="toggleEmptyState()" class="w-full text-left px-3.5 py-2 text-xs font-medium text-text-slate hover:bg-slate-50 flex items-center gap-2">
+            <span class="material-symbols-outlined text-[16px]">restart_alt</span>
+            <span>Show empty state</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- View Switcher Tabs (Demo helper to toggle active conversation, empty state, and error state) -->
+  <div class="bg-indigo-50/70 px-4 py-1.5 border-b border-indigo-100 flex items-center justify-between text-[11px]">
+    <span class="font-semibold text-indigo-deep">View Mode:</span>
+    <div class="flex items-center gap-2">
+      <button onclick="switchView(&#39;active&#39;)" id="btn-active" class="font-bold text-light-primary underline">Active Chat</button>
+      <span class="text-slate-300">•</span>
+      <button onclick="switchView(&#39;empty&#39;)" id="btn-empty" class="text-text-slate hover:text-text-navy">Empty State</button>
+      <span class="text-slate-300">•</span>
+      <button onclick="switchView(&#39;error&#39;)" id="btn-error" class="text-text-slate hover:text-text-navy">Chat Error</button>
+    </div>
+  </div>
+
+  <!-- Scrollable Messages Feed -->
+  <main class="flex-1 px-4 py-4 space-y-4 max-w-sm mx-auto w-full overflow-y-auto">
+
+    <!-- Active Conversation View -->
+    <div id="view-active" class="space-y-4">
+      <!-- Grounded Scope Notice Banner -->
+      <div class="p-2.5 rounded-lg bg-light-surface border border-light-outline-variant text-[11px] text-text-slate flex items-start gap-2">
+        <span class="material-symbols-outlined text-[15px] text-light-primary shrink-0 mt-0.5">lock_outline</span>
+        <p class="leading-relaxed">
+          Wara2tak AI answers exclusively using information extracted from this specific document. It does not speculate or guarantee acceptance.
+        </p>
+      </div>
+
+      <!-- AI Assistant Introduction Bubble -->
+      <div class="flex items-start gap-2.5 max-w-[90%]">
+        <div class="w-8 h-8 rounded-pill bg-light-primary text-light-on-primary flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+          <span class="material-symbols-outlined text-[16px]">smart_toy</span>
+        </div>
+        <div class="p-3.5 rounded-2xl rounded-tl-sm bg-light-surface border border-light-outline-variant shadow-xs text-body-sm text-text-navy space-y-1">
+          <p class="font-medium text-indigo-deep text-[11px] uppercase tracking-wider font-label">Wara2tak Assistant</p>
+          <p class="leading-relaxed">
+            Hi! I have analyzed your document. Ask me anything about its requirements, deadlines, or application process.
+          </p>
+        </div>
+      </div>
+
+      <!-- User Question 1 -->
+      <div class="flex justify-end">
+        <div class="max-w-[85%] p-3.5 rounded-2xl rounded-tr-sm bg-light-primary text-light-on-primary shadow-xs text-body-sm font-medium leading-relaxed">
+          Am I eligible if my current GPA is 3.15?
+        </div>
+      </div>
+
+      <!-- AI Neutral Response with Page Reference & Verification -->
+      <div class="flex items-start gap-2.5 max-w-[92%]">
+        <div class="w-8 h-8 rounded-pill bg-light-primary text-light-on-primary flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+          <span class="material-symbols-outlined text-[16px]">smart_toy</span>
+        </div>
+        <div class="p-3.5 rounded-2xl rounded-tl-sm bg-light-surface border border-light-outline-variant shadow-xs text-body-sm text-text-navy space-y-2">
+          <p class="leading-relaxed">
+            The document requires a minimum cumulative GPA of 3.0 out of 4.0. A GPA of 3.15 meets this requirement.
+          </p>
+          <p class="text-[12px] text-text-slate leading-relaxed">
+            Other conditions also apply:
+          </p>
+          <ul class="text-[12px] text-text-slate space-y-1 pl-4 list-disc">
+            <li>Completion of at least 2 full semesters before departure</li>
+            <li>English language proficiency B2 (IELTS 6.5+ or TOEFL iBT 85+)</li>
+            <li>Age between 18 and 26 years at time of mobility</li>
+          </ul>
+          <p class="text-[11px] text-warning-text font-medium pt-1">
+            Please confirm with the official provider.
+          </p>
+          <div class="pt-2 border-t border-light-outline-variant flex items-center justify-between text-[11px]">
+            <span class="text-light-primary font-bold flex items-center gap-1">
+              <span class="material-symbols-outlined text-[13px]">menu_book</span>
+              Page 3, Section 2.1
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- User Question 2 -->
+      <div class="flex justify-end">
+        <div class="max-w-[85%] p-3.5 rounded-2xl rounded-tr-sm bg-light-primary text-light-on-primary shadow-xs text-body-sm font-medium leading-relaxed">
+          Can I get an extension on the November 15 deadline?
+        </div>
+      </div>
+
+      <!-- AI "Not Found in Document" Response -->
+      <div class="flex items-start gap-2.5 max-w-[92%]">
+        <div class="w-8 h-8 rounded-pill bg-light-primary text-light-on-primary flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+          <span class="material-symbols-outlined text-[16px]">smart_toy</span>
+        </div>
+        <div class="p-3.5 rounded-2xl rounded-tl-sm bg-light-surface border border-amber-200 shadow-xs text-body-sm text-text-navy space-y-2">
+          <div class="flex items-center gap-1.5 text-warning-text font-label text-[11px] font-bold">
+            <span class="material-symbols-outlined text-[15px] text-warning-text">info</span>
+            <span>This information was not found in the uploaded document.</span>
+          </div>
+          <p class="text-[12px] text-text-slate leading-relaxed">
+            The document states that November 15, 2026 (23:59 GMT) is the official closing date, but does not mention extension procedures or appeal mechanisms.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State View: "Start a conversation" with 3 suggested questions -->
+    <div id="view-empty" class="hidden py-8 flex flex-col items-center text-center space-y-4">
+      <div class="w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-light-primary">
+        <span class="material-symbols-outlined text-[32px]">chat_bubble_outline</span>
+      </div>
+      <div>
+        <h2 class="font-headline text-headline-sm font-bold text-text-navy mb-1">
+          Start a conversation
+        </h2>
+        <p class="text-xs text-text-slate max-w-[260px] leading-relaxed">
+          Ask specific questions regarding eligibility, documents, or key deadlines in this file.
+        </p>
+      </div>
+
+      <div class="w-full space-y-2 pt-2 text-left">
+        <p class="text-[11px] font-bold text-text-slate uppercase tracking-wider text-center">Suggested Questions</p>
+        <button onclick="fillInput(&#39;Am I eligible for this opportunity?&#39;)" class="w-full p-3 rounded-xl bg-light-surface border border-light-outline-variant hover:border-light-primary text-xs font-semibold text-text-navy flex items-center justify-between group transition">
+          <span>&#34;Am I eligible for this opportunity?&#34;</span>
+          <span class="material-symbols-outlined text-[16px] text-slate-400 group-hover:text-light-primary">arrow_forward</span>
+        </button>
+        <button onclick="fillInput(&#39;What documents do I need?&#39;)" class="w-full p-3 rounded-xl bg-light-surface border border-light-outline-variant hover:border-light-primary text-xs font-semibold text-text-navy flex items-center justify-between group transition">
+          <span>&#34;What documents do I need?&#34;</span>
+          <span class="material-symbols-outlined text-[16px] text-slate-400 group-hover:text-light-primary">arrow_forward</span>
+        </button>
+        <button onclick="fillInput(&#39;What is the application deadline?&#39;)" class="w-full p-3 rounded-xl bg-light-surface border border-light-outline-variant hover:border-light-primary text-xs font-semibold text-text-navy flex items-center justify-between group transition">
+          <span>&#34;What is the application deadline?&#34;</span>
+          <span class="material-symbols-outlined text-[16px] text-slate-400 group-hover:text-light-primary">arrow_forward</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Chat Error State View -->
+    <div id="view-error" class="hidden py-6 space-y-4">
+      <div class="flex justify-end">
+        <div class="max-w-[85%] p-3.5 rounded-2xl rounded-tr-sm bg-light-primary text-light-on-primary text-body-sm font-medium">
+          What are the health insurance coverage rules?
+        </div>
+      </div>
+
+      <div class="flex items-start gap-2.5 max-w-[92%]">
+        <div class="w-8 h-8 rounded-pill bg-rose-100 text-error flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+          <span class="material-symbols-outlined text-[16px]">error_outline</span>
+        </div>
+        <div class="p-3.5 rounded-2xl rounded-tl-sm bg-rose-50/70 border border-rose-200 shadow-xs text-body-sm text-text-navy space-y-2">
+          <p class="font-bold text-error text-xs">
+            Couldn&#39;t get an answer. Try again.
+          </p>
+          <p class="text-[11px] text-text-slate leading-relaxed">
+            The assistant was unable to process this question due to a temporary connection timeout.
+          </p>
+          <button type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-rose-200 text-error font-bold text-xs hover:bg-rose-50 transition">
+            <span class="material-symbols-outlined text-[14px]">refresh</span>
+            <span>Try again</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Sticky Bottom Question Suggestions & Input -->
+  <footer class="border-t border-light-outline-variant bg-light-surface p-3 space-y-2.5 max-w-sm mx-auto w-full sticky bottom-0 z-20">
+    <div class="flex items-center gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 no-scrollbar">
+      <button type="button" onclick="fillInput(&#39;Am I eligible for this opportunity?&#39;)" class="whitespace-nowrap px-3 py-1.5 rounded-pill bg-neutral-bg hover:bg-light-secondary border border-light-outline-variant font-label text-[11px] font-medium text-text-navy transition active:scale-95">
+        Am I eligible?
+      </button>
+      <button type="button" onclick="fillInput(&#39;What documents do I need?&#39;)" class="whitespace-nowrap px-3 py-1.5 rounded-pill bg-neutral-bg hover:bg-light-secondary border border-light-outline-variant font-label text-[11px] font-medium text-text-navy transition active:scale-95">
+        What documents do I need?
+      </button>
+      <button type="button" onclick="fillInput(&#39;Explain the application steps.&#39;)" class="whitespace-nowrap px-3 py-1.5 rounded-pill bg-neutral-bg hover:bg-light-secondary border border-light-outline-variant font-label text-[11px] font-medium text-text-navy transition active:scale-95">
+        Explain application steps
+      </button>
+    </div>
+
+    <!-- Input Form -->
+    <div class="flex items-center gap-2">
+      <input type="text" id="chat-input" placeholder="Ask anything about this document..." class="flex-1 bg-neutral-bg border border-light-outline-variant rounded-xl px-3.5 py-2.5 text-xs text-text-navy placeholder:text-text-slate focus:outline-none focus:border-light-primary">
+      <button type="button" class="w-10 h-10 rounded-xl bg-light-primary text-light-on-primary flex items-center justify-center shrink-0 shadow-sm hover:opacity-95 active:scale-95 transition">
+        <span class="material-symbols-outlined text-[18px]">send</span>
+      </button>
+    </div>
+  </footer>
+
+  <!-- Clear Conversation Confirmation Modal Sheet -->
+  <div id="clear-modal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-end sm:items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-5 max-w-xs w-full shadow-2xl space-y-3">
+      <div class="w-10 h-10 rounded-full bg-rose-50 text-error flex items-center justify-center mx-auto">
+        <span class="material-symbols-outlined text-[22px]">delete_sweep</span>
+      </div>
+      <div class="text-center space-y-1">
+        <h3 class="font-headline text-headline-sm font-bold text-text-navy">Delete this conversation?</h3>
+        <p class="text-xs text-text-slate leading-relaxed">This can&#39;t be undone.</p>
+      </div>
+      <div class="space-y-2 pt-2">
+        <button type="button" onclick="executeClear()" class="w-full py-2.5 rounded-xl bg-error text-white font-bold text-xs hover:bg-rose-700 transition">
+          Delete conversation
+        </button>
+        <button type="button" onclick="closeClearModal()" class="w-full py-2.5 rounded-xl bg-neutral-bg text-text-navy font-semibold text-xs hover:bg-slate-200 transition">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleChatMenu() {
+      document.getElementById('chat-dropdown').classList.toggle('hidden');
+    }
+    function openClearModal() {
+      document.getElementById('chat-dropdown').classList.add('hidden');
+      document.getElementById('clear-modal').classList.remove('hidden');
+    }
+    function closeClearModal() {
+      document.getElementById('clear-modal').classList.add('hidden');
+    }
+    function executeClear() {
+      closeClearModal();
+      switchView('empty');
+    }
+    function switchView(mode) {
+      document.getElementById('view-active').classList.add('hidden');
+      document.getElementById('view-empty').classList.add('hidden');
+      document.getElementById('view-error').classList.add('hidden');
+      
+      document.getElementById('btn-active').className = 'text-text-slate hover:text-text-navy';
+      document.getElementById('btn-empty').className = 'text-text-slate hover:text-text-navy';
+      document.getElementById('btn-error').className = 'text-text-slate hover:text-text-navy';
+
+      document.getElementById('view-' + mode).classList.remove('hidden');
+      const activeBtn = document.getElementById('btn-' + mode);
+      if (activeBtn) activeBtn.className = 'font-bold text-light-primary underline';
+    }
+    function fillInput(text) {
+      document.getElementById('chat-input').value = text;
+      document.getElementById('chat-input').focus();
+    }
+  </script>
+
+
+</body></html>

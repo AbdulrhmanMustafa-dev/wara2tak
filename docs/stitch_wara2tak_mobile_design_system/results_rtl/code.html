@@ -1,0 +1,589 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تفاصيل المستند — نتائج التحليل</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
+globalThis.tailwind = globalThis.tailwind || {};
+globalThis.tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'indigo-deep': '#4F46E5',
+        'blue-soft': '#E0E7FF',
+        'neutral-bg': '#F8FAFC',
+        'text-navy': '#0F172A',
+        'text-slate': '#475569',
+        'success': '#16A34A',
+        'warning': '#F59E0B',
+        'warning-text': '#B45309',
+        'error': '#EF4444',
+        'light-primary': '#4F46E5',
+        'light-on-primary': '#FFFFFF',
+        'light-secondary': '#E0E7FF',
+        'light-on-secondary': '#1E1B4B',
+        'light-surface': '#FFFFFF',
+        'light-on-surface': '#0F172A',
+        'light-surface-variant': '#F1F5F9',
+        'light-on-surface-variant': '#475569',
+        'light-outline': '#CBD5E1',
+        'light-outline-variant': '#E2E8F0',
+      },
+      borderRadius: {
+        'sm': '6px',
+        'md': '10px',
+        'DEFAULT': '12px',
+        'lg': '16px',
+        'xl': '20px',
+        'pill': '9999px',
+      },
+      spacing: {
+        'spacing-2xs': '4px',
+        'spacing-xs': '4px',
+        'spacing-sm': '8px',
+        'spacing-md': '12px',
+        'spacing-base': '16px',
+        'spacing-lg': '20px',
+        'spacing-xl': '24px',
+        'spacing-2xl': '32px',
+        'spacing-3xl': '40px',
+        'gutter-mobile': '16px',
+        'nav-height': '68px',
+        'touch-target-min': '44px',
+      },
+      fontFamily: {
+        'display': ['"Cairo"', 'sans-serif'],
+        'headline': ['"Cairo"', 'sans-serif'],
+        'body': ['"Inter"', 'sans-serif'],
+        'label': ['"Inter"', 'sans-serif'],
+      },
+      fontSize: {
+        'display-lg': ['36px', { lineHeight: '44px', letterSpacing: '-0.5px', fontWeight: '700' }],
+        'display-lg-mobile': ['28px', { lineHeight: '36px', letterSpacing: '-0.25px', fontWeight: '700' }],
+        'headline-lg': ['32px', { lineHeight: '40px', letterSpacing: '-0.25px', fontWeight: '700' }],
+        'headline-lg-mobile': ['24px', { lineHeight: '32px', letterSpacing: '0px', fontWeight: '700' }],
+        'headline-md': ['22px', { lineHeight: '30px', letterSpacing: '0px', fontWeight: '600' }],
+        'headline-sm': ['18px', { lineHeight: '26px', letterSpacing: '0px', fontWeight: '600' }],
+        'body-lg': ['16px', { lineHeight: '24px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-md': ['14px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-sm': ['12px', { lineHeight: '18px', letterSpacing: '0px', fontWeight: '400' }],
+        'label-lg': ['14px', { lineHeight: '20px', letterSpacing: '0.1px', fontWeight: '600' }],
+        'label-md': ['12px', { lineHeight: '16px', letterSpacing: '0.2px', fontWeight: '500' }],
+        'label-sm': ['11px', { lineHeight: '14px', letterSpacing: '0.3px', fontWeight: '500' }],
+      },
+      transitionDuration: {
+        'tap': '120ms',
+        'sheet-slide': '260ms',
+        'status-change': '180ms',
+      },
+      transitionDelay: {
+        'tap': '0ms',
+        'sheet-slide': '0ms',
+        'status-change': '0ms',
+      },
+      transitionTimingFunction: {
+        'tap': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'sheet-slide': 'cubic-bezier(0.16, 1, 0.3, 1)',
+        'status-change': 'ease-out',
+      },
+    },
+  },
+};
+if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet">
+  <style>
+    .material-symbols-outlined {
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      line-height: 1 !important;
+      overflow: hidden;
+      white-space: nowrap;
+      direction: ltr;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body class="bg-neutral-bg text-text-navy min-h-[884px] flex flex-col font-sans selection:bg-light-secondary selection:text-indigo-deep pb-28" data-stitch-vh="min-h-[884px]===min-h-screen">
+
+  <!-- Mobile Top Bar -->
+  <div class="w-full pt-3 px-6 flex items-center justify-between text-text-slate z-20 bg-light-surface/90 backdrop-blur-xs sticky top-0 border-b border-light-outline-variant">
+    <span class="font-label text-label-sm font-semibold tabular-nums text-text-navy">9:41</span>
+    <div class="flex items-center gap-1.5 flex-row-reverse text-text-navy">
+      <div class="w-5 h-2.5 bg-slate-800 rounded-sm"></div>
+      <span class="material-symbols-outlined text-[16px]">wifi</span>
+      <span class="material-symbols-outlined text-[16px]">signal_cellular_4_bar</span>
+    </div>
+  </div>
+
+  <!-- Document Header Bar -->
+  <header class="px-6 pt-3 pb-3 border-b border-light-outline-variant bg-light-surface z-10 relative">
+    <div class="flex items-start justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <a href="../home-rtl/HomeScreenRTL.html" aria-label="الرجوع للرئيسية" class="w-10 h-10 rounded-DEFAULT bg-neutral-bg border border-light-outline-variant text-text-slate hover:text-text-navy flex items-center justify-center transition active:scale-95 shadow-xs shrink-0">
+          <span class="material-symbols-outlined text-[20px] rotate-180">arrow_back</span>
+        </a>
+        <div>
+          <div class="flex items-center gap-2 mb-0.5">
+            <span class="px-2 py-0.5 rounded-pill bg-light-secondary text-indigo-deep font-label text-[11px] font-semibold">
+              برنامج تبادل طلابي
+            </span>
+            <!-- Honest Missing Items Tag -->
+            <button type="button" onclick="document.getElementById(&#39;missing-section-rtl&#39;).scrollIntoView({behavior: &#39;smooth&#39;})" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-pill bg-amber-50 text-warning-text font-label text-[11px] font-bold border border-amber-200 hover:bg-amber-100 transition">
+              <span class="w-1.5 h-1.5 rounded-pill bg-warning-text"></span>
+              عنصران لم يردا في المستند
+            </button>
+          </div>
+          <h1 class="text-base font-bold text-text-navy leading-tight">
+            برنامج التبادل الطلابي الدولي 2027
+          </h1>
+        </div>
+      </div>
+
+      <!-- More Options Menu with Dropdown Definition -->
+      <div class="relative">
+        <button type="button" id="menu-btn-rtl" onclick="toggleMenuRTL()" aria-label="خيارات إضافية" class="w-10 h-10 rounded-DEFAULT text-text-slate hover:text-text-navy hover:bg-neutral-bg flex items-center justify-center shrink-0 transition">
+          <span class="material-symbols-outlined text-[20px]">more_vert</span>
+        </button>
+
+        <!-- Dropdown Menu Box -->
+        <div id="dropdown-menu-rtl" class="hidden absolute left-0 mt-1 w-56 bg-white rounded-xl shadow-lg border border-light-outline-variant py-1.5 z-30 text-right">
+          <a href="../preview-confirm-rtl/PreviewConfirmScreenRTL.html" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-text-navy hover:bg-slate-50">
+            <span class="material-symbols-outlined text-[18px] text-light-primary">refresh</span>
+            <span>إعادة تحليل المستند</span>
+          </a>
+          <a href="../translation/TranslationScreen.html" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-text-navy hover:bg-slate-50">
+            <span class="material-symbols-outlined text-[18px] text-light-primary">translate</span>
+            <span>تغيير لغة التحليل</span>
+          </a>
+          <div class="border-t border-light-outline-variant my-1"></div>
+          <button type="button" onclick="confirmDeleteRTL()" class="w-full text-right flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-rose-600 hover:bg-rose-50">
+            <span class="material-symbols-outlined text-[18px]">delete</span>
+            <span>حذف المستند</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Tool Action Bar: Open Checklist, Ask AI, Translate -->
+    <div class="grid grid-cols-3 gap-2 pt-3 mt-3 border-t border-light-outline-variant">
+      <!-- 1. Open Checklist (shows real progress) -->
+      <a href="../checklist-rtl/ChecklistScreenRTL.html" class="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-DEFAULT bg-indigo-50 hover:bg-light-secondary text-indigo-deep font-label text-xs font-semibold transition active:scale-95 text-center">
+        <span class="material-symbols-outlined text-[18px]">checklist</span>
+        <span>المهام (4 من 8)</span>
+      </a>
+
+      <!-- 2. Ask AI -->
+      <a href="../document-chat/DocumentChatScreen.html" class="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-DEFAULT bg-indigo-50 hover:bg-light-secondary text-indigo-deep font-label text-xs font-semibold transition active:scale-95 text-center">
+        <span class="material-symbols-outlined text-[18px]">smart_toy</span>
+        <span>اسأل الذكاء</span>
+      </a>
+
+      <!-- 3. Translate -->
+      <a href="../translation/TranslationScreen.html" class="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-DEFAULT bg-indigo-50 hover:bg-light-secondary text-indigo-deep font-label text-xs font-semibold transition active:scale-95 text-center">
+        <span class="material-symbols-outlined text-[18px]">translate</span>
+        <span>ترجمة</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Scrollable Main Results Content -->
+  <main class="flex-1 px-6 space-y-4 pt-4 max-w-sm mx-auto w-full">
+
+    <!-- Section 1: Overview Card -->
+    <section class="bg-light-surface rounded-xl p-4 border border-light-outline-variant shadow-xs space-y-3">
+      <div class="flex items-center justify-between border-b border-light-outline-variant pb-2.5">
+        <h2 class="text-sm font-bold text-text-navy flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px] text-light-primary">lightbulb</span>
+          نظرة عامة على الفرصة
+        </h2>
+        <div class="flex items-center gap-1.5">
+          <span class="text-[11px] font-semibold text-text-slate bg-light-surface-variant px-2 py-0.5 rounded-pill">
+            صفحة 1
+          </span>
+          <button type="button" class="text-[11px] font-bold text-light-primary hover:underline flex items-center gap-0.5">
+            <span class="material-symbols-outlined text-[13px] rotate-180">open_in_new</span>
+            <span>عرض الأصل (صفحة 1)</span>
+          </button>
+        </div>
+      </div>
+
+      <p class="text-xs text-text-navy leading-relaxed">
+        برنامج تبادل أكاديمي دولي تنافسي لمدة فصل دراسي واحد، يغطي 100% من الرسوم الدراسية مع منحة معيشة شهرية (850 يورو) وتذاكر طيران ذهاب وإياب لطلاب البكالوريوس والدراسات العليا.
+      </p>
+
+      <!-- Provider Identity Callout -->
+      <div class="p-2.5 rounded-md bg-neutral-bg border border-light-outline-variant flex items-center gap-3">
+        <div class="w-8 h-8 rounded-md bg-light-surface border border-light-outline-variant text-indigo-deep flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-[18px]">account_balance</span>
+        </div>
+        <div>
+          <p class="text-[10px] font-medium text-text-slate">الجهة المانحة</p>
+          <p class="text-xs font-bold text-text-navy">
+            تحالف التبادل الأكاديمي الدولي (IAMC) والمفوضية الأوروبية
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Important Deadlines -->
+    <section class="bg-light-surface rounded-xl p-4 border border-light-outline-variant shadow-xs space-y-3">
+      <div class="flex items-center justify-between border-b border-light-outline-variant pb-2.5">
+        <h2 class="text-sm font-bold text-text-navy flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px] text-warning-text">event</span>
+          المواعيد النهائية الهامة
+        </h2>
+        <span class="text-[11px] font-semibold text-text-slate">تاريخان مرصودان</span>
+      </div>
+
+      <div class="space-y-2">
+        <!-- 1. Explicitly Available Deadline -->
+        <div class="p-3 rounded-lg bg-amber-50/70 border border-amber-200 flex flex-col gap-2">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="text-xs font-bold text-text-navy">الموعد النهائي للتقديم الإلكتروني</p>
+              <p class="text-xs text-warning-text font-bold mt-0.5">15 نوفمبر 2026 • 23:59 بتوقيت غرينتش</p>
+            </div>
+            <span class="px-2 py-0.5 rounded-pill bg-amber-100 text-warning-text text-[11px] font-bold shrink-0">
+              موعد صارم
+            </span>
+          </div>
+          <div class="flex items-center justify-between pt-1 border-t border-amber-200/60 text-[11px]">
+            <span class="text-text-slate font-medium">المصدر: القسم 4.2، صفحة 9</span>
+            <button type="button" class="text-light-primary font-bold hover:underline flex items-center gap-1">
+              <span class="material-symbols-outlined text-[13px] rotate-180">open_in_new</span>
+              <span>عرض الأصل (صفحة 9)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. Missing Date: Honest wording -->
+        <div class="p-3 rounded-lg bg-neutral-bg border border-light-outline-variant flex items-start justify-between gap-3">
+          <div>
+            <p class="text-xs font-semibold text-text-navy">فترة المقابلات مع الجامعة المستضيفة</p>
+            <p class="text-xs text-text-slate italic mt-0.5">لم يتم التحديد في المستند</p>
+          </div>
+          <span class="px-2 py-0.5 rounded-pill bg-light-surface-variant text-text-slate text-[10px] font-medium shrink-0">
+            لم يُذكر في المستند
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Eligibility Requirements -->
+    <section class="bg-light-surface rounded-xl p-4 border border-light-outline-variant shadow-xs space-y-3">
+      <div class="flex items-center justify-between border-b border-light-outline-variant pb-2.5">
+        <h2 class="text-sm font-bold text-text-navy flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px] text-indigo-deep">fact_check</span>
+          شروط الأهلية
+        </h2>
+        <span class="text-[11px] text-text-slate">القسم 2.1</span>
+      </div>
+
+      <div class="space-y-3">
+        <!-- Item 1: GPA -->
+        <div class="space-y-1">
+          <div class="flex items-start justify-between gap-2">
+            <p class="text-xs font-bold text-text-navy">المستوى الأكاديمي والمعدل</p>
+            <div class="flex items-center gap-1.5">
+              <span class="text-[10px] font-semibold bg-light-surface-variant px-1.5 py-0.5 rounded">صفحة 3</span>
+              <button type="button" class="text-[10px] font-bold text-light-primary hover:underline flex items-center gap-0.5">
+                <span class="material-symbols-outlined text-[12px] rotate-180">open_in_new</span>
+                <span>عرض الأصل (صفحة 3)</span>
+              </button>
+            </div>
+          </div>
+          <p class="text-xs text-text-slate leading-relaxed">
+            الحد الأدنى للمعدل التراكمي GPA هو 3.0 من 4.0 (أو ما يعادله جيد جداً). يجب إتمام فصلين دراسيين كاملين على الأقل.
+          </p>
+        </div>
+
+        <!-- Item 2: Language -->
+        <div class="space-y-1 pt-2 border-t border-light-outline-variant">
+          <div class="flex items-start justify-between gap-2">
+            <p class="text-xs font-bold text-text-navy">إتقان اللغة الإنجليزية</p>
+            <div class="flex items-center gap-1.5">
+              <span class="text-[10px] font-semibold bg-light-surface-variant px-1.5 py-0.5 rounded">صفحة 4</span>
+              <button type="button" class="text-[10px] font-bold text-light-primary hover:underline flex items-center gap-0.5">
+                <span class="material-symbols-outlined text-[12px] rotate-180">open_in_new</span>
+                <span>عرض الأصل (صفحة 4)</span>
+              </button>
+            </div>
+          </div>
+          <p class="text-xs text-text-slate leading-relaxed">
+            مستوى B2 في الإطار الأوروبي للغات CEFR (درجة 6.5 في IELTS أو 85+ في TOEFL iBT).
+          </p>
+        </div>
+
+        <!-- Item 3: Enrollment -->
+        <div class="space-y-1 pt-2 border-t border-light-outline-variant">
+          <div class="flex items-start justify-between gap-2">
+            <p class="text-xs font-bold text-text-navy">القيد الجامعي والعمر</p>
+            <div class="flex items-center gap-1.5">
+              <span class="text-[10px] font-semibold bg-light-surface-variant px-1.5 py-0.5 rounded">صفحة 3</span>
+              <button type="button" class="text-[10px] font-bold text-light-primary hover:underline flex items-center gap-0.5">
+                <span class="material-symbols-outlined text-[12px] rotate-180">open_in_new</span>
+                <span>عرض الأصل (صفحة 3)</span>
+              </button>
+            </div>
+          </div>
+          <p class="text-xs text-text-slate leading-relaxed">
+            أن يكون الطالب مسجلاً حالياً في برنامج بكالوريوس معتمد، ويتراوح عمره بين 18 و 26 سنة عند السفر.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: Required Documents (All 5 Items shown) -->
+    <section class="bg-light-surface rounded-xl p-4 border border-light-outline-variant shadow-xs space-y-3">
+      <div class="flex items-center justify-between border-b border-light-outline-variant pb-2.5">
+        <h2 class="text-sm font-bold text-text-navy flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px] text-indigo-deep">folder_copy</span>
+          المستندات المطلوبة
+        </h2>
+        <span class="text-[11px] font-semibold text-text-slate">5 مستندات</span>
+      </div>
+
+      <div class="space-y-2.5">
+        <!-- 1. Mandatory Transcript -->
+        <div class="p-2.5 rounded-lg bg-neutral-bg border border-light-outline-variant space-y-1">
+          <div class="flex items-center justify-between">
+            <p class="text-xs font-bold text-text-navy">1. السجل الأكاديمي الرسمي (بيان الدرجات)</p>
+            <span class="px-2 py-0.5 rounded-pill bg-rose-50 text-error text-[10px] font-bold">إلزامي</span>
+          </div>
+          <p class="text-[11px] text-text-slate">مترجم للإنجليزية ومختوم بختم إدارة شؤون الطلاب</p>
+          <div class="flex items-center justify-between pt-1 border-t border-slate-200/60 text-[10px]">
+            <span class="bg-light-surface-variant px-1.5 py-0.2 rounded font-semibold text-text-slate">صفحة 4</span>
+            <button type="button" class="text-light-primary font-bold hover:underline flex items-center gap-0.5">
+              <span class="material-symbols-outlined text-[12px] rotate-180">open_in_new</span>
+              <span>عرض الأصل (صفحة 4)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. Mandatory English Proficiency Test Report -->
+        <div class="p-2.5 rounded-lg bg-neutral-bg border border-light-outline-variant space-y-1">
+          <div class="flex items-center justify-between">
+            <p class="text-xs font-bold text-text-navy">2. تقرير اختبار إتقان اللغة الإنجليزية</p>
+            <span class="px-2 py-0.5 rounded-pill bg-rose-50 text-error text-[10px] font-bold">إلزامي</span>
+          </div>
+          <p class="text-[11px] text-text-slate">شهادة IELTS (6.5+) أو TOEFL (85+) صادرة خلال آخر 24 شهراً</p>
+          <div class="flex items-center justify-between pt-1 border-t border-slate-200/60 text-[10px]">
+            <span class="bg-light-surface-variant px-1.5 py-0.2 rounded font-semibold text-text-slate">صفحة 4</span>
+            <button type="button" class="text-light-primary font-bold hover:underline flex items-center gap-0.5">
+              <span class="material-symbols-outlined text-[12px] rotate-180">open_in_new</span>
+              <span>عرض الأصل (صفحة 4)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. Mandatory Statement of Purpose -->
+        <div class="p-2.5 rounded-lg bg-neutral-bg border border-light-outline-variant space-y-1">
+          <div class="flex items-center justify-between">
+            <p class="text-xs font-bold text-text-navy">3. خطاب الغرض من الدراسة (SoP)</p>
+            <span class="px-2 py-0.5 rounded-pill bg-rose-50 text-error text-[10px] font-bold">إلزامي</span>
+          </div>
+          <p class="text-[11px] text-text-slate">بحد أقصى 800 كلمة يشرح الأهداف الأكاديمية</p>
+          <div class="flex items-center justify-between pt-1 border-t border-slate-200/60 text-[10px]">
+            <span class="bg-light-surface-variant px-1.5 py-0.2 rounded font-semibold text-text-slate">صفحة 5</span>
+            <button type="button" class="text-light-primary font-bold hover:underline flex items-center gap-0.5">
+              <span class="material-symbols-outlined text-[12px] rotate-180">open_in_new</span>
+              <span>عرض الأصل (صفحة 5)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4. Mandatory Learning Agreement Draft -->
+        <div class="p-2.5 rounded-lg bg-neutral-bg border border-light-outline-variant space-y-1">
+          <div class="flex items-center justify-between">
+            <p class="text-xs font-bold text-text-navy">4. مسودة اتفاقية التعلم الأكاديمي</p>
+            <span class="px-2 py-0.5 rounded-pill bg-rose-50 text-error text-[10px] font-bold">إلزامي</span>
+          </div>
+          <p class="text-[11px] text-text-slate">قائمة بالمواد المقترحة معتمدة من المرشد الأكاديمي</p>
+          <div class="flex items-center justify-between pt-1 border-t border-slate-200/60 text-[10px]">
+            <span class="bg-light-surface-variant px-1.5 py-0.2 rounded font-semibold text-text-slate">صفحة 6</span>
+            <button type="button" class="text-light-primary font-bold hover:underline flex items-center gap-0.5">
+              <span class="material-symbols-outlined text-[12px] rotate-180">open_in_new</span>
+              <span>عرض الأصل (صفحة 6)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 5. Optional Recommendation Letter -->
+        <div class="p-2.5 rounded-lg bg-neutral-bg border border-light-outline-variant space-y-1">
+          <div class="flex items-center justify-between">
+            <p class="text-xs font-bold text-text-navy">5. خطاب توصية أكاديمي</p>
+            <span class="px-2 py-0.5 rounded-pill bg-light-surface-variant text-text-slate text-[10px] font-medium">اختياري</span>
+          </div>
+          <p class="text-[11px] text-text-slate">من أستاذ جامعي أو رئيس القسم الأكاديمي</p>
+          <div class="flex items-center justify-between pt-1 border-t border-slate-200/60 text-[10px]">
+            <span class="bg-light-surface-variant px-1.5 py-0.2 rounded font-semibold text-text-slate">صفحة 7</span>
+            <button type="button" class="text-light-primary font-bold hover:underline flex items-center gap-0.5">
+              <span class="material-symbols-outlined text-[12px] rotate-180">open_in_new</span>
+              <span>عرض الأصل (صفحة 7)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: Application Steps (All 4 Steps shown) -->
+    <section class="bg-light-surface rounded-xl p-4 border border-light-outline-variant shadow-xs space-y-3">
+      <div class="flex items-center justify-between border-b border-light-outline-variant pb-2.5">
+        <h2 class="text-sm font-bold text-text-navy flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px] text-light-primary">route</span>
+          خطوات التقديم
+        </h2>
+        <span class="text-[11px] font-semibold text-text-slate">4 مراحل متتالية</span>
+      </div>
+
+      <div class="space-y-3">
+        <!-- Step 1 -->
+        <div class="p-3 rounded-lg bg-neutral-bg border border-light-outline-variant space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-text-navy flex items-center gap-1.5">
+              <span class="w-5 h-5 rounded-full bg-light-primary text-white text-[11px] flex items-center justify-center">1</span>
+              الترشيح الداخلي من الجامعة الأم
+            </span>
+            <span class="text-[10px] font-semibold bg-light-surface-variant px-1.5 py-0.5 rounded">صفحة 2</span>
+          </div>
+          <p class="text-xs text-text-slate pr-6.5">تقديم طلب الرغبة لمكتب العلاقات الدولية بجامعتك المحلية.</p>
+          <div class="flex justify-end pt-1">
+            <button type="button" class="text-[10px] font-bold text-light-primary hover:underline flex items-center gap-0.5">
+              <span class="material-symbols-outlined text-[12px] rotate-180">open_in_new</span>
+              <span>عرض الأصل (صفحة 2)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="p-3 rounded-lg bg-neutral-bg border border-light-outline-variant space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-text-navy flex items-center gap-1.5">
+              <span class="w-5 h-5 rounded-full bg-light-primary text-white text-[11px] flex items-center justify-center">2</span>
+              التسجيل عبر بوابة IAMC الرسمية
+            </span>
+            <span class="text-[10px] font-semibold bg-light-surface-variant px-1.5 py-0.5 rounded">صفحة 8</span>
+          </div>
+          <p class="text-xs text-text-slate pr-6.5">إنشاء ملف المترشح واختيار ما يصل إلى 3 جامعات مستضيفة.</p>
+          <div class="flex justify-end pt-1">
+            <button type="button" class="text-[10px] font-bold text-light-primary hover:underline flex items-center gap-0.5">
+              <span class="material-symbols-outlined text-[12px] rotate-180">open_in_new</span>
+              <span>عرض الأصل (صفحة 8)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="p-3 rounded-lg bg-neutral-bg border border-light-outline-variant space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-text-navy flex items-center gap-1.5">
+              <span class="w-5 h-5 rounded-full bg-light-primary text-white text-[11px] flex items-center justify-center">3</span>
+              رفع الملف والوثائق المعتمدة
+            </span>
+            <span class="text-[10px] font-semibold bg-light-surface-variant px-1.5 py-0.5 rounded">صفحة 9</span>
+          </div>
+          <p class="text-xs text-text-slate pr-6.5">إرفاق كشف الدرجات وشهادة اللغة وخطاب الغرض بصيغة PDF مدمجة.</p>
+          <div class="flex justify-end pt-1">
+            <button type="button" class="text-[10px] font-bold text-light-primary hover:underline flex items-center gap-0.5">
+              <span class="material-symbols-outlined text-[12px] rotate-180">open_in_new</span>
+              <span>عرض الأصل (صفحة 9)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="p-3 rounded-lg bg-neutral-bg border border-light-outline-variant space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-text-navy flex items-center gap-1.5">
+              <span class="w-5 h-5 rounded-full bg-light-primary text-white text-[11px] flex items-center justify-center">4</span>
+              تأكيد الاستلام ومتابعة الطلب
+            </span>
+            <span class="text-[10px] font-semibold bg-light-surface-variant px-1.5 py-0.5 rounded">صفحة 10</span>
+          </div>
+          <p class="text-xs text-text-slate pr-6.5">استلام إشعار التقديم الإلكتروني ومتابعة جدول المقابلات عبر البريد.</p>
+          <div class="flex justify-end pt-1">
+            <button type="button" class="text-[10px] font-bold text-light-primary hover:underline flex items-center gap-0.5">
+              <span class="material-symbols-outlined text-[12px] rotate-180">open_in_new</span>
+              <span>عرض الأصل (صفحة 10)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 6: Missing or Unclear Information (Explicit Honesty Section) -->
+    <section id="missing-section-rtl" class="bg-amber-50/80 rounded-xl p-4 border border-amber-200 shadow-xs space-y-2.5">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-[18px] text-warning-text">help_outline</span>
+        <h3 class="text-sm font-bold text-warning-text">معلومات غير واضحة أو ناقصة في المستند</h3>
+      </div>
+      <p class="text-[11px] text-warning-text leading-relaxed">
+        المستند المرفوع لا يحتوي على تفاصيل العناصر التالية. لا يُفترض الاعتماد على أي تواريخ غير مصرح بها:
+      </p>
+      <ul class="space-y-1.5 pr-5 list-disc text-xs text-warning-text">
+        <li><strong>الجدول الزمني للمقابلات:</strong> لم يتم تحديده في المستند. يرجى التواصل مع مكتب تنسيق البرنامج.</li>
+        <li><strong>مواعيد صرف دفعات المنحة المالية:</strong> لم تُذكر آلية الصرف في نص الإعلان.</li>
+      </ul>
+    </section>
+
+    <!-- Section 7: Important Notes & Restrictions -->
+    <section class="bg-neutral-bg rounded-xl p-4 border border-light-outline-variant shadow-xs space-y-2">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-[18px] text-text-navy">info</span>
+        <h3 class="text-xs font-bold text-text-navy">تنبيهات هامة</h3>
+      </div>
+      <ul class="text-xs text-text-slate space-y-1.5 pr-5 list-disc leading-relaxed">
+        <li>المتقدمون الحاملون لجنسيات دول الاتحاد الأوروبي غير مؤهلين لمنحة تذاكر الطيران (صفحة 6).</li>
+        <li>الملفات المتأخرة أو غير المكتملة سيتم استبعادها تلقائياً دون فرصة لإعادة الإرسال.</li>
+      </ul>
+    </section>
+
+    <!-- Honest AI Disclaimer -->
+    <div class="p-3.5 rounded-lg bg-light-surface border border-light-outline-variant text-[11px] text-text-slate leading-relaxed flex items-start gap-2.5">
+      <span class="material-symbols-outlined text-[16px] text-text-slate shrink-0 mt-0.5">shield</span>
+      <p>
+        قد تحتوي المعلومات المستخرجة بواسطة الذكاء الاصطناعي على أخطاء. تحقق دائماً من الشروط والمواعيد مباشرة من إعلان الفرصة الرسمي.
+      </p>
+    </div>
+
+  </main>
+
+  <!-- Persistent Bottom Action Dock -->
+  <footer class="fixed bottom-0 inset-x-0 bg-light-surface border-t border-light-outline-variant py-3 px-6 flex items-center justify-between gap-3 z-30 shadow-[0_-4px_16px_rgba(15,23,42,0.06)]">
+    <div class="flex flex-col">
+      <span class="text-[10px] text-text-slate">قائمة المهام جاهزة</span>
+      <span class="text-xs font-bold text-text-navy">تم إنجاز 4 من 8 مهام</span>
+    </div>
+
+    <!-- Primary CTA: Open Checklist -->
+    <a href="../checklist-rtl/ChecklistScreenRTL.html" class="py-2.5 px-5 rounded-DEFAULT bg-light-primary text-light-on-primary font-bold text-xs flex items-center gap-1.5 shadow-sm hover:opacity-95 active:scale-95 transition">
+      <span class="material-symbols-outlined text-[18px]">checklist_rtl</span>
+      <span>فتح قائمة المهام (4 من 8 منجزة)</span>
+    </a>
+  </footer>
+
+  <script>
+    function toggleMenuRTL() {
+      const menu = document.getElementById('dropdown-menu-rtl');
+      menu.classList.toggle('hidden');
+    }
+    function confirmDeleteRTL() {
+      if (confirm('هل تريد حذف هذا المستند؟ سيتم حذف بيانات التحليل وقائمة المهام التابعة له نهائياً.')) {
+        window.location.href = '../my-documents/MyDocumentsScreen.html';
+      }
+    }
+    document.addEventListener('click', function(e) {
+      const menu = document.getElementById('dropdown-menu-rtl');
+      const btn = document.getElementById('menu-btn-rtl');
+      if (menu && btn && !btn.contains(e.target) && !menu.contains(e.target)) {
+        menu.classList.add('hidden');
+      }
+    });
+  </script>
+
+
+</body></html>

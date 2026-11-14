@@ -1,0 +1,352 @@
+<!DOCTYPE html><html lang="en" dir="ltr"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wara2tak — Home Dashboard</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
+globalThis.tailwind = globalThis.tailwind || {};
+globalThis.tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'indigo-deep': '#4F46E5',
+        'blue-soft': '#E0E7FF',
+        'neutral-bg': '#F8FAFC',
+        'text-navy': '#0F172A',
+        'text-slate': '#475569',
+        'success': '#16A34A',
+        'warning': '#F59E0B',
+        'warning-text': '#B45309',
+        'error': '#EF4444',
+        'light-primary': '#4F46E5',
+        'light-on-primary': '#FFFFFF',
+        'light-secondary': '#E0E7FF',
+        'light-on-secondary': '#1E1B4B',
+        'light-surface': '#FFFFFF',
+        'light-on-surface': '#0F172A',
+        'light-surface-variant': '#F1F5F9',
+        'light-on-surface-variant': '#475569',
+        'light-outline': '#CBD5E1',
+        'light-outline-variant': '#E2E8F0',
+      },
+      borderRadius: {
+        'sm': '6px',
+        'md': '10px',
+        'DEFAULT': '12px',
+        'lg': '16px',
+        'xl': '20px',
+        'pill': '9999px',
+      },
+      spacing: {
+        'spacing-2xs': '4px',
+        'spacing-xs': '4px',
+        'spacing-sm': '8px',
+        'spacing-md': '12px',
+        'spacing-base': '16px',
+        'spacing-lg': '20px',
+        'spacing-xl': '24px',
+        'spacing-2xl': '32px',
+        'spacing-3xl': '40px',
+        'gutter-mobile': '16px',
+        'nav-height': '68px',
+        'touch-target-min': '44px',
+      },
+      fontFamily: {
+        'display': ['"Cairo"', 'sans-serif'],
+        'headline': ['"Cairo"', 'sans-serif'],
+        'body': ['"Inter"', 'sans-serif'],
+        'label': ['"Inter"', 'sans-serif'],
+      },
+      fontSize: {
+        'display-lg': ['36px', { lineHeight: '44px', letterSpacing: '-0.5px', fontWeight: '700' }],
+        'display-lg-mobile': ['28px', { lineHeight: '36px', letterSpacing: '-0.25px', fontWeight: '700' }],
+        'headline-lg': ['32px', { lineHeight: '40px', letterSpacing: '-0.25px', fontWeight: '700' }],
+        'headline-lg-mobile': ['24px', { lineHeight: '32px', letterSpacing: '0px', fontWeight: '700' }],
+        'headline-md': ['22px', { lineHeight: '30px', letterSpacing: '0px', fontWeight: '600' }],
+        'headline-sm': ['18px', { lineHeight: '26px', letterSpacing: '0px', fontWeight: '600' }],
+        'body-lg': ['16px', { lineHeight: '24px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-md': ['14px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-sm': ['12px', { lineHeight: '18px', letterSpacing: '0px', fontWeight: '400' }],
+        'label-lg': ['14px', { lineHeight: '20px', letterSpacing: '0.1px', fontWeight: '600' }],
+        'label-md': ['12px', { lineHeight: '16px', letterSpacing: '0.2px', fontWeight: '500' }],
+        'label-sm': ['11px', { lineHeight: '14px', letterSpacing: '0.3px', fontWeight: '500' }],
+      },
+      transitionDuration: {
+        'tap': '120ms',
+        'sheet-slide': '260ms',
+        'status-change': '180ms',
+      },
+      transitionDelay: {
+        'tap': '0ms',
+        'sheet-slide': '0ms',
+        'status-change': '0ms',
+      },
+      transitionTimingFunction: {
+        'tap': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'sheet-slide': 'cubic-bezier(0.16, 1, 0.3, 1)',
+        'status-change': 'ease-out',
+      },
+    },
+  },
+};
+if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet">
+  <style>
+    .material-symbols-outlined, .material-symbols-rounded, .material-symbols-sharp, .material-icons {
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      line-height: 1 !important;
+      box-sizing: content-box;
+      overflow: hidden;
+      white-space: nowrap;
+      direction: ltr;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body class="bg-neutral-bg text-text-navy min-h-[884px] flex flex-col font-body selection:bg-light-secondary selection:text-indigo-deep pb-24" data-stitch-vh="min-h-[884px]===min-h-screen">
+
+  <!-- Status Bar Area (Mobile Viewport) -->
+  <div class="w-full pt-3 px-6 flex items-center justify-between text-text-slate z-10">
+    <span class="font-label text-label-sm font-semibold tabular-nums text-text-navy">9:41</span>
+    <div class="flex items-center gap-1.5 text-text-navy">
+      <span class="material-symbols-outlined text-[16px]">signal_cellular_4_bar</span>
+      <span class="material-symbols-outlined text-[16px]">wifi</span>
+      <span class="material-symbols-outlined text-[18px]">battery_full</span>
+    </div>
+  </div>
+
+  <!-- App Header: Personalized Greeting & Profile Avatar -->
+  <header class="px-6 pt-4 pb-3 flex items-center justify-between">
+    <div class="space-y-0.5">
+      <h1 data-design-text-token="headline-sm" class="font-headline text-headline-sm font-bold text-text-navy">
+        Hello, Abdulrhman 👋
+      </h1>
+      <p data-design-text-token="body-sm" class="text-body-sm text-text-slate">
+        Let&#39;s make your next opportunity easier.
+      </p>
+    </div>
+
+    <!-- Profile Avatar Button -->
+    <a href="#profile" aria-label="View user profile" class="w-10 h-10 rounded-pill bg-light-secondary text-indigo-deep border border-indigo-100 flex items-center justify-center font-headline font-bold text-sm shadow-xs hover:ring-2 hover:ring-light-primary transition duration-tap">
+      <span data-design-text-token="label-md">AB</span>
+    </a>
+  </header>
+
+  <!-- Main Scrollable Dashboard Content -->
+  <main class="flex-1 px-6 space-y-6 pt-2">
+
+    <!-- Primary Action Hero Card: "Analyze a Document" -->
+    <!-- COMPONENT: card-action -->
+    <section data-component-id="card-hero-analyze" data-component-type="card" data-component-variant="action" class="bg-light-surface rounded-xl p-5 border border-indigo-100 shadow-sm relative overflow-hidden flex flex-col gap-4">
+      <!-- Subtle Decorative Background Shape -->
+      <div class="absolute -right-6 -bottom-6 w-32 h-32 rounded-pill bg-light-secondary opacity-60 pointer-events-none"></div>
+
+      <div class="flex items-start justify-between relative z-10">
+        <div class="flex-1 pr-3">
+          <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-pill bg-light-secondary text-indigo-deep font-label text-label-sm font-semibold mb-2">
+            <span class="material-symbols-outlined text-[14px]">auto_awesome</span>
+            <span>AI Document Intelligence</span>
+          </div>
+          <h2 data-design-text-token="headline-sm" class="font-headline text-headline-sm font-bold text-text-navy mb-1">
+            Analyze a Document
+          </h2>
+          <p data-design-text-token="body-sm" class="text-body-sm text-text-slate leading-relaxed">
+            Upload a scholarship, internship, or exchange program announcement.
+          </p>
+        </div>
+
+        <!-- Integrated Document + AI Sparkle Emblem -->
+        <div class="w-14 h-14 rounded-xl bg-indigo-50 text-indigo-deep border border-indigo-100 flex items-center justify-center relative shrink-0">
+          <span class="material-symbols-outlined text-[30px] text-light-primary">upload_file</span>
+          <span class="absolute -top-1 -right-1 w-5 h-5 rounded-pill bg-light-primary text-light-on-primary flex items-center justify-center shadow-xs">
+            <span class="material-symbols-outlined text-[12px]">auto_awesome</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Prominent Primary Action Button -->
+      <!-- COMPONENT: button-primary -->
+      <button data-component-id="button-upload-document" data-component-type="button" data-component-variant="primary" type="button" class="w-full py-3.5 px-4 rounded-DEFAULT bg-light-primary text-light-on-primary font-label text-label-lg font-semibold flex items-center justify-center gap-2 shadow-sm hover:opacity-95 active:scale-[0.98] transition duration-tap cursor-pointer relative z-10">
+        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">add_circle</span>
+        <span data-design-text-token="label-lg">Upload Document</span>
+      </button>
+    </section>
+
+    <!-- Quick Access: "My Documents" Feed -->
+    <section class="space-y-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <h2 data-design-text-token="headline-sm" class="font-headline text-headline-sm font-semibold text-text-navy">
+            My Documents
+          </h2>
+          <span data-component-id="badge-numeric" data-component-type="badge" data-component-variant="numeric" class="px-2 py-0.5 rounded-pill bg-light-secondary text-indigo-deep font-label text-label-sm font-semibold tabular-nums">
+            3
+          </span>
+        </div>
+        <a href="#documents" class="text-label-md font-label font-semibold text-light-primary hover:underline">
+          View All
+        </a>
+      </div>
+
+      <!-- Compact Document Cards List -->
+      <div class="space-y-2.5">
+
+        <!-- 1. Chevening UK Scholarship Card (Analyzed) -->
+        <!-- COMPONENT: card-elevated -->
+        <article data-component-id="doc-card-chevening" data-component-type="card" data-component-variant="elevated" class="bg-light-surface rounded-DEFAULT p-3.5 border border-light-outline-variant shadow-2xs hover:border-light-outline transition flex items-center justify-between gap-3 cursor-pointer">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-md bg-indigo-50 text-indigo-deep flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[20px]">school</span>
+            </div>
+            <div class="min-w-0">
+              <h3 data-design-text-token="label-lg" class="font-headline text-label-lg font-semibold text-text-navy truncate">
+                Chevening UK Master&#39;s 2026
+              </h3>
+              <div class="flex items-center gap-2 mt-0.5">
+                <span class="text-body-sm text-text-slate text-[11px]">Scholarship</span>
+                <span class="text-text-slate text-[10px]">•</span>
+                <span class="text-body-sm text-emerald-700 font-semibold text-[11px]">Analyzed</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col items-end gap-1 shrink-0">
+            <!-- Deadline exists: show N days left -->
+            <span data-component-id="badge-status-warning" data-component-type="badge" data-component-variant="status" class="px-2 py-0.5 rounded-pill bg-amber-50 text-warning-text font-label text-[11px] font-semibold flex items-center gap-1 border border-amber-200">
+              <span class="w-1.5 h-1.5 rounded-pill bg-warning"></span>
+              12 days left
+            </span>
+            <span class="font-label text-[11px] text-text-slate">4 of 7 tasks done</span>
+          </div>
+        </article>
+
+        <!-- 2. Google EMEA Student Internship Card (Analyzed) -->
+        <article data-component-id="doc-card-google" data-component-type="card" data-component-variant="elevated" class="bg-light-surface rounded-DEFAULT p-3.5 border border-light-outline-variant shadow-2xs hover:border-light-outline transition flex items-center justify-between gap-3 cursor-pointer">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-md bg-blue-50 text-light-primary flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[20px]">work</span>
+            </div>
+            <div class="min-w-0">
+              <h3 data-design-text-token="label-lg" class="font-headline text-label-lg font-semibold text-text-navy truncate">
+                Google EMEA SWE Internship
+              </h3>
+              <div class="flex items-center gap-2 mt-0.5">
+                <span class="text-body-sm text-text-slate text-[11px]">Internship</span>
+                <span class="text-text-slate text-[10px]">•</span>
+                <span class="text-body-sm text-emerald-700 font-semibold text-[11px]">Analyzed</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col items-end gap-1 shrink-0">
+            <!-- No deadline exists: show No deadline found -->
+            <span class="px-2 py-0.5 rounded-pill bg-neutral-bg text-text-slate font-label text-[11px] font-medium border border-light-outline-variant">
+              No deadline found
+            </span>
+            <span class="font-label text-[11px] text-text-slate">5 of 5 tasks done</span>
+          </div>
+        </article>
+
+        <!-- 3. Erasmus+ Exchange Program Munich (Analyzing state) -->
+        <article data-component-id="doc-card-erasmus" data-component-type="card" data-component-variant="elevated" class="bg-light-surface rounded-DEFAULT p-3.5 border border-light-outline-variant shadow-2xs hover:border-light-outline transition flex items-center justify-between gap-3 cursor-pointer">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-md bg-indigo-50 text-indigo-deep flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[20px]">flight_takeoff</span>
+            </div>
+            <div class="min-w-0">
+              <h3 data-design-text-token="label-lg" class="font-headline text-label-lg font-semibold text-text-navy truncate">
+                Erasmus+ TU Munich Exchange
+              </h3>
+              <div class="flex items-center gap-2 mt-0.5">
+                <span class="text-body-sm text-text-slate text-[11px]">Exchange</span>
+                <span class="text-text-slate text-[10px]">•</span>
+                <span class="text-body-sm text-light-primary font-semibold text-[11px] flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-pill bg-light-primary animate-pulse"></span>
+                  Analyzing
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col items-end gap-1 shrink-0">
+            <span data-component-id="badge-status-warning" data-component-type="badge" data-component-variant="status" class="px-2 py-0.5 rounded-pill bg-amber-50 text-warning-text font-label text-[11px] font-semibold flex items-center gap-1 border border-amber-200">
+              <span class="w-1.5 h-1.5 rounded-pill bg-warning"></span>
+              26 days left
+            </span>
+            <span class="font-label text-[11px] text-text-slate">2 of 6 tasks done</span>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- Additional Section: "How Wara2tak Works" Card -->
+    <section class="bg-light-surface rounded-lg p-4 border border-light-outline-variant shadow-2xs">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="material-symbols-outlined text-[18px] text-light-primary">lightbulb</span>
+        <h3 data-design-text-token="label-lg" class="font-headline text-label-lg font-semibold text-text-navy">
+          How Wara2tak Works
+        </h3>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 text-center">
+        <!-- Step 1 -->
+        <div class="flex flex-col items-center gap-1.5 p-2 rounded-md bg-neutral-bg">
+          <div class="w-7 h-7 rounded-pill bg-light-secondary text-indigo-deep flex items-center justify-center font-bold text-xs">
+            1
+          </div>
+          <p class="font-label text-[11px] font-semibold text-text-navy leading-tight">Upload</p>
+          <p class="font-body text-[10px] text-text-slate leading-tight">PDFs or images</p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="flex flex-col items-center gap-1.5 p-2 rounded-md bg-neutral-bg">
+          <div class="w-7 h-7 rounded-pill bg-light-secondary text-indigo-deep flex items-center justify-center font-bold text-xs">
+            2
+          </div>
+          <p class="font-label text-[11px] font-semibold text-text-navy leading-tight">Understand</p>
+          <p class="font-body text-[10px] text-text-slate leading-tight">AI extracts criteria</p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="flex flex-col items-center gap-1.5 p-2 rounded-md bg-neutral-bg">
+          <div class="w-7 h-7 rounded-pill bg-light-secondary text-indigo-deep flex items-center justify-center font-bold text-xs">
+            3
+          </div>
+          <p class="font-label text-[11px] font-semibold text-text-navy leading-tight">Organize</p>
+          <p class="font-body text-[10px] text-text-slate leading-tight">Action checklist</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Sticky Mobile Bottom Navigation Bar (Persistent Shared App Shell) -->
+  <nav aria-label="Main navigation" class="fixed bottom-0 inset-x-0 bg-light-surface border-t border-light-outline-variant py-2 px-6 flex items-center justify-around z-30 shadow-[0_-4px_16px_rgba(15,23,42,0.04)]">
+    <!-- Home Tab (Active) -->
+    <a href="#home" aria-current="page" class="flex flex-col items-center gap-0.5 text-light-primary px-3 py-1 cursor-pointer transition">
+      <span class="material-symbols-outlined text-[24px]">home</span>
+      <span data-design-text-token="label-sm" class="font-label text-label-sm font-semibold">Home</span>
+    </a>
+
+    <!-- My Documents Tab -->
+    <a href="#documents" class="flex flex-col items-center gap-0.5 text-text-slate hover:text-text-navy px-3 py-1 cursor-pointer transition">
+      <span class="material-symbols-outlined text-[24px]">description</span>
+      <span data-design-text-token="label-sm" class="font-label text-label-sm font-medium">My Documents</span>
+    </a>
+
+    <!-- Profile Tab -->
+    <a href="#profile" class="flex flex-col items-center gap-0.5 text-text-slate hover:text-text-navy px-3 py-1 cursor-pointer transition">
+      <span class="material-symbols-outlined text-[24px]">person</span>
+      <span data-design-text-token="label-sm" class="font-label text-label-sm font-medium">Profile</span>
+    </a>
+  </nav>
+
+
+
+</body></html>
