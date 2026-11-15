@@ -1,0 +1,348 @@
+<!DOCTYPE html><html lang="en" dir="ltr" class="dark"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wara2tak — System States Gallery (LTR &amp; RTL)</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
+globalThis.tailwind = globalThis.tailwind || {};
+globalThis.tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'indigo-deep': '#4F46E5',
+        'blue-soft': '#E0E7FF',
+        'neutral-bg': '#F8FAFC',
+        'text-navy': '#0F172A',
+        'text-slate': '#475569',
+        'success': '#16A34A',
+        'warning': '#F59E0B',
+        'warning-text': '#B45309',
+        'error': '#EF4444',
+        'light-primary': '#4F46E5',
+        'light-on-primary': '#FFFFFF',
+        'light-secondary': '#E0E7FF',
+        'light-on-secondary': '#1E1B4B',
+        'light-surface': '#FFFFFF',
+        'light-on-surface': '#0F172A',
+        'light-surface-variant': '#F1F5F9',
+        'light-on-surface-variant': '#475569',
+        'light-outline': '#CBD5E1',
+        'light-outline-variant': '#E2E8F0',
+        'dark-bg': '#0F172A',
+        'dark-primary': '#818CF8',
+        'dark-on-primary': '#0F172A',
+        'dark-secondary': '#1E1B4B',
+        'dark-on-secondary': '#E0E7FF',
+        'dark-surface': '#1E293B',
+        'dark-on-surface': '#F8FAFC',
+        'dark-surface-variant': '#334155',
+        'dark-on-surface-variant': '#CBD5E1',
+        'dark-outline': '#475569',
+        'dark-outline-variant': '#334155',
+      },
+      borderRadius: {
+        'sm': '6px',
+        'md': '10px',
+        'DEFAULT': '12px',
+        'lg': '16px',
+        'xl': '20px',
+        'pill': '9999px',
+      },
+      spacing: {
+        'spacing-2xs': '4px',
+        'spacing-xs': '4px',
+        'spacing-sm': '8px',
+        'spacing-md': '12px',
+        'spacing-base': '16px',
+        'spacing-lg': '20px',
+        'spacing-xl': '24px',
+        'spacing-2xl': '32px',
+        'spacing-3xl': '40px',
+        'gutter-mobile': '16px',
+        'nav-height': '68px',
+        'touch-target-min': '44px',
+      },
+      fontFamily: {
+        'display': ['"Cairo"', 'sans-serif'],
+        'headline': ['"Cairo"', 'sans-serif'],
+        'body': ['"Inter"', 'sans-serif'],
+        'label': ['"Inter"', 'sans-serif'],
+      },
+      fontSize: {
+        'display-lg': ['36px', { lineHeight: '44px', letterSpacing: '-0.5px', fontWeight: '700' }],
+        'display-lg-mobile': ['28px', { lineHeight: '36px', letterSpacing: '-0.25px', fontWeight: '700' }],
+        'headline-lg': ['32px', { lineHeight: '40px', letterSpacing: '-0.25px', fontWeight: '700' }],
+        'headline-lg-mobile': ['24px', { lineHeight: '32px', letterSpacing: '0px', fontWeight: '700' }],
+        'headline-md': ['22px', { lineHeight: '30px', letterSpacing: '0px', fontWeight: '600' }],
+        'headline-sm': ['18px', { lineHeight: '26px', letterSpacing: '0px', fontWeight: '600' }],
+        'body-lg': ['16px', { lineHeight: '24px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-md': ['14px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-sm': ['12px', { lineHeight: '18px', letterSpacing: '0px', fontWeight: '400' }],
+        'label-lg': ['14px', { lineHeight: '20px', letterSpacing: '0.1px', fontWeight: '600' }],
+        'label-md': ['12px', { lineHeight: '16px', letterSpacing: '0.2px', fontWeight: '500' }],
+        'label-sm': ['11px', { lineHeight: '14px', letterSpacing: '0.3px', fontWeight: '500' }],
+      },
+      transitionDuration: {
+        'tap': '120ms',
+        'sheet-slide': '260ms',
+        'status-change': '180ms',
+      },
+      transitionDelay: {
+        'tap': '0ms',
+        'sheet-slide': '0ms',
+        'status-change': '0ms',
+      },
+      transitionTimingFunction: {
+        'tap': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'sheet-slide': 'cubic-bezier(0.16, 1, 0.3, 1)',
+        'status-change': 'ease-out',
+      },
+    },
+  },
+};
+if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet">
+  <style>
+    .material-symbols-outlined {
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      line-height: 1 !important;
+      overflow: hidden;
+      white-space: nowrap;
+      direction: ltr;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body class="bg-dark-surface-variant text-dark-on-surface min-h-[884px] p-4 sm:p-8 font-body" data-stitch-vh="min-h-[884px]===min-h-screen">
+
+  <div class="max-w-4xl mx-auto space-y-8">
+    <!-- Header -->
+    <div class="bg-dark-surface rounded-2xl p-6 border border-dark-outline-variant shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <span class="text-xs font-bold text-dark-primary uppercase tracking-wider bg-dark-secondary px-2.5 py-0.5 rounded-md">UI States System</span>
+        <h1 class="font-headline text-2xl font-bold text-dark-on-surface mt-1">
+          Wara2tak System States &amp; Skeletons
+        </h1>
+        <p class="text-xs text-dark-on-surface-variant mt-1">
+          Comprehensive reference of empty states, loading skeletons, progress, and error conditions in both English (LTR) and Arabic (RTL).
+        </p>
+      </div>
+      <a href="../home/HomeScreen.html" class="px-4 py-2 rounded-xl bg-dark-primary text-white text-xs font-bold hover:opacity-95 transition shrink-0 text-center">
+        Go to Home
+      </a>
+    </div>
+
+    <!-- Section 1: Empty States Comparison (LTR & RTL) -->
+    <section class="space-y-4">
+      <h2 class="text-base font-bold text-dark-on-surface flex items-center gap-2">
+        <span class="material-symbols-outlined text-dark-primary text-[20px]">inbox</span>
+        <span>1. Reusable Empty States</span>
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- LTR Empty States Column -->
+        <div class="space-y-4">
+          <div class="text-xs font-bold text-dark-on-surface-variant uppercase tracking-wider px-1">English (LTR)</div>
+
+          <!-- No Documents -->
+          <div class="bg-dark-surface rounded-2xl p-5 border border-dark-outline-variant shadow-xs text-center space-y-3">
+            <div class="w-14 h-14 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-dark-primary mx-auto">
+              <span class="material-symbols-outlined text-[28px]">folder_open</span>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-dark-on-surface">No documents yet</h3>
+              <p class="text-xs text-dark-on-surface-variant mt-0.5">Upload your first opportunity document to get started.</p>
+            </div>
+            <a href="../upload/UploadScreen.html" class="inline-block px-4 py-2 rounded-lg bg-dark-primary text-white text-xs font-bold">Upload Document</a>
+          </div>
+
+          <!-- No Checklist Tasks -->
+          <div class="bg-dark-surface rounded-2xl p-5 border border-dark-outline-variant shadow-xs text-center space-y-3">
+            <div class="w-14 h-14 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-dark-primary mx-auto">
+              <span class="material-symbols-outlined text-[28px]">checklist</span>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-dark-on-surface">No checklist tasks</h3>
+              <p class="text-xs text-dark-on-surface-variant mt-0.5">All tasks are completed or none have been extracted yet.</p>
+            </div>
+          </div>
+
+          <!-- No Chat Messages -->
+          <div class="bg-dark-surface rounded-2xl p-5 border border-dark-outline-variant shadow-xs text-center space-y-3">
+            <div class="w-14 h-14 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-dark-primary mx-auto">
+              <span class="material-symbols-outlined text-[28px]">chat_bubble_outline</span>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-dark-on-surface">Start a conversation</h3>
+              <p class="text-xs text-dark-on-surface-variant mt-0.5">Ask questions about requirements, deadlines or steps.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- RTL Empty States Column -->
+        <div class="space-y-4" dir="rtl">
+          <div class="text-xs font-bold text-dark-on-surface-variant uppercase tracking-wider px-1 font-sans">العربية (RTL)</div>
+
+          <!-- لا توجد مستندات -->
+          <div class="bg-dark-surface rounded-2xl p-5 border border-dark-outline-variant shadow-xs text-center space-y-3 font-sans">
+            <div class="w-14 h-14 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-dark-primary mx-auto">
+              <span class="material-symbols-outlined text-[28px]">folder_open</span>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-dark-on-surface">لا توجد مستندات بعد</h3>
+              <p class="text-xs text-dark-on-surface-variant mt-0.5">ارفع مستند فرصتك الأول للبدء في التحليل.</p>
+            </div>
+            <a href="../upload-rtl/UploadScreenRTL.html" class="inline-block px-4 py-2 rounded-lg bg-dark-primary text-white text-xs font-bold">رفع مستند</a>
+          </div>
+
+          <!-- لا توجد مهام -->
+          <div class="bg-dark-surface rounded-2xl p-5 border border-dark-outline-variant shadow-xs text-center space-y-3 font-sans">
+            <div class="w-14 h-14 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-dark-primary mx-auto">
+              <span class="material-symbols-outlined text-[28px]">checklist</span>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-dark-on-surface">لا توجد مهام في القائمة</h3>
+              <p class="text-xs text-dark-on-surface-variant mt-0.5">تم إنجاز كافة المهام أو لم يتم استخراج متطلبات بعد.</p>
+            </div>
+          </div>
+
+          <!-- ابدأ محادثة -->
+          <div class="bg-dark-surface rounded-2xl p-5 border border-dark-outline-variant shadow-xs text-center space-y-3 font-sans">
+            <div class="w-14 h-14 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-dark-primary mx-auto">
+              <span class="material-symbols-outlined text-[28px]">chat_bubble_outline</span>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-dark-on-surface">ابدأ محادثة</h3>
+              <p class="text-xs text-dark-on-surface-variant mt-0.5">اطرح أسئلة حول شروط الأهلية والمواعيد والخطوات.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Loading Skeletons -->
+    <section class="space-y-4">
+      <h2 class="text-base font-bold text-dark-on-surface flex items-center gap-2">
+        <span class="material-symbols-outlined text-dark-primary text-[20px]">hourglass_empty</span>
+        <span>2. Loading Skeletons (Home, Results &amp; Checklist)</span>
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Home Skeleton -->
+        <div class="bg-dark-surface rounded-2xl p-4 border border-dark-outline-variant shadow-xs space-y-3">
+          <div class="text-xs font-bold text-dark-on-surface-variant uppercase tracking-wider">Home Skeleton</div>
+          <div class="animate-pulse space-y-3">
+            <div class="h-4 bg-slate-200 rounded w-1/3"></div>
+            <div class="h-10 bg-dark-surface-variant rounded-xl"></div>
+            <div class="h-28 bg-dark-surface-variant rounded-xl"></div>
+            <div class="h-28 bg-dark-surface-variant rounded-xl"></div>
+          </div>
+        </div>
+
+        <!-- Results Skeleton -->
+        <div class="bg-dark-surface rounded-2xl p-4 border border-dark-outline-variant shadow-xs space-y-3">
+          <div class="text-xs font-bold text-dark-on-surface-variant uppercase tracking-wider">Results Skeleton</div>
+          <div class="animate-pulse space-y-3">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 bg-slate-200 rounded-full"></div>
+              <div class="h-4 bg-slate-200 rounded w-1/2"></div>
+            </div>
+            <div class="h-20 bg-dark-surface-variant rounded-xl"></div>
+            <div class="h-24 bg-dark-surface-variant rounded-xl"></div>
+            <div class="h-20 bg-dark-surface-variant rounded-xl"></div>
+          </div>
+        </div>
+
+        <!-- Checklist Skeleton -->
+        <div class="bg-dark-surface rounded-2xl p-4 border border-dark-outline-variant shadow-xs space-y-3">
+          <div class="text-xs font-bold text-dark-on-surface-variant uppercase tracking-wider">Checklist Skeleton</div>
+          <div class="animate-pulse space-y-3">
+            <div class="h-14 bg-dark-surface-variant rounded-xl"></div>
+            <div class="h-14 bg-dark-surface-variant rounded-xl"></div>
+            <div class="h-14 bg-dark-surface-variant rounded-xl"></div>
+            <div class="h-14 bg-dark-surface-variant rounded-xl"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Upload Progress & Analysis Stages -->
+    <section class="space-y-4">
+      <h2 class="text-base font-bold text-dark-on-surface flex items-center gap-2">
+        <span class="material-symbols-outlined text-dark-primary text-[20px]">sync</span>
+        <span>3. Upload &amp; Analysis Progress (4 Honest Stages)</span>
+      </h2>
+
+      <div class="bg-dark-surface rounded-2xl p-5 border border-dark-outline-variant shadow-xs max-w-md mx-auto space-y-3">
+        <div class="flex items-center justify-between text-xs">
+          <span class="font-bold text-dark-on-surface">Analysis in progress</span>
+          <span class="text-dark-primary font-bold">Stage 3 of 4</span>
+        </div>
+        <div class="w-full bg-dark-surface-variant rounded-full h-2">
+          <div class="bg-dark-primary h-2 rounded-full w-3/4"></div>
+        </div>
+        <div class="text-[11px] text-dark-on-surface-variant flex items-center justify-between pt-1">
+          <span>1. Uploading (Done)</span>
+          <span>2. Checking (Done)</span>
+          <span class="font-bold text-dark-primary">3. Analyzing</span>
+          <span class="text-slate-400">4. Saving</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: All 9 Error States Reference Grid -->
+    <section class="space-y-4">
+      <h2 class="text-base font-bold text-dark-on-surface flex items-center gap-2">
+        <span class="material-symbols-outlined text-error text-[20px]">error_outline</span>
+        <span>4. All Error States Reference (English &amp; Arabic)</span>
+      </h2>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+        <div class="bg-dark-surface p-3.5 rounded-xl border border-dark-outline-variant shadow-xs space-y-1">
+          <span class="font-bold text-warning-text">1. Password Protected</span>
+          <p class="text-dark-on-surface-variant">&#34;This file is protected by a password.&#34; / &#34;هذا الملف محمي بكلمة مرور.&#34;</p>
+        </div>
+        <div class="bg-dark-surface p-3.5 rounded-xl border border-dark-outline-variant shadow-xs space-y-1">
+          <span class="font-bold text-error">2. File Too Large</span>
+          <p class="text-dark-on-surface-variant">&#34;File too large / too many pages.&#34; / &#34;الملف كبير جداً أو يحتوي صفحات كثيرة.&#34;</p>
+        </div>
+        <div class="bg-dark-surface p-3.5 rounded-xl border border-dark-outline-variant shadow-xs space-y-1">
+          <span class="font-bold text-indigo-deep">3. Unsupported File Type</span>
+          <p class="text-dark-on-surface-variant">&#34;Unsupported file type (.docx).&#34; / &#34;صيغة الملف غير مدعومة (.docx).&#34;</p>
+        </div>
+        <div class="bg-dark-surface p-3.5 rounded-xl border border-dark-outline-variant shadow-xs space-y-1">
+          <span class="font-bold text-warning-text">4. Personal ID Document</span>
+          <p class="text-dark-on-surface-variant">&#34;Personal document detected.&#34; / &#34;تم رصد وثيقة شخصية.&#34;</p>
+        </div>
+        <div class="bg-dark-surface p-3.5 rounded-xl border border-dark-outline-variant shadow-xs space-y-1">
+          <span class="font-bold text-slate-custom">5. Blurry Scan</span>
+          <p class="text-dark-on-surface-variant">&#34;Blurry or unreadable scan.&#34; / &#34;المسح الضوئي غير واضح أو مشوش.&#34;</p>
+        </div>
+        <div class="bg-dark-surface p-3.5 rounded-xl border border-dark-outline-variant shadow-xs space-y-1">
+          <span class="font-bold text-error">6. Permission Denied</span>
+          <p class="text-dark-on-surface-variant">&#34;Permission required (Open Settings).&#34; / &#34;مطلوب إذن الوصول (فتح الإعدادات).&#34;</p>
+        </div>
+        <div class="bg-dark-surface p-3.5 rounded-xl border border-dark-outline-variant shadow-xs space-y-1">
+          <span class="font-bold text-slate-custom">7. No Internet</span>
+          <p class="text-dark-on-surface-variant">&#34;No internet connection (Retry).&#34; / &#34;لا يوجد اتصال بالإنترنت (إعادة المحاولة).&#34;</p>
+        </div>
+        <div class="bg-dark-surface p-3.5 rounded-xl border border-dark-outline-variant shadow-xs space-y-1">
+          <span class="font-bold text-warning-text">8. Server Rate Limit</span>
+          <p class="text-dark-on-surface-variant">&#34;Analysis took too long / Limit reached.&#34; / &#34;استغرق التحليل وقتاً طويلاً.&#34;</p>
+        </div>
+        <div class="bg-dark-surface p-3.5 rounded-xl border border-dark-outline-variant shadow-xs space-y-1">
+          <span class="font-bold text-warning-text">9. Partial Results</span>
+          <p class="text-dark-on-surface-variant">&#34;Partial analysis results.&#34; / &#34;نتائج تحليل جزئية.&#34;</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+
+
+</body></html>

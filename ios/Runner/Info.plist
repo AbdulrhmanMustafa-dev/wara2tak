@@ -66,5 +66,16 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<!-- Google Sign-In URL Scheme -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<!-- Reversed client ID from Google Cloud Console -->
+				<string>com.googleusercontent.apps.471240171200-74earbu056i61eav87pdtn0el3sjvcbf</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

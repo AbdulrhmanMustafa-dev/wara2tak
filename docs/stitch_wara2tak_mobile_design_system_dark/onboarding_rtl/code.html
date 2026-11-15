@@ -1,0 +1,239 @@
+<!DOCTYPE html><html lang="ar" dir="rtl" class="dark"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ورقتك — شاشة التعريف</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
+globalThis.tailwind = globalThis.tailwind || {};
+globalThis.tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'indigo-deep': '#4F46E5',
+        'blue-soft': '#E0E7FF',
+        'neutral-bg': '#F8FAFC',
+        'text-navy': '#0F172A',
+        'text-slate': '#475569',
+        'success': '#16A34A',
+        'warning': '#F59E0B',
+        'warning-text': '#B45309',
+        'error': '#EF4444',
+        'light-primary': '#4F46E5',
+        'light-on-primary': '#FFFFFF',
+        'light-secondary': '#E0E7FF',
+        'light-on-secondary': '#1E1B4B',
+        'light-surface': '#FFFFFF',
+        'light-on-surface': '#0F172A',
+        'light-surface-variant': '#F1F5F9',
+        'light-on-surface-variant': '#475569',
+        'light-outline': '#CBD5E1',
+        'light-outline-variant': '#E2E8F0',
+        'dark-bg': '#0F172A',
+        'dark-primary': '#818CF8',
+        'dark-on-primary': '#0F172A',
+        'dark-secondary': '#1E1B4B',
+        'dark-on-secondary': '#E0E7FF',
+        'dark-surface': '#1E293B',
+        'dark-on-surface': '#F8FAFC',
+        'dark-surface-variant': '#334155',
+        'dark-on-surface-variant': '#CBD5E1',
+        'dark-outline': '#475569',
+        'dark-outline-variant': '#334155',
+      },
+      borderRadius: {
+        'sm': '6px',
+        'md': '10px',
+        'DEFAULT': '12px',
+        'lg': '16px',
+        'xl': '20px',
+        'pill': '9999px',
+      },
+      spacing: {
+        'spacing-2xs': '4px',
+        'spacing-xs': '4px',
+        'spacing-sm': '8px',
+        'spacing-md': '12px',
+        'spacing-base': '16px',
+        'spacing-lg': '20px',
+        'spacing-xl': '24px',
+        'spacing-2xl': '32px',
+        'spacing-3xl': '40px',
+        'gutter-mobile': '16px',
+        'nav-height': '68px',
+        'touch-target-min': '44px',
+      },
+      fontFamily: {
+        'display': ['"Cairo"', 'sans-serif'],
+        'headline': ['"Cairo"', 'sans-serif'],
+        'body': ['"Inter"', 'sans-serif'],
+        'label': ['"Inter"', 'sans-serif'],
+      },
+      fontSize: {
+        'display-lg': ['36px', { lineHeight: '44px', letterSpacing: '-0.5px', fontWeight: '700' }],
+        'display-lg-mobile': ['28px', { lineHeight: '36px', letterSpacing: '-0.25px', fontWeight: '700' }],
+        'headline-lg': ['32px', { lineHeight: '40px', letterSpacing: '-0.25px', fontWeight: '700' }],
+        'headline-lg-mobile': ['24px', { lineHeight: '32px', letterSpacing: '0px', fontWeight: '700' }],
+        'headline-md': ['22px', { lineHeight: '30px', letterSpacing: '0px', fontWeight: '600' }],
+        'headline-sm': ['18px', { lineHeight: '26px', letterSpacing: '0px', fontWeight: '600' }],
+        'body-lg': ['16px', { lineHeight: '24px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-md': ['14px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-sm': ['12px', { lineHeight: '18px', letterSpacing: '0px', fontWeight: '400' }],
+        'label-lg': ['14px', { lineHeight: '20px', letterSpacing: '0.1px', fontWeight: '600' }],
+        'label-md': ['12px', { lineHeight: '16px', letterSpacing: '0.2px', fontWeight: '500' }],
+        'label-sm': ['11px', { lineHeight: '14px', letterSpacing: '0.3px', fontWeight: '500' }],
+      },
+      transitionDuration: {
+        'tap': '120ms',
+        'sheet-slide': '260ms',
+        'status-change': '180ms',
+      },
+      transitionDelay: {
+        'tap': '0ms',
+        'sheet-slide': '0ms',
+        'status-change': '0ms',
+      },
+      transitionTimingFunction: {
+        'tap': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'sheet-slide': 'cubic-bezier(0.16, 1, 0.3, 1)',
+        'status-change': 'ease-out',
+      },
+    },
+  },
+};
+if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet">
+  <style>
+    body { font-family: 'Cairo', sans-serif; }
+    .material-symbols-outlined, .material-symbols-rounded, .material-symbols-sharp, .material-icons {
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      line-height: 1 !important;
+      box-sizing: content-box;
+      overflow: hidden;
+      white-space: nowrap;
+      direction: ltr;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body class="bg-dark-bg text-dark-on-surface min-h-[884px] flex flex-col justify-between selection:bg-dark-secondary selection:text-indigo-deep relative" data-stitch-vh="min-h-[884px]===min-h-screen">
+
+  <!-- Mobile Top Bar (RTL Mirrored) -->
+  <header class="w-full pt-4 px-6 flex items-center justify-between text-dark-on-surface-variant z-10">
+    <div class="flex items-center gap-2">
+      <span class="font-label text-label-sm font-semibold tabular-nums text-dark-on-surface">9:41</span>
+    </div>
+    <!-- Skip Action Button (تخطي) -->
+    <a href="../auth-rtl/AuthScreenRTL.html" class="text-label-md font-bold text-dark-on-surface-variant hover:text-dark-on-surface px-2 py-1 rounded-md transition">
+      <span>تخطي</span>
+    </a>
+  </header>
+
+  <!-- Main Hero Graphic & Transformation Narrative (RTL Mirrored) -->
+  <main class="flex-1 flex flex-col items-center justify-center px-6 py-4 max-w-sm mx-auto w-full">
+
+    <div class="relative w-full aspect-square max-w-[300px] flex items-center justify-center mb-6">
+      <div class="absolute w-56 h-56 rounded-pill bg-dark-secondary blur-2xl opacity-60"></div>
+
+      <!-- Raw Document Sheet (Background Right in RTL) -->
+      <div class="absolute -right-1 top-8 w-36 h-48 bg-dark-surface rounded-lg border border-dark-outline-variant shadow-xs rotate-6 p-3 flex flex-col gap-2 opacity-75">
+        <div class="flex items-center gap-1.5 border-b border-dark-outline-variant pb-2">
+          <div class="w-5 h-5 rounded bg-rose-50 text-error flex items-center justify-center">
+            <span class="material-symbols-outlined text-[14px]">picture_as_pdf</span>
+          </div>
+          <div class="h-2 w-16 bg-dark-outline-variant rounded-pill"></div>
+        </div>
+        <div class="space-y-1.5 pt-1">
+          <div class="h-1.5 w-full bg-dark-outline-variant rounded-pill"></div>
+          <div class="h-1.5 w-5/6 bg-dark-outline-variant rounded-pill"></div>
+          <div class="h-1.5 w-4/6 bg-dark-outline-variant rounded-pill"></div>
+          <div class="h-1.5 w-full bg-dark-outline-variant rounded-pill"></div>
+        </div>
+        <div class="mt-auto flex items-center justify-between pt-2 border-t border-dark-outline-variant">
+          <div class="h-1.5 w-8 bg-dark-outline-variant rounded-pill"></div>
+          <div class="h-3 w-3 rounded-pill bg-dark-outline-variant"></div>
+        </div>
+      </div>
+
+      <!-- Central AI Transformation Connector -->
+      <div class="absolute z-20 w-11 h-11 rounded-pill bg-dark-primary text-dark-on-primary shadow-sm flex items-center justify-center border-2 border-dark-surface">
+        <span class="material-symbols-outlined text-[22px]">auto_awesome</span>
+      </div>
+
+      <!-- Structured Information Cards (Emerging Left in RTL) -->
+      <div class="absolute left-0 top-3 flex flex-col gap-2.5 z-10 w-48">
+
+        <!-- 1. Eligibility Card: "تم استخراج الشروط" -->
+        <div class="bg-dark-surface rounded-DEFAULT p-2.5 border border-dark-outline-variant shadow-sm flex items-center gap-2">
+          <div class="w-7 h-7 rounded-md bg-indigo-50 text-indigo-deep flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[16px]">rule</span>
+          </div>
+          <div class="min-w-0">
+            <p class="text-label-sm font-bold text-dark-on-surface truncate">تم العثور على شروط الأهلية</p>
+            <p class="text-[10px] text-dark-on-surface-variant truncate">معدل GPA 3.0+ / مستوى B2</p>
+          </div>
+        </div>
+
+        <!-- 2. Deadlines Card -->
+        <div class="bg-dark-surface rounded-DEFAULT p-2.5 border border-dark-outline-variant shadow-sm flex items-center gap-2 -translate-x-1">
+          <div class="w-7 h-7 rounded-md bg-amber-50 text-warning flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[16px]">calendar_today</span>
+          </div>
+          <div class="min-w-0">
+            <p class="text-label-sm font-bold text-dark-on-surface truncate">تم استخراج الموعد النهائي</p>
+            <p class="text-[10px] text-warning-text font-bold truncate">15 أكتوبر (باقي 14 يوماً)</p>
+          </div>
+        </div>
+
+        <!-- 3. Required Documents Checklist Card -->
+        <div class="bg-dark-surface rounded-DEFAULT p-2.5 border border-dark-outline-variant shadow-sm flex items-center gap-2 -translate-x-2">
+          <div class="w-7 h-7 rounded-md bg-emerald-50 text-success flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[16px]">checklist_rtl</span>
+          </div>
+          <div class="min-w-0">
+            <p class="text-label-sm font-bold text-dark-on-surface truncate">قائمة المهام التفاعلية</p>
+            <p class="text-[10px] text-dark-on-surface-variant truncate">3 من 5 أوراق جاهزة</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Onboarding Copy Block -->
+    <div class="text-center space-y-3 px-2">
+      <h1 class="text-headline-lg-mobile font-bold text-dark-on-surface tracking-tight text-balance">
+        فرصتك الأكاديمية، واضحة ومفهومة.
+      </h1>
+      <p class="text-body-md text-dark-on-surface-variant leading-relaxed text-pretty max-w-[310px] mx-auto">
+        ارفع مستندات المنح، التدريب، أو التبادل الطلابي ودع الذكاء الاصطناعي يستخرج ما يهمك.
+      </p>
+    </div>
+
+  </main>
+
+  <!-- Bottom Controls: 3 Dots & Get Started Button (RTL Mirrored) -->
+  <footer class="w-full px-6 pb-8 pt-2 flex flex-col gap-6 z-10 max-w-sm mx-auto">
+    <!-- Pagination Dots -->
+    <div class="flex items-center justify-center gap-2" role="tablist" aria-label="خطوات التعريف">
+      <span class="w-7 h-2 rounded-pill bg-dark-primary transition duration-status-change" aria-current="step"></span>
+      <span class="w-2 h-2 rounded-pill bg-dark-outline-variant"></span>
+      <span class="w-2 h-2 rounded-pill bg-dark-outline-variant"></span>
+    </div>
+
+    <!-- Primary CTA: "ابدأ الآن" -->
+    <!-- COMPONENT: button-primary -->
+    <a href="../auth-rtl/AuthScreenRTL.html" class="w-full py-3.5 px-6 rounded-DEFAULT bg-dark-primary text-dark-on-primary text-label-lg font-bold shadow-sm hover:opacity-95 active:scale-[0.98] transition duration-tap cursor-pointer text-center">
+      <span>ابدأ الآن</span>
+    </a>
+
+    <!-- Home Indicator -->
+    <div class="w-32 h-1 bg-dark-outline rounded-pill mx-auto opacity-40"></div>
+  </footer>
+
+
+
+</body></html>

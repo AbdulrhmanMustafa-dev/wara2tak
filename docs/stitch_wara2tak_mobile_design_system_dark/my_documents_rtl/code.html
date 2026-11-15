@@ -1,0 +1,418 @@
+<!DOCTYPE html><html lang="ar" dir="rtl" class="dark"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مستنداتي — ورقتك</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
+globalThis.tailwind = globalThis.tailwind || {};
+globalThis.tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'indigo-deep': '#4F46E5',
+        'blue-soft': '#E0E7FF',
+        'neutral-bg': '#F8FAFC',
+        'text-navy': '#0F172A',
+        'text-slate': '#475569',
+        'success': '#16A34A',
+        'warning': '#F59E0B',
+        'warning-text': '#B45309',
+        'error': '#EF4444',
+        'light-primary': '#4F46E5',
+        'light-on-primary': '#FFFFFF',
+        'light-secondary': '#E0E7FF',
+        'light-on-secondary': '#1E1B4B',
+        'light-surface': '#FFFFFF',
+        'light-on-surface': '#0F172A',
+        'light-surface-variant': '#F1F5F9',
+        'light-on-surface-variant': '#475569',
+        'light-outline': '#CBD5E1',
+        'light-outline-variant': '#E2E8F0',
+        'dark-bg': '#0F172A',
+        'dark-primary': '#818CF8',
+        'dark-on-primary': '#0F172A',
+        'dark-secondary': '#1E1B4B',
+        'dark-on-secondary': '#E0E7FF',
+        'dark-surface': '#1E293B',
+        'dark-on-surface': '#F8FAFC',
+        'dark-surface-variant': '#334155',
+        'dark-on-surface-variant': '#CBD5E1',
+        'dark-outline': '#475569',
+        'dark-outline-variant': '#334155',
+      },
+      borderRadius: {
+        'sm': '6px',
+        'md': '10px',
+        'DEFAULT': '12px',
+        'lg': '16px',
+        'xl': '20px',
+        'pill': '9999px',
+      },
+      spacing: {
+        'spacing-2xs': '4px',
+        'spacing-xs': '4px',
+        'spacing-sm': '8px',
+        'spacing-md': '12px',
+        'spacing-base': '16px',
+        'spacing-lg': '20px',
+        'spacing-xl': '24px',
+        'spacing-2xl': '32px',
+        'spacing-3xl': '40px',
+        'gutter-mobile': '16px',
+        'nav-height': '68px',
+        'touch-target-min': '44px',
+      },
+      fontFamily: {
+        'display': ['"Cairo"', 'sans-serif'],
+        'headline': ['"Cairo"', 'sans-serif'],
+        'body': ['"Inter"', 'sans-serif'],
+        'label': ['"Inter"', 'sans-serif'],
+      },
+      fontSize: {
+        'display-lg': ['36px', { lineHeight: '44px', letterSpacing: '-0.5px', fontWeight: '700' }],
+        'display-lg-mobile': ['28px', { lineHeight: '36px', letterSpacing: '-0.25px', fontWeight: '700' }],
+        'headline-lg': ['32px', { lineHeight: '40px', letterSpacing: '-0.25px', fontWeight: '700' }],
+        'headline-lg-mobile': ['24px', { lineHeight: '32px', letterSpacing: '0px', fontWeight: '700' }],
+        'headline-md': ['22px', { lineHeight: '30px', letterSpacing: '0px', fontWeight: '600' }],
+        'headline-sm': ['18px', { lineHeight: '26px', letterSpacing: '0px', fontWeight: '600' }],
+        'body-lg': ['16px', { lineHeight: '24px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-md': ['14px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-sm': ['12px', { lineHeight: '18px', letterSpacing: '0px', fontWeight: '400' }],
+        'label-lg': ['14px', { lineHeight: '20px', letterSpacing: '0.1px', fontWeight: '600' }],
+        'label-md': ['12px', { lineHeight: '16px', letterSpacing: '0.2px', fontWeight: '500' }],
+        'label-sm': ['11px', { lineHeight: '14px', letterSpacing: '0.3px', fontWeight: '500' }],
+      },
+      transitionDuration: {
+        'tap': '120ms',
+        'sheet-slide': '260ms',
+        'status-change': '180ms',
+      },
+      transitionDelay: {
+        'tap': '0ms',
+        'sheet-slide': '0ms',
+        'status-change': '0ms',
+      },
+      transitionTimingFunction: {
+        'tap': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'sheet-slide': 'cubic-bezier(0.16, 1, 0.3, 1)',
+        'status-change': 'ease-out',
+      },
+    },
+  },
+};
+if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet">
+  <style>
+    .material-symbols-outlined {
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      line-height: 1 !important;
+      overflow: hidden;
+      white-space: nowrap;
+      direction: ltr;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body class="bg-dark-bg text-dark-on-surface min-h-[884px] flex flex-col justify-between font-sans selection:bg-dark-secondary selection:text-indigo-deep pb-20" data-stitch-vh="min-h-[884px]===min-h-screen">
+
+  <!-- Mobile Top Bar -->
+  <div class="w-full pt-3 px-6 flex items-center justify-between text-dark-on-surface-variant z-20 bg-dark-surface sticky top-0 border-b border-dark-outline-variant">
+    <span class="font-label text-label-sm font-semibold tabular-nums text-dark-on-surface">9:41</span>
+    <div class="flex items-center gap-1.5 flex-row-reverse text-dark-on-surface">
+      <div class="w-5 h-2.5 bg-slate-800 rounded-sm"></div>
+      <span class="material-symbols-outlined text-[16px]">wifi</span>
+      <span class="material-symbols-outlined text-[16px]">signal_cellular_4_bar</span>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="px-6 pt-3 pb-3 bg-dark-surface border-b border-dark-outline-variant space-y-3 sticky top-[41px] z-10 text-right">
+    <div class="flex items-center justify-between">
+      <h1 class="text-lg font-bold text-dark-on-surface">
+        مستنداتي
+      </h1>
+      <a href="../upload-rtl/UploadScreenRTL.html" class="w-9 h-9 rounded-xl bg-dark-primary text-dark-on-primary flex items-center justify-center shadow-xs hover:opacity-95 active:scale-95 transition" aria-label="رفع مستند جديد">
+        <span class="material-symbols-outlined text-[20px]">add</span>
+      </a>
+    </div>
+
+    <!-- Search Input -->
+    <div class="relative">
+      <span class="material-symbols-outlined absolute right-3 top-2.5 text-[18px] text-dark-on-surface-variant">search</span>
+      <input type="text" id="search-input-rtl" oninput="handleSearchRTL(this.value)" placeholder="ابحث باسم المستند أو الكلمات المفتاحية..." class="w-full bg-dark-bg border border-dark-outline-variant rounded-xl pr-9 pl-4 py-2 text-xs text-dark-on-surface placeholder:text-dark-on-surface-variant focus:outline-none focus:border-dark-primary text-right">
+    </div>
+
+    <!-- Horizontally Scrollable Category Filters -->
+    <div class="flex items-center gap-1.5 overflow-x-auto pb-1 -mx-2 px-2 no-scrollbar" id="filter-bar-rtl">
+      <button onclick="filterTypeRTL(&#39;all&#39;)" class="filter-btn-rtl active px-3 py-1 rounded-pill text-[11px] font-bold bg-dark-primary text-dark-on-primary shrink-0">الكل</button>
+      <button onclick="filterTypeRTL(&#39;منحة&#39;)" class="filter-btn-rtl px-3 py-1 rounded-pill text-[11px] font-semibold bg-dark-bg text-dark-on-surface-variant hover:text-dark-on-surface shrink-0">منحة دراسية</button>
+      <button onclick="filterTypeRTL(&#39;تدريب&#39;)" class="filter-btn-rtl px-3 py-1 rounded-pill text-[11px] font-semibold bg-dark-bg text-dark-on-surface-variant hover:text-dark-on-surface shrink-0">تدريب عملي</button>
+      <button onclick="filterTypeRTL(&#39;تبادل&#39;)" class="filter-btn-rtl px-3 py-1 rounded-pill text-[11px] font-semibold bg-dark-bg text-dark-on-surface-variant hover:text-dark-on-surface shrink-0">تبادل طلابي</button>
+      <button onclick="filterTypeRTL(&#39;دورة&#39;)" class="filter-btn-rtl px-3 py-1 rounded-pill text-[11px] font-semibold bg-dark-bg text-dark-on-surface-variant hover:text-dark-on-surface shrink-0">دورة تدريبية</button>
+      <button onclick="filterTypeRTL(&#39;برنامج&#39;)" class="filter-btn-rtl px-3 py-1 rounded-pill text-[11px] font-semibold bg-dark-bg text-dark-on-surface-variant hover:text-dark-on-surface shrink-0">برنامج أكاديمي</button>
+      <button onclick="filterTypeRTL(&#39;أخرى&#39;)" class="filter-btn-rtl px-3 py-1 rounded-pill text-[11px] font-semibold bg-dark-bg text-dark-on-surface-variant hover:text-dark-on-surface shrink-0">أخرى</button>
+    </div>
+  </header>
+
+  <!-- Document List & Dynamic States -->
+  <main class="flex-1 px-5 py-4 max-w-sm mx-auto w-full space-y-3.5" id="docs-container-rtl">
+
+    <!-- Document Card 1: Analyzed (Exchange) -->
+    <article class="doc-card-rtl bg-dark-surface rounded-2xl p-4 border border-dark-outline-variant shadow-xs space-y-3 text-right" data-category="تبادل" data-title="برنامج التبادل الطلابي الدولي 2027">
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-12 rounded-lg bg-rose-50 border border-rose-200 text-error flex flex-col items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
+            <span class="text-[9px] font-bold mt-0.5">PDF</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5 mb-1">
+              <span class="px-2 py-0.2 rounded-pill bg-dark-secondary text-indigo-deep text-[10px] font-bold">تبادل طلابي</span>
+              <!-- Status: Analyzed -->
+              <span class="px-2 py-0.2 rounded-pill bg-emerald-50 text-success text-[10px] font-bold border border-emerald-200 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-success"></span>
+                تم التحليل
+              </span>
+            </div>
+            <a href="../document-results-rtl/DocumentResultsScreenRTL.html" class="text-sm font-bold text-dark-on-surface hover:text-dark-primary leading-snug line-clamp-1">
+              برنامج التبادل الطلابي الدولي 2027
+            </a>
+            <p class="text-[11px] text-dark-on-surface-variant mt-0.5">تم التحليل في 12 نوفمبر 2026 • 8 صفحات</p>
+          </div>
+        </div>
+
+        <button onclick="openDeleteSheetRTL(&#39;برنامج التبادل الطلابي الدولي 2027&#39;)" class="text-dark-on-surface-variant hover:text-rose-600 p-1">
+          <span class="material-symbols-outlined text-[18px]">delete</span>
+        </button>
+      </div>
+
+      <!-- Task Progress & Deadline info -->
+      <div class="flex items-center justify-between text-xs pt-2 border-t border-dark-outline-variant">
+        <span class="text-dark-on-surface-variant font-medium">تم إنجاز 4 من 8 مهام</span>
+        <span class="text-warning-text font-bold flex items-center gap-1">
+          <span class="material-symbols-outlined text-[13px]">alarm</span>
+          متبقي يومان
+        </span>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="grid grid-cols-2 gap-2 pt-1">
+        <a href="../document-chat-rtl/DocumentChatScreenRTL.html" class="py-1.5 px-3 rounded-lg bg-indigo-50 text-indigo-deep text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-dark-secondary transition">
+          <span class="material-symbols-outlined text-[16px]">chat</span>
+          <span>اسأل الذكاء</span>
+        </a>
+        <a href="../checklist-rtl/ChecklistScreenRTL.html" class="py-1.5 px-3 rounded-lg bg-dark-surface border border-dark-outline-variant text-dark-on-surface text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-dark-surface-variant transition">
+          <span class="material-symbols-outlined text-[16px]">checklist</span>
+          <span>قائمة المهام</span>
+        </a>
+      </div>
+    </article>
+
+    <!-- Document Card 2: Analyzing Status with Spinner -->
+    <article class="doc-card-rtl bg-dark-surface rounded-2xl p-4 border border-teal-200 shadow-xs space-y-3 text-right" data-category="منحة" data-title="منحة DAAD للدراسات العليا">
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-12 rounded-lg bg-teal-50 border border-teal-200 text-dark-primary flex flex-col items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[18px]">description</span>
+            <span class="text-[9px] font-bold mt-0.5">PDF</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5 mb-1">
+              <span class="px-2 py-0.2 rounded-pill bg-dark-secondary text-indigo-deep text-[10px] font-bold">منحة دراسية</span>
+              <!-- Status: Analyzing -->
+              <span class="px-2 py-0.2 rounded-pill bg-teal-50 text-teal-800 text-[10px] font-bold border border-teal-200 flex items-center gap-1">
+                <svg class="w-2.5 h-2.5 animate-spin text-dark-primary" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                جاري التحليل
+              </span>
+            </div>
+            <h2 class="text-sm font-bold text-dark-on-surface leading-snug line-clamp-1">
+              منحة DAAD للدراسات العليا
+            </h2>
+            <p class="text-[11px] text-dark-on-surface-variant mt-0.5">رُفعت الآن • 5.1 ميجابايت</p>
+          </div>
+        </div>
+
+        <button onclick="openDeleteSheetRTL(&#39;منحة DAAD للدراسات العليا&#39;)" class="text-dark-on-surface-variant hover:text-rose-600 p-1">
+          <span class="material-symbols-outlined text-[18px]">delete</span>
+        </button>
+      </div>
+
+      <div class="p-2.5 rounded-xl bg-teal-50/60 border border-teal-100 flex items-center justify-between text-xs text-teal-900">
+        <span class="text-[11px] font-medium">جاري استخراج المواعيد والشروط...</span>
+        <a href="../analysis-progress-rtl/AnalysisProgressScreenRTL.html" class="text-[11px] font-bold text-dark-primary underline">عرض التقدم</a>
+      </div>
+    </article>
+
+    <!-- Document Card 3: Failed Status with Retry -->
+    <article class="doc-card-rtl bg-rose-50/40 rounded-2xl p-4 border border-rose-200 shadow-xs space-y-3 text-right" data-category="تدريب" data-title="إعلان التدريب الصيفي بمختبر CERN">
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-12 rounded-lg bg-rose-100 border border-rose-200 text-error flex flex-col items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[18px]">broken_image</span>
+            <span class="text-[9px] font-bold mt-0.5">JPG</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5 mb-1">
+              <span class="px-2 py-0.2 rounded-pill bg-dark-secondary text-indigo-deep text-[10px] font-bold">تدريب عملي</span>
+              <!-- Status: Failed -->
+              <span class="px-2 py-0.2 rounded-pill bg-rose-100 text-error text-[10px] font-bold border border-rose-200 flex items-center gap-1">
+                <span class="material-symbols-outlined text-[11px]">error</span>
+                فشل التحليل
+              </span>
+            </div>
+            <h2 class="text-sm font-bold text-dark-on-surface leading-snug line-clamp-1">
+              إعلان التدريب الصيفي بمختبر CERN
+            </h2>
+            <p class="text-[11px] text-dark-on-surface-variant mt-0.5">رُفعت في 09 نوفمبر 2026 • صورة غير واضحة</p>
+          </div>
+        </div>
+
+        <button onclick="openDeleteSheetRTL(&#39;إعلان التدريب الصيفي بمختبر CERN&#39;)" class="text-dark-on-surface-variant hover:text-rose-600 p-1">
+          <span class="material-symbols-outlined text-[18px]">delete</span>
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between pt-1 border-t border-rose-200/80">
+        <span class="text-[11px] text-error font-medium">النصوص غير مقروءة أو مشوشة.</span>
+        <a href="../preview-confirm-rtl/PreviewConfirmScreenRTL.html" class="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-dark-surface border border-rose-200 text-error font-bold text-xs hover:bg-rose-50 transition">
+          <span class="material-symbols-outlined text-[13px]">refresh</span>
+          <span>إعادة المحاولة</span>
+        </a>
+      </div>
+    </article>
+
+    <!-- Empty State -->
+    <div id="empty-state-rtl" class="hidden py-12 flex flex-col items-center text-center space-y-4">
+      <div class="w-20 h-20 rounded-3xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-dark-primary">
+        <span class="material-symbols-outlined text-[40px]">folder_open</span>
+      </div>
+      <div>
+        <h2 class="text-base font-bold text-dark-on-surface mb-1">
+          لا توجد مستندات بعد
+        </h2>
+        <p class="text-xs text-dark-on-surface-variant max-w-[240px] leading-relaxed">
+          ارفع مستند فرصتك الأول للبدء في استخراج المواعيد والشروط.
+        </p>
+      </div>
+      <a href="../upload-rtl/UploadScreenRTL.html" class="px-5 py-2.5 rounded-xl bg-dark-primary text-dark-on-primary text-xs font-bold shadow-sm hover:opacity-95 transition">
+        رفع مستند
+      </a>
+    </div>
+
+    <!-- No results state -->
+    <div id="no-results-state-rtl" class="hidden py-12 flex flex-col items-center text-center space-y-3">
+      <div class="w-14 h-14 rounded-2xl bg-dark-surface-variant flex items-center justify-center text-dark-on-surface-variant">
+        <span class="material-symbols-outlined text-[28px]">search_off</span>
+      </div>
+      <div>
+        <h3 class="text-sm font-bold text-dark-on-surface">لم يتم العثور على نتائج</h3>
+        <p class="text-xs text-dark-on-surface-variant mt-0.5">جرب البحث بكلمة أو عنوان آخر.</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Bottom Navigation Bar -->
+  <nav class="border-t border-dark-outline-variant bg-dark-surface px-6 py-2.5 flex items-center justify-around fixed bottom-0 inset-x-0 z-20">
+    <a href="../home-rtl/HomeScreenRTL.html" class="flex flex-col items-center gap-0.5 text-dark-on-surface-variant hover:text-dark-on-surface">
+      <span class="material-symbols-outlined text-[22px]">home</span>
+      <span class="text-[10px] font-medium">الرئيسية</span>
+    </a>
+    <div class="flex flex-col items-center gap-0.5 text-dark-primary">
+      <span class="material-symbols-outlined text-[22px]">folder</span>
+      <span class="text-[10px] font-bold">مستنداتي</span>
+    </div>
+    <a href="../upload-rtl/UploadScreenRTL.html" class="flex flex-col items-center gap-0.5 text-dark-on-surface-variant hover:text-dark-on-surface">
+      <div class="w-9 h-9 rounded-full bg-dark-primary text-white flex items-center justify-center -mt-4 shadow-md">
+        <span class="material-symbols-outlined text-[20px]">add</span>
+      </div>
+      <span class="text-[10px] font-medium">رفع</span>
+    </a>
+    <a href="../profile-rtl/ProfileScreenRTL.html" class="flex flex-col items-center gap-0.5 text-dark-on-surface-variant hover:text-dark-on-surface">
+      <span class="material-symbols-outlined text-[22px]">person</span>
+      <span class="text-[10px] font-medium">حسابي</span>
+    </a>
+  </nav>
+
+  <!-- Delete Confirmation Bottom Sheet -->
+  <div id="delete-modal-rtl" class="hidden fixed inset-0 bg-black/40 z-50 flex items-end sm:items-center justify-center p-4">
+    <div class="bg-dark-surface rounded-2xl p-5 max-w-sm w-full shadow-2xl space-y-3 text-center">
+      <div class="w-10 h-10 rounded-full bg-rose-50 text-error flex items-center justify-center mx-auto">
+        <span class="material-symbols-outlined text-[22px]">delete_forever</span>
+      </div>
+      <div class="space-y-1">
+        <h3 class="text-sm font-bold text-dark-on-surface">حذف هذا المستند؟</h3>
+        <!-- Honest Updated text -->
+        <p class="text-xs text-dark-on-surface-variant leading-relaxed">
+          سيؤدي هذا إلى حذف الملف، وبيانات التحليل، وقائمة المهام، وسجل المحادثة بشكل دائم.
+        </p>
+      </div>
+      <div class="space-y-2 pt-2">
+        <button onclick="closeDeleteSheetRTL()" class="w-full py-2.5 rounded-xl bg-error text-white font-bold text-xs hover:bg-rose-700 transition">
+          حذف نهائي
+        </button>
+        <button onclick="closeDeleteSheetRTL()" class="w-full py-2.5 rounded-xl bg-dark-bg text-dark-on-surface font-semibold text-xs hover:bg-slate-200 transition">
+          إلغاء
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let activeCategoryRTL = 'all';
+
+    function filterTypeRTL(category) {
+      activeCategoryRTL = category;
+      document.querySelectorAll('.filter-btn-rtl').forEach(btn => {
+        btn.classList.remove('bg-dark-primary', 'text-dark-on-primary', 'font-bold');
+        btn.classList.add('bg-dark-bg', 'text-dark-on-surface-variant', 'font-semibold');
+      });
+      event.target.classList.remove('bg-dark-bg', 'text-dark-on-surface-variant', 'font-semibold');
+      event.target.classList.add('bg-dark-primary', 'text-dark-on-primary', 'font-bold');
+      applyFiltersRTL();
+    }
+
+    function handleSearchRTL(query) {
+      applyFiltersRTL(query.toLowerCase());
+    }
+
+    function applyFiltersRTL(searchQuery = '') {
+      let visibleCount = 0;
+      const cards = document.querySelectorAll('.doc-card-rtl');
+      cards.forEach(card => {
+        const cat = card.getAttribute('data-category');
+        const title = card.getAttribute('data-title').toLowerCase();
+        const matchesCategory = activeCategoryRTL === 'all' || cat === activeCategoryRTL;
+        const matchesSearch = !searchQuery || title.includes(searchQuery);
+
+        if (matchesCategory && matchesSearch) {
+          card.classList.remove('hidden');
+          visibleCount++;
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+
+      const noResults = document.getElementById('no-results-state-rtl');
+      if (visibleCount === 0 && searchQuery) {
+        noResults.classList.remove('hidden');
+      } else {
+        noResults.classList.add('hidden');
+      }
+    }
+
+    function openDeleteSheetRTL(title) {
+      document.getElementById('delete-modal-rtl').classList.remove('hidden');
+    }
+    function closeDeleteSheetRTL() {
+      document.getElementById('delete-modal-rtl').classList.add('hidden');
+    }
+  </script>
+
+
+</body></html>

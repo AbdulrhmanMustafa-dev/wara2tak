@@ -1,0 +1,25 @@
+import 'package:dartz/dartz.dart';
+
+import '../models/checklist_model.dart';
+import '../../../../core/errors/failures.dart';
+
+/// Checklist repository interface
+abstract class ChecklistRepository {
+  /// Get checklist for document
+  Future<Either<Failure, List<ChecklistItemModel>>> getChecklist(String documentId);
+
+  /// Save checklist
+  Future<Either<Failure, List<ChecklistItemModel>>> saveChecklist(
+    String documentId,
+    List<ChecklistItemModel> items,
+  );
+
+  /// Update checklist item
+  Future<Either<Failure, ChecklistItemModel>> updateChecklistItem(
+    String documentId,
+    ChecklistItemModel item,
+  );
+
+  /// Listen to checklist changes
+  Stream<List<ChecklistItemModel>> watchChecklist(String documentId);
+}

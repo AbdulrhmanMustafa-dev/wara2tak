@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "213010149913",
+    "project_id": "wara2takapp",
+    "storage_bucket": "wara2takapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:213010149913:android:e175f9b4a6bb9e1b333088",
+        "android_client_info": {
+          "package_name": "com.example.wara2tak"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "471240171200-74earbu056i61eav87pdtn0el3sjvcbf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHn_fOpWDPd40d-RBPRlgN11SyxktHl3w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "471240171200-74earbu056i61eav87pdtn0el3sjvcbf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

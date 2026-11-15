@@ -1,0 +1,361 @@
+<!DOCTYPE html><html lang="ar" dir="rtl" class="dark"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ورقتك — الرئيسية</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
+globalThis.tailwind = globalThis.tailwind || {};
+globalThis.tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'indigo-deep': '#4F46E5',
+        'blue-soft': '#E0E7FF',
+        'neutral-bg': '#F8FAFC',
+        'text-navy': '#0F172A',
+        'text-slate': '#475569',
+        'success': '#16A34A',
+        'warning': '#F59E0B',
+        'warning-text': '#B45309',
+        'error': '#EF4444',
+        'light-primary': '#4F46E5',
+        'light-on-primary': '#FFFFFF',
+        'light-secondary': '#E0E7FF',
+        'light-on-secondary': '#1E1B4B',
+        'light-surface': '#FFFFFF',
+        'light-on-surface': '#0F172A',
+        'light-surface-variant': '#F1F5F9',
+        'light-on-surface-variant': '#475569',
+        'light-outline': '#CBD5E1',
+        'light-outline-variant': '#E2E8F0',
+        'dark-bg': '#0F172A',
+        'dark-primary': '#818CF8',
+        'dark-on-primary': '#0F172A',
+        'dark-secondary': '#1E1B4B',
+        'dark-on-secondary': '#E0E7FF',
+        'dark-surface': '#1E293B',
+        'dark-on-surface': '#F8FAFC',
+        'dark-surface-variant': '#334155',
+        'dark-on-surface-variant': '#CBD5E1',
+        'dark-outline': '#475569',
+        'dark-outline-variant': '#334155',
+      },
+      borderRadius: {
+        'sm': '6px',
+        'md': '10px',
+        'DEFAULT': '12px',
+        'lg': '16px',
+        'xl': '20px',
+        'pill': '9999px',
+      },
+      spacing: {
+        'spacing-2xs': '4px',
+        'spacing-xs': '4px',
+        'spacing-sm': '8px',
+        'spacing-md': '12px',
+        'spacing-base': '16px',
+        'spacing-lg': '20px',
+        'spacing-xl': '24px',
+        'spacing-2xl': '32px',
+        'spacing-3xl': '40px',
+        'gutter-mobile': '16px',
+        'nav-height': '68px',
+        'touch-target-min': '44px',
+      },
+      fontFamily: {
+        'display': ['"Cairo"', 'sans-serif'],
+        'headline': ['"Cairo"', 'sans-serif'],
+        'body': ['"Inter"', 'sans-serif'],
+        'label': ['"Inter"', 'sans-serif'],
+      },
+      fontSize: {
+        'display-lg': ['36px', { lineHeight: '44px', letterSpacing: '-0.5px', fontWeight: '700' }],
+        'display-lg-mobile': ['28px', { lineHeight: '36px', letterSpacing: '-0.25px', fontWeight: '700' }],
+        'headline-lg': ['32px', { lineHeight: '40px', letterSpacing: '-0.25px', fontWeight: '700' }],
+        'headline-lg-mobile': ['24px', { lineHeight: '32px', letterSpacing: '0px', fontWeight: '700' }],
+        'headline-md': ['22px', { lineHeight: '30px', letterSpacing: '0px', fontWeight: '600' }],
+        'headline-sm': ['18px', { lineHeight: '26px', letterSpacing: '0px', fontWeight: '600' }],
+        'body-lg': ['16px', { lineHeight: '24px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-md': ['14px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-sm': ['12px', { lineHeight: '18px', letterSpacing: '0px', fontWeight: '400' }],
+        'label-lg': ['14px', { lineHeight: '20px', letterSpacing: '0.1px', fontWeight: '600' }],
+        'label-md': ['12px', { lineHeight: '16px', letterSpacing: '0.2px', fontWeight: '500' }],
+        'label-sm': ['11px', { lineHeight: '14px', letterSpacing: '0.3px', fontWeight: '500' }],
+      },
+      transitionDuration: {
+        'tap': '120ms',
+        'sheet-slide': '260ms',
+        'status-change': '180ms',
+      },
+      transitionDelay: {
+        'tap': '0ms',
+        'sheet-slide': '0ms',
+        'status-change': '0ms',
+      },
+      transitionTimingFunction: {
+        'tap': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'sheet-slide': 'cubic-bezier(0.16, 1, 0.3, 1)',
+        'status-change': 'ease-out',
+      },
+    },
+  },
+};
+if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet">
+  <style>
+    body { font-family: 'Cairo', sans-serif; }
+    .material-symbols-outlined, .material-symbols-rounded, .material-symbols-sharp, .material-icons {
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      line-height: 1 !important;
+      box-sizing: content-box;
+      overflow: hidden;
+      white-space: nowrap;
+      direction: ltr;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body class="bg-dark-bg text-dark-on-surface min-h-[884px] flex flex-col selection:bg-dark-secondary selection:text-indigo-deep pb-24" data-stitch-vh="min-h-[884px]===min-h-screen">
+
+  <!-- Mobile Top Bar (RTL Mirrored) -->
+  <div class="w-full pt-3 px-6 flex items-center justify-between text-dark-on-surface-variant z-10">
+    <span class="font-label text-label-sm font-semibold tabular-nums text-dark-on-surface">9:41</span>
+    <div class="flex items-center gap-1.5 text-dark-on-surface">
+      <span class="material-symbols-outlined text-[16px]">signal_cellular_4_bar</span>
+      <span class="material-symbols-outlined text-[16px]">wifi</span>
+      <span class="material-symbols-outlined text-[18px]">battery_full</span>
+    </div>
+  </div>
+
+  <!-- Header: Personalized Arabic Greeting & Profile Avatar -->
+  <header class="px-6 pt-4 pb-3 flex items-center justify-between">
+    <div class="space-y-0.5">
+      <h1 class="text-headline-sm font-bold text-dark-on-surface">
+        أهلاً، عبد الرحمن 👋
+      </h1>
+      <p class="text-body-sm text-dark-on-surface-variant">
+        خلّينا نسهل عليك خطوتك القادمة في المنح والفرص.
+      </p>
+    </div>
+
+    <!-- Profile Avatar Button -->
+    <a href="../profile/ProfileScreen.html" aria-label="الملف الشخصي" class="w-10 h-10 rounded-pill bg-dark-secondary text-indigo-deep border border-indigo-100 flex items-center justify-center font-bold text-sm shadow-xs hover:ring-2 hover:ring-dark-primary transition duration-tap">
+      <span>ع.م</span>
+    </a>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 px-6 space-y-6 pt-2">
+
+    <!-- Primary Action Hero Card: "تحليل وثيقة جديدة" -->
+    <!-- COMPONENT: card-action -->
+    <section data-component-id="card-hero-analyze-rtl" data-component-type="card" data-component-variant="action" class="bg-dark-surface rounded-xl p-5 border border-indigo-100 shadow-sm relative overflow-hidden flex flex-col gap-4">
+      <!-- Background Ambient Glow -->
+      <div class="absolute -left-6 -bottom-6 w-32 h-32 rounded-pill bg-dark-secondary opacity-60 pointer-events-none"></div>
+
+      <div class="flex items-start justify-between relative z-10">
+        <div class="flex-1 pl-3">
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-pill bg-dark-secondary text-indigo-deep text-label-sm font-bold mb-2">
+            <span class="material-symbols-outlined text-[14px]">auto_awesome</span>
+            <span>ذكاء اصطناعي للمستندات</span>
+          </div>
+          <h2 class="text-headline-sm font-bold text-dark-on-surface mb-1">
+            حلّل ورقة منحتك أو فرصتك
+          </h2>
+          <p class="text-body-sm text-dark-on-surface-variant leading-relaxed">
+            ارفع ملف الـ PDF أو إعلان برنامج التبادل والتدريب ودع الذكاء الاصطناعي يلخص الشروط بدقة.
+          </p>
+        </div>
+
+        <!-- Integrated Emblem -->
+        <div class="w-14 h-14 rounded-xl bg-indigo-50 text-indigo-deep border border-indigo-100 flex items-center justify-center relative shrink-0">
+          <span class="material-symbols-outlined text-[30px] text-dark-primary">upload_file</span>
+          <span class="absolute -top-1 -left-1 w-5 h-5 rounded-pill bg-dark-primary text-dark-on-primary flex items-center justify-center shadow-xs">
+            <span class="material-symbols-outlined text-[12px]">auto_awesome</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Prominent Upload Action Button -->
+      <!-- COMPONENT: button-primary -->
+      <a href="../upload/UploadScreen.html" class="w-full py-3.5 px-4 rounded-DEFAULT bg-dark-primary text-dark-on-primary text-label-lg font-bold flex items-center justify-center gap-2 shadow-sm hover:opacity-95 active:scale-[0.98] transition duration-tap cursor-pointer relative z-10">
+        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">add_circle</span>
+        <span>رفع وثيقة جديدة</span>
+      </a>
+    </section>
+
+    <!-- Quick Access: "مستنداتي الأخيرة" -->
+    <section class="space-y-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <h2 class="text-headline-sm font-bold text-dark-on-surface">
+            مستنداتي
+          </h2>
+          <span class="px-2 py-0.5 rounded-pill bg-dark-secondary text-indigo-deep text-label-sm font-bold tabular-nums">
+            3
+          </span>
+        </div>
+        <a href="../my-documents/MyDocumentsScreen.html" class="text-label-md font-bold text-dark-primary hover:underline">
+          عرض الكل
+        </a>
+      </div>
+
+      <!-- Documents Feed (RTL Aligned) -->
+      <div class="space-y-2.5">
+
+        <!-- 1. Chevening Scholarship (تم التحليل) -->
+        <article class="bg-dark-surface rounded-DEFAULT p-3.5 border border-dark-outline-variant shadow-2xs hover:border-dark-primary transition flex items-center justify-between gap-3 cursor-pointer">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-md bg-indigo-50 text-indigo-deep flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[20px]">school</span>
+            </div>
+            <div class="min-w-0">
+              <h3 class="text-label-lg font-bold text-dark-on-surface truncate">
+                منحة تشيفنينج البريطانية Chevening 2026
+              </h3>
+              <div class="flex items-center gap-2 mt-0.5 text-[11px] text-dark-on-surface-variant">
+                <span>Scholarship</span>
+                <span>•</span>
+                <span class="text-emerald-700 font-bold">تم التحليل</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col items-start gap-1 shrink-0">
+            <span class="px-2 py-0.5 rounded-pill bg-amber-50 text-warning-text text-[11px] font-bold flex items-center gap-1 border border-amber-200">
+              <span class="w-1.5 h-1.5 rounded-pill bg-warning"></span>
+              باقي 12 يوماً
+            </span>
+            <span class="text-[11px] text-dark-on-surface-variant">4 من 7 مهام منجزة</span>
+          </div>
+        </article>
+
+        <!-- 2. Google Internship (تم التحليل بدون موعد نهائي) -->
+        <article class="bg-dark-surface rounded-DEFAULT p-3.5 border border-dark-outline-variant shadow-2xs hover:border-dark-primary transition flex items-center justify-between gap-3 cursor-pointer">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-md bg-blue-50 text-dark-primary flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[20px]">work</span>
+            </div>
+            <div class="min-w-0">
+              <h3 class="text-label-lg font-bold text-dark-on-surface truncate">
+                تدريب Google الصيفي للطلاب (SWE)
+              </h3>
+              <div class="flex items-center gap-2 mt-0.5 text-[11px] text-dark-on-surface-variant">
+                <span>Internship</span>
+                <span>•</span>
+                <span class="text-emerald-700 font-bold">تم التحليل</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col items-start gap-1 shrink-0">
+            <span class="px-2 py-0.5 rounded-pill bg-dark-bg text-dark-on-surface-variant text-[11px] font-medium border border-dark-outline-variant">
+              لا يوجد موعد نهائي
+            </span>
+            <span class="text-[11px] text-dark-on-surface-variant">5 من 5 مهام منجزة</span>
+          </div>
+        </article>
+
+        <!-- 3. Erasmus+ Exchange (قيد التحليل) -->
+        <article class="bg-dark-surface rounded-DEFAULT p-3.5 border border-dark-outline-variant shadow-2xs hover:border-dark-primary transition flex items-center justify-between gap-3 cursor-pointer">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-md bg-indigo-50 text-indigo-deep flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[20px]">flight_takeoff</span>
+            </div>
+            <div class="min-w-0">
+              <h3 class="text-label-lg font-bold text-dark-on-surface truncate">
+                برنامج التبادل Erasmus+ جامعة ميونخ
+              </h3>
+              <div class="flex items-center gap-2 mt-0.5 text-[11px] text-dark-on-surface-variant">
+                <span>Exchange</span>
+                <span>•</span>
+                <span class="text-dark-primary font-bold flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-pill bg-dark-primary animate-pulse"></span>
+                  قيد التحليل
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col items-start gap-1 shrink-0">
+            <span class="px-2 py-0.5 rounded-pill bg-amber-50 text-warning-text text-[11px] font-bold flex items-center gap-1 border border-amber-200">
+              <span class="w-1.5 h-1.5 rounded-pill bg-warning"></span>
+              باقي 26 يوماً
+            </span>
+            <span class="text-[11px] text-dark-on-surface-variant">2 من 6 مهام منجزة</span>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- Additional Section: "كيف يعمل تطبيق ورقتك" -->
+    <section class="bg-dark-surface rounded-lg p-4 border border-dark-outline-variant shadow-2xs">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="material-symbols-outlined text-[18px] text-dark-primary">lightbulb</span>
+        <h3 class="text-label-lg font-bold text-dark-on-surface">
+          كيف يعمل تطبيق ورقتك؟
+        </h3>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 text-center">
+        <!-- 1 -->
+        <div class="flex flex-col items-center gap-1.5 p-2 rounded-md bg-dark-bg">
+          <div class="w-7 h-7 rounded-pill bg-dark-secondary text-indigo-deep flex items-center justify-center font-bold text-xs">
+            1
+          </div>
+          <p class="text-[11px] font-bold text-dark-on-surface leading-tight">ارفع الملف</p>
+          <p class="text-[10px] text-dark-on-surface-variant leading-tight">PDF أو صورة واضحة</p>
+        </div>
+
+        <!-- 2 -->
+        <div class="flex flex-col items-center gap-1.5 p-2 rounded-md bg-dark-bg">
+          <div class="w-7 h-7 rounded-pill bg-dark-secondary text-indigo-deep flex items-center justify-center font-bold text-xs">
+            2
+          </div>
+          <p class="text-[11px] font-bold text-dark-on-surface leading-tight">افهم الشروط</p>
+          <p class="text-[10px] text-dark-on-surface-variant leading-tight">استخراج ذكي للمواعيد</p>
+        </div>
+
+        <!-- 3 -->
+        <div class="flex flex-col items-center gap-1.5 p-2 rounded-md bg-dark-bg">
+          <div class="w-7 h-7 rounded-pill bg-dark-secondary text-indigo-deep flex items-center justify-center font-bold text-xs">
+            3
+          </div>
+          <p class="text-[11px] font-bold text-dark-on-surface leading-tight">رتّب مهامك</p>
+          <p class="text-[10px] text-dark-on-surface-variant leading-tight">قائمة متابعة عملية</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Sticky Mobile Bottom Navigation Bar (RTL Mirrored) -->
+  <nav aria-label="شريط التنقل الرئيسي" class="fixed bottom-0 inset-x-0 bg-dark-surface border-t border-dark-outline-variant py-2 px-6 flex items-center justify-around z-30 shadow-[0_-4px_16px_rgba(15,23,42,0.04)]">
+    <!-- Home Tab (Active) -->
+    <a href="#home" aria-current="page" class="flex flex-col items-center gap-0.5 text-dark-primary px-3 py-1 cursor-pointer transition">
+      <span class="material-symbols-outlined text-[24px]">home</span>
+      <span class="text-label-sm font-bold">الرئيسية</span>
+    </a>
+
+    <!-- My Documents Tab -->
+    <a href="../my-documents/MyDocumentsScreen.html" class="flex flex-col items-center gap-0.5 text-dark-on-surface-variant hover:text-dark-on-surface px-3 py-1 cursor-pointer transition">
+      <span class="material-symbols-outlined text-[24px]">description</span>
+      <span class="text-label-sm font-medium">مستنداتي</span>
+    </a>
+
+    <!-- Profile Tab -->
+    <a href="../profile/ProfileScreen.html" class="flex flex-col items-center gap-0.5 text-dark-on-surface-variant hover:text-dark-on-surface px-3 py-1 cursor-pointer transition">
+      <span class="material-symbols-outlined text-[24px]">person</span>
+      <span class="text-label-sm font-medium">حسابي</span>
+    </a>
+  </nav>
+
+
+
+</body></html>

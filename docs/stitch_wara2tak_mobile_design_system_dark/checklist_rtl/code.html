@@ -1,0 +1,452 @@
+<!DOCTYPE html><html lang="ar" dir="rtl" class="dark"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>قائمة المهام — خطة التقديم</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
+globalThis.tailwind = globalThis.tailwind || {};
+globalThis.tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'indigo-deep': '#4F46E5',
+        'blue-soft': '#E0E7FF',
+        'neutral-bg': '#F8FAFC',
+        'text-navy': '#0F172A',
+        'text-slate': '#475569',
+        'success': '#16A34A',
+        'warning': '#F59E0B',
+        'warning-text': '#B45309',
+        'error': '#EF4444',
+        'light-primary': '#4F46E5',
+        'light-on-primary': '#FFFFFF',
+        'light-secondary': '#E0E7FF',
+        'light-on-secondary': '#1E1B4B',
+        'light-surface': '#FFFFFF',
+        'light-on-surface': '#0F172A',
+        'light-surface-variant': '#F1F5F9',
+        'light-on-surface-variant': '#475569',
+        'light-outline': '#CBD5E1',
+        'light-outline-variant': '#E2E8F0',
+        'dark-bg': '#0F172A',
+        'dark-primary': '#818CF8',
+        'dark-on-primary': '#0F172A',
+        'dark-secondary': '#1E1B4B',
+        'dark-on-secondary': '#E0E7FF',
+        'dark-surface': '#1E293B',
+        'dark-on-surface': '#F8FAFC',
+        'dark-surface-variant': '#334155',
+        'dark-on-surface-variant': '#CBD5E1',
+        'dark-outline': '#475569',
+        'dark-outline-variant': '#334155',
+      },
+      borderRadius: {
+        'sm': '6px',
+        'md': '10px',
+        'DEFAULT': '12px',
+        'lg': '16px',
+        'xl': '20px',
+        'pill': '9999px',
+      },
+      spacing: {
+        'spacing-2xs': '4px',
+        'spacing-xs': '4px',
+        'spacing-sm': '8px',
+        'spacing-md': '12px',
+        'spacing-base': '16px',
+        'spacing-lg': '20px',
+        'spacing-xl': '24px',
+        'spacing-2xl': '32px',
+        'spacing-3xl': '40px',
+        'gutter-mobile': '16px',
+        'nav-height': '68px',
+        'touch-target-min': '44px',
+      },
+      fontFamily: {
+        'display': ['"Cairo"', 'sans-serif'],
+        'headline': ['"Cairo"', 'sans-serif'],
+        'body': ['"Inter"', 'sans-serif'],
+        'label': ['"Inter"', 'sans-serif'],
+      },
+      fontSize: {
+        'display-lg': ['36px', { lineHeight: '44px', letterSpacing: '-0.5px', fontWeight: '700' }],
+        'display-lg-mobile': ['28px', { lineHeight: '36px', letterSpacing: '-0.25px', fontWeight: '700' }],
+        'headline-lg': ['32px', { lineHeight: '40px', letterSpacing: '-0.25px', fontWeight: '700' }],
+        'headline-lg-mobile': ['24px', { lineHeight: '32px', letterSpacing: '0px', fontWeight: '700' }],
+        'headline-md': ['22px', { lineHeight: '30px', letterSpacing: '0px', fontWeight: '600' }],
+        'headline-sm': ['18px', { lineHeight: '26px', letterSpacing: '0px', fontWeight: '600' }],
+        'body-lg': ['16px', { lineHeight: '24px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-md': ['14px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-sm': ['12px', { lineHeight: '18px', letterSpacing: '0px', fontWeight: '400' }],
+        'label-lg': ['14px', { lineHeight: '20px', letterSpacing: '0.1px', fontWeight: '600' }],
+        'label-md': ['12px', { lineHeight: '16px', letterSpacing: '0.2px', fontWeight: '500' }],
+        'label-sm': ['11px', { lineHeight: '14px', letterSpacing: '0.3px', fontWeight: '500' }],
+      },
+      transitionDuration: {
+        'tap': '120ms',
+        'sheet-slide': '260ms',
+        'status-change': '180ms',
+      },
+      transitionDelay: {
+        'tap': '0ms',
+        'sheet-slide': '0ms',
+        'status-change': '0ms',
+      },
+      transitionTimingFunction: {
+        'tap': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'sheet-slide': 'cubic-bezier(0.16, 1, 0.3, 1)',
+        'status-change': 'ease-out',
+      },
+    },
+  },
+};
+if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet">
+  <style>
+    .material-symbols-outlined {
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      line-height: 1 !important;
+      overflow: hidden;
+      white-space: nowrap;
+      direction: ltr;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body class="bg-dark-bg text-dark-on-surface min-h-[884px] flex flex-col font-sans selection:bg-dark-secondary selection:text-indigo-deep pb-28 relative" data-stitch-vh="min-h-[884px]===min-h-screen">
+
+  <!-- Mobile Top Bar -->
+  <div class="w-full pt-3 px-6 flex items-center justify-between text-dark-on-surface-variant z-20 bg-dark-surface sticky top-0 border-b border-dark-outline-variant">
+    <span class="font-label text-label-sm font-semibold tabular-nums text-dark-on-surface">9:41</span>
+    <div class="flex items-center gap-1.5 flex-row-reverse text-dark-on-surface">
+      <div class="w-5 h-2.5 bg-slate-800 rounded-sm"></div>
+      <span class="material-symbols-outlined text-[16px]">wifi</span>
+      <span class="material-symbols-outlined text-[16px]">signal_cellular_4_bar</span>
+    </div>
+  </div>
+
+  <!-- Header with Opportunity Context -->
+  <header class="px-6 pt-2 pb-3 border-b border-dark-outline-variant bg-dark-surface shadow-2xs z-10">
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <a href="../document-results-rtl/DocumentResultsScreenRTL.html" aria-label="الرجوع لنتائج المستند" class="w-9 h-9 rounded-DEFAULT bg-dark-bg border border-dark-outline-variant text-dark-on-surface-variant hover:text-dark-on-surface flex items-center justify-center transition active:scale-95 shadow-xs shrink-0">
+          <span class="material-symbols-outlined text-[20px] rotate-180">arrow_back</span>
+        </a>
+        <div class="min-w-0">
+          <h1 class="text-base font-bold text-dark-on-surface leading-tight truncate">
+            قائمة مهام التقديم
+          </h1>
+          <p class="text-[11px] text-dark-on-surface-variant truncate mt-0.5">
+            برنامج التبادل الطلابي الدولي 2027
+          </p>
+        </div>
+      </div>
+
+      <!-- Add Task Quick Header Action -->
+      <button type="button" onclick="openAddTaskModalRTL()" class="w-9 h-9 rounded-DEFAULT bg-dark-primary text-dark-on-primary flex items-center justify-center shadow-xs hover:opacity-95 active:scale-95 transition shrink-0 cursor-pointer" aria-label="إضافة مهمة شخصية">
+        <span class="material-symbols-outlined text-[20px]">add</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Scrollable Checklist Content -->
+  <main class="flex-1 px-6 space-y-5 pt-4 max-w-sm mx-auto w-full">
+
+    <!-- Progress Overview Card (Consistent Numbers: 4 من 8 = 3/5 رسمية + 1/3 شخصية) -->
+    <section class="bg-dark-surface rounded-xl p-4 border border-dark-outline-variant shadow-xs space-y-3">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-base font-bold text-dark-on-surface">
+            تم إنجاز 4 من 8 مهام
+          </p>
+          <p class="text-xs text-dark-on-surface-variant">
+            واصل التقدم! 50% من ملف تقديمك أصبح جاهزاً.
+          </p>
+        </div>
+        <span class="text-lg font-bold text-dark-primary tabular-nums">
+          50%
+        </span>
+      </div>
+
+      <!-- Clean Visual Progress Bar -->
+      <div class="w-full h-2.5 rounded-pill bg-dark-surface-variant overflow-hidden p-0.5 border border-dark-outline-variant/60">
+        <div class="w-1/2 h-full bg-dark-primary rounded-pill transition-all duration-300"></div>
+      </div>
+
+      <!-- Category Breakdown Pills -->
+      <div class="flex items-center gap-2 pt-1 text-[11px]">
+        <span class="px-2 py-0.5 rounded-pill bg-indigo-50 text-indigo-deep font-semibold">
+          3 من 5 مهام رسمية منجزة
+        </span>
+        <span class="px-2 py-0.5 rounded-pill bg-dark-bg text-dark-on-surface-variant font-medium border border-dark-outline-variant">
+          1 من 3 مهام شخصية منجزة
+        </span>
+      </div>
+    </section>
+
+    <!-- Section 1: Official Requirements (5 items total, 3 completed, 2 remaining) -->
+    <section class="space-y-2.5">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[18px] text-dark-primary">verified</span>
+          <h2 class="text-sm font-bold text-dark-on-surface">
+            المتطلبات الرسمية
+          </h2>
+        </div>
+        <span class="text-[11px] font-bold text-indigo-deep bg-indigo-50 px-2 py-0.5 rounded">3 من 5 مكتملة</span>
+      </div>
+
+      <!-- Official Task 1: Complete -->
+      <article class="bg-dark-surface rounded-xl p-3.5 border border-dark-outline-variant shadow-xs flex items-start gap-3 transition">
+        <button type="button" class="w-5 h-5 rounded-md bg-dark-primary text-dark-on-primary flex items-center justify-center shrink-0 mt-0.5">
+          <span class="material-symbols-outlined text-[16px]">check</span>
+        </button>
+        <div class="min-w-0 flex-1 space-y-1 text-right">
+          <div class="flex items-center justify-between gap-2">
+            <h3 class="text-xs font-semibold text-dark-on-surface-variant line-through truncate">
+              تجهيز السجل الأكاديمي الرسمي
+            </h3>
+            <span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-indigo-50 text-indigo-deep uppercase shrink-0">من المستند</span>
+          </div>
+          <p class="text-[11px] text-dark-on-surface-variant line-through">
+            يجب أن يتضمن الختم الرسمي للجامعة والترجمة الإنجليزية المعتمدة.
+          </p>
+          <div class="flex items-center justify-between pt-1 text-[10px]">
+            <span class="text-dark-on-surface-variant font-medium">موعد المستند: 15 نوفمبر 2026</span>
+            <span class="text-dark-primary font-bold flex items-center gap-0.5">
+              <span class="material-symbols-outlined text-[12px] rotate-180">menu_book</span> صفحة 4
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Official Task 2: Complete -->
+      <article class="bg-dark-surface rounded-xl p-3.5 border border-dark-outline-variant shadow-xs flex items-start gap-3 transition">
+        <button type="button" class="w-5 h-5 rounded-md bg-dark-primary text-dark-on-primary flex items-center justify-center shrink-0 mt-0.5">
+          <span class="material-symbols-outlined text-[16px]">check</span>
+        </button>
+        <div class="min-w-0 flex-1 space-y-1 text-right">
+          <div class="flex items-center justify-between gap-2">
+            <h3 class="text-xs font-semibold text-dark-on-surface-variant line-through truncate">
+              التحقق من صلاحية شهادة اللغة
+            </h3>
+            <span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-indigo-50 text-indigo-deep uppercase shrink-0">من المستند</span>
+          </div>
+          <p class="text-[11px] text-dark-on-surface-variant line-through">
+            IELTS 6.5+ أو TOEFL iBT 85+ صادرة خلال آخر 24 شهراً.
+          </p>
+          <div class="flex items-center justify-between pt-1 text-[10px]">
+            <span class="text-dark-on-surface-variant font-medium">موعد المستند: 15 نوفمبر 2026</span>
+            <span class="text-dark-primary font-bold flex items-center gap-0.5">
+              <span class="material-symbols-outlined text-[12px] rotate-180">menu_book</span> صفحة 4
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Official Task 3: Complete -->
+      <article class="bg-dark-surface rounded-xl p-3.5 border border-dark-outline-variant shadow-xs flex items-start gap-3 transition">
+        <button type="button" class="w-5 h-5 rounded-md bg-dark-primary text-dark-on-primary flex items-center justify-center shrink-0 mt-0.5">
+          <span class="material-symbols-outlined text-[16px]">check</span>
+        </button>
+        <div class="min-w-0 flex-1 space-y-1 text-right">
+          <div class="flex items-center justify-between gap-2">
+            <h3 class="text-xs font-semibold text-dark-on-surface-variant line-through truncate">
+              تقديم طلب الترشيح الداخلي بالجامعة
+            </h3>
+            <span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-indigo-50 text-indigo-deep uppercase shrink-0">من المستند</span>
+          </div>
+          <p class="text-[11px] text-dark-on-surface-variant line-through">
+            تسليم استمارة إبداء الرغبة لمكتب العلاقات الدولية بجامعتك الأم.
+          </p>
+          <div class="flex items-center justify-between pt-1 text-[10px]">
+            <span class="text-dark-on-surface-variant font-medium">موعد المستند: 20 أكتوبر 2026</span>
+            <span class="text-dark-primary font-bold flex items-center gap-0.5">
+              <span class="material-symbols-outlined text-[12px] rotate-180">menu_book</span> صفحة 2
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Official Task 4: Incomplete -->
+      <article class="bg-dark-surface rounded-xl p-3.5 border border-dark-outline-variant shadow-xs flex items-start gap-3 transition">
+        <button type="button" class="w-5 h-5 rounded-md border-2 border-slate-300 hover:border-dark-primary flex items-center justify-center shrink-0 mt-0.5"></button>
+        <div class="min-w-0 flex-1 space-y-1 text-right">
+          <div class="flex items-center justify-between gap-2">
+            <h3 class="text-xs font-bold text-dark-on-surface truncate">
+              صياغة خطاب الغرض من الدراسة (SoP)
+            </h3>
+            <span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-indigo-50 text-indigo-deep uppercase shrink-0">من المستند</span>
+          </div>
+          <p class="text-[11px] text-dark-on-surface-variant">
+            بحد أقصى 800 كلمة يشرح الأهداف الأكاديمية والبحثية.
+          </p>
+          <div class="flex items-center justify-between pt-1 text-[10px]">
+            <span class="text-dark-on-surface-variant font-medium">موعد المستند: 15 نوفمبر 2026</span>
+            <span class="text-dark-primary font-bold flex items-center gap-0.5">
+              <span class="material-symbols-outlined text-[12px] rotate-180">menu_book</span> صفحة 5
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Official Task 5: Incomplete with Overdue Tag -->
+      <article class="bg-rose-50/40 rounded-xl p-3.5 border border-rose-200 shadow-xs flex items-start gap-3 transition">
+        <button type="button" class="w-5 h-5 rounded-md border-2 border-rose-300 hover:border-error flex items-center justify-center shrink-0 mt-0.5"></button>
+        <div class="min-w-0 flex-1 space-y-1 text-right">
+          <div class="flex items-center justify-between gap-2">
+            <h3 class="text-xs font-bold text-dark-on-surface truncate">
+              طلب خطاب التوصية الأكاديمي
+            </h3>
+            <span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-indigo-50 text-indigo-deep uppercase shrink-0">من المستند</span>
+          </div>
+          <p class="text-[11px] text-dark-on-surface-variant">
+            توقيع التزكية من أستاذ المادة أو رئيس القسم الأكاديمي.
+          </p>
+          <div class="flex items-center justify-between pt-1 text-[10px]">
+            <!-- Overdue Indicator -->
+            <span class="text-error font-bold flex items-center gap-1">
+              <span class="material-symbols-outlined text-[13px]">alarm</span>
+              موعد المستند: 30 أكتوبر 2026 (انتهى الموعد)
+            </span>
+            <span class="text-dark-primary font-bold flex items-center gap-0.5">
+              <span class="material-symbols-outlined text-[12px] rotate-180">menu_book</span> صفحة 7
+            </span>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- Section 2: Personal Tasks (3 items total, 1 completed, 2 pending) -->
+    <section class="space-y-2.5">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[18px] text-indigo-deep">edit_note</span>
+          <h2 class="text-sm font-bold text-dark-on-surface">
+            المهام الشخصية
+          </h2>
+        </div>
+        <button onclick="openAddTaskModalRTL()" class="text-xs font-bold text-dark-primary hover:underline flex items-center gap-0.5">
+          <span class="material-symbols-outlined text-[14px]">add</span>
+          <span>إضافة مهمة</span>
+        </button>
+      </div>
+
+      <!-- Personal Task 1: Complete -->
+      <article class="bg-dark-surface rounded-xl p-3.5 border border-dark-outline-variant shadow-xs flex items-start gap-3 transition">
+        <button type="button" class="w-5 h-5 rounded-md bg-dark-primary text-dark-on-primary flex items-center justify-center shrink-0 mt-0.5">
+          <span class="material-symbols-outlined text-[16px]">check</span>
+        </button>
+        <div class="min-w-0 flex-1 space-y-1 text-right">
+          <div class="flex items-center justify-between gap-2">
+            <h3 class="text-xs font-semibold text-dark-on-surface-variant line-through truncate">
+              استخراج صور شخصية إضافية للسفارة
+            </h3>
+            <span class="px-1.5 py-0.2 rounded text-[10px] font-medium bg-dark-bg text-dark-on-surface-variant border border-dark-outline-variant">شخصية</span>
+          </div>
+          <p class="text-[11px] text-dark-on-surface-variant line-through">4 صور بيومترية حديثة لملف التأشيرة.</p>
+          <div class="flex items-center justify-between pt-1 text-[10px] text-dark-on-surface-variant">
+            <span>تاريخي المحدد: 15 أكتوبر 2026</span>
+            <span class="text-success font-bold">مكتملة</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Personal Task 2: Pending with custom due date -->
+      <article class="bg-dark-surface rounded-xl p-3.5 border border-dark-outline-variant shadow-xs flex items-start gap-3 transition">
+        <button type="button" class="w-5 h-5 rounded-md border-2 border-slate-300 hover:border-dark-primary flex items-center justify-center shrink-0 mt-0.5"></button>
+        <div class="min-w-0 flex-1 space-y-1 text-right">
+          <div class="flex items-center justify-between gap-2">
+            <h3 class="text-xs font-bold text-dark-on-surface truncate">
+              فحص تاريخ سريان جواز السفر
+            </h3>
+            <span class="px-1.5 py-0.2 rounded text-[10px] font-medium bg-dark-bg text-dark-on-surface-variant border border-dark-outline-variant">شخصية</span>
+          </div>
+          <p class="text-[11px] text-dark-on-surface-variant">التأكد من سريان الجواز لمدة 6 أشهر بعد تاريخ العودة.</p>
+          <div class="flex items-center justify-between pt-1 text-[10px]">
+            <span class="text-dark-on-surface-variant font-medium">تاريخي المحدد: 10 نوفمبر 2026</span>
+            <button type="button" class="text-dark-on-surface-variant hover:text-error flex items-center gap-0.5">
+              <span class="material-symbols-outlined text-[13px]">delete</span>
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <!-- Personal Task 3: Overdue personal task -->
+      <article class="bg-rose-50/40 rounded-xl p-3.5 border border-rose-200 shadow-xs flex items-start gap-3 transition">
+        <button type="button" class="w-5 h-5 rounded-md border-2 border-rose-300 hover:border-error flex items-center justify-center shrink-0 mt-0.5"></button>
+        <div class="min-w-0 flex-1 space-y-1 text-right">
+          <div class="flex items-center justify-between gap-2">
+            <h3 class="text-xs font-bold text-dark-on-surface truncate">
+              تحديد موعد استشارة مع المرشد الأكاديمي
+            </h3>
+            <span class="px-1.5 py-0.2 rounded text-[10px] font-medium bg-dark-bg text-dark-on-surface-variant border border-dark-outline-variant">شخصية</span>
+          </div>
+          <p class="text-[11px] text-dark-on-surface-variant">مناقشة معادلة المقررات وخطة اتفاقية التعلم.</p>
+          <div class="flex items-center justify-between pt-1 text-[10px]">
+            <span class="text-error font-bold flex items-center gap-1">
+              <span class="material-symbols-outlined text-[13px]">alarm</span>
+              تاريخي المحدد: 01 نوفمبر 2026 (انتهى الموعد)
+            </span>
+            <button type="button" class="text-dark-on-surface-variant hover:text-error flex items-center gap-0.5">
+              <span class="material-symbols-outlined text-[13px]">delete</span>
+            </button>
+          </div>
+        </div>
+      </article>
+    </section>
+
+  </main>
+
+  <!-- Add Personal Task Modal Sheet -->
+  <div id="add-task-modal-rtl" class="hidden fixed inset-0 bg-black/40 z-50 flex items-end sm:items-center justify-center p-4">
+    <div class="bg-dark-surface rounded-2xl p-5 max-w-sm w-full shadow-2xl space-y-4 text-right">
+      <div class="flex items-center justify-between border-b border-dark-outline-variant pb-2">
+        <h3 class="text-sm font-bold text-dark-on-surface">إضافة مهمة شخصية</h3>
+        <button onclick="closeAddTaskModalRTL()" class="text-dark-on-surface-variant hover:text-dark-on-surface">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-dark-on-surface mb-1">عنوان المهمة *</label>
+          <input type="text" placeholder="مثال: حجز موعد مقابلة السفارة" class="w-full bg-dark-bg border border-dark-outline-variant rounded-xl px-3 py-2 text-xs text-dark-on-surface focus:outline-none focus:border-dark-primary text-right">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-dark-on-surface mb-1">الوصف (اختياري)</label>
+          <textarea rows="2" placeholder="أضف ملاحظات أو تذكيرات خاصة..." class="w-full bg-dark-bg border border-dark-outline-variant rounded-xl px-3 py-2 text-xs text-dark-on-surface focus:outline-none focus:border-dark-primary text-right"></textarea>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-dark-on-surface mb-1">تاريخي المحدد (اختياري)</label>
+          <input type="date" class="w-full bg-dark-bg border border-dark-outline-variant rounded-xl px-3 py-2 text-xs text-dark-on-surface focus:outline-none focus:border-dark-primary text-right">
+        </div>
+      </div>
+
+      <div class="pt-2 flex items-center gap-2">
+        <button onclick="closeAddTaskModalRTL()" class="flex-1 py-2.5 rounded-xl bg-dark-primary text-dark-on-primary font-bold text-xs hover:opacity-95 transition">
+          إضافة المهمة
+        </button>
+        <button onclick="closeAddTaskModalRTL()" class="px-4 py-2.5 rounded-xl bg-dark-bg text-dark-on-surface font-semibold text-xs hover:bg-slate-200 transition">
+          إلغاء
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openAddTaskModalRTL() {
+      document.getElementById('add-task-modal-rtl').classList.remove('hidden');
+    }
+    function closeAddTaskModalRTL() {
+      document.getElementById('add-task-modal-rtl').classList.add('hidden');
+    }
+  </script>
+
+
+</body></html>
