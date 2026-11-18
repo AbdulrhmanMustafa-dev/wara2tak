@@ -13,10 +13,9 @@ class AuthRepositoryImpl implements AuthRepository {
   final GoogleSignIn _googleSignIn;
 
   AuthRepositoryImpl({
-    required SupabaseClient supabaseClient,
-    required GoogleSignIn googleSignIn,
-  })  : _supabaseClient = supabaseClient,
-        _googleSignIn = googleSignIn;
+    required this._supabaseClient,
+    required this._googleSignIn,
+  });
 
   @override
   Future<Either<Failure, UserModel>> signInWithGoogle() async {
@@ -107,8 +106,8 @@ class AuthRepositoryImpl implements AuthRepository {
   Stream<UserModel?> get authStateChanges {
     return _supabaseClient.auth.onAuthStateChange.map((data) {
       final session = data.session;
-      if (session == null || session.user == null) return null;
-      return UserModel.fromSupabase(session.user!);
+      if (session == null) return null;
+      return UserModel.fromSupabase(session.user);
     });
   }
 

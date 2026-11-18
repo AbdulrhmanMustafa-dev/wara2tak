@@ -1,4 +1,5 @@
 /// Profile feature barrel file
+library;
 export 'presentation/cubit/profile_cubit.dart';
 export 'presentation/cubit/profile_state.dart';
 export 'domain/models/profile_model.dart';

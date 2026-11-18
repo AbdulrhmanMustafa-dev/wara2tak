@@ -32,7 +32,7 @@ class UserModel extends Equatable {
       photoUrl: metadata['avatar_url'] as String? ?? metadata['picture'] as String?,
       phoneNumber: user.phone,
       isEmailVerified: user.emailConfirmedAt != null,
-      createdAt: user.createdAt != null ? DateTime.parse(user.createdAt!) : null,
+      createdAt: DateTime.parse(user.createdAt),
       lastSignInAt: user.updatedAt != null ? DateTime.parse(user.updatedAt!) : null,
     );
   }

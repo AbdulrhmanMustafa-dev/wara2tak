@@ -10,7 +10,7 @@ void testConfiguration() async {
     serverClientId: '471240171200-74earbu056i61eav87pdtn0el3sjvcbf.apps.googleusercontent.com',
   );
   
-  print('GoogleSignIn initialized: ${googleSignIn}');
+  print('GoogleSignIn initialized: $googleSignIn');
   
   // Test 2: Try to sign in silently
   try {

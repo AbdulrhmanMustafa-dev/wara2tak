@@ -31,24 +31,15 @@ class DocumentsLoaded extends DocumentState {
   List<Object?> get props => [documents];
 }
 
-/// Document loaded state
+/// Document loaded state (document + optional analysis)
 class DocumentLoaded extends DocumentState {
   final DocumentModel document;
+  final AnalysisModel? analysis;
 
-  const DocumentLoaded(this.document);
-
-  @override
-  List<Object?> get props => [document];
-}
-
-/// Analysis loaded state
-class AnalysisLoaded extends DocumentState {
-  final AnalysisModel analysis;
-
-  const AnalysisLoaded(this.analysis);
+  const DocumentLoaded(this.document, {this.analysis});
 
   @override
-  List<Object?> get props => [analysis];
+  List<Object?> get props => [document, analysis];
 }
 
 /// Upload progress state
@@ -69,17 +60,6 @@ class DocumentUploadSuccess extends DocumentState {
 
   @override
   List<Object?> get props => [document];
-}
-
-/// Analysis progress state
-class AnalysisProgressState extends DocumentState {
-  final int progress;
-  final String? message;
-
-  const AnalysisProgressState(this.progress, {this.message});
-
-  @override
-  List<Object?> get props => [progress, message];
 }
 
 /// Error state

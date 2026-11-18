@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
 
 /// Context extensions for easy access to theme, navigation, etc.
@@ -11,6 +11,12 @@ extension AppContextExtensions on BuildContext {
 
   // Navigation
   GoRouter get router => GoRouter.of(this);
+
+  /// Whether the current route can be popped (GoRouter extension)
+  bool get canGoBack => router.canPop();
+
+  /// Pop the current route safely (uses GoRouter)
+  void goBack<T extends Object?>([T? result]) => router.pop<T>(result);
 
   // MediaQuery
   MediaQueryData get mediaQuery => MediaQuery.of(this);
@@ -160,7 +166,7 @@ extension WidgetListExtensions on Iterable<Widget> {
   Widget separatedBy(Widget separator) =>
       ListView.separated(
         itemCount: length,
-        separatorBuilder: (_, __) => separator,
+        separatorBuilder: (_, _) => separator,
         itemBuilder: (_, index) => elementAt(index),
       );
 

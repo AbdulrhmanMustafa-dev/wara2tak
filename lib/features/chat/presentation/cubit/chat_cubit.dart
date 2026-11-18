@@ -1,11 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:dartz/dartz.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../domain/models/chat_model.dart';
 import '../../domain/repositories/chat_repository.dart';
 import 'chat_state.dart';
-import '../../../../core/errors/failures.dart';
 
 /// ChatCubit manages chat state
 class ChatCubit extends Cubit<ChatState> {

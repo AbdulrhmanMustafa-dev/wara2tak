@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
@@ -39,8 +39,7 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
   }
 
   void _loadData() {
-    context.read<DocumentCubit>().getDocument(widget.documentId);
-    context.read<DocumentCubit>().getAnalysis(widget.documentId);
+    context.read<DocumentCubit>().loadDocumentWithAnalysis(widget.documentId);
   }
 
   @override
@@ -49,6 +48,7 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
       builder: (context, state) {
         if (state is DocumentLoaded) {
           final doc = state.document;
+          final analysis = state.analysis;
           return Scaffold(
             appBar: AppBar(
               title: Text(doc.title, style: AppTypography.headlineSmall),
@@ -76,10 +76,10 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
             body: TabBarView(
               controller: _tabController,
               children: [
-                _buildSummaryTab(doc),
-                _buildKeyClausesTab(doc),
-                _buildDeadlinesTab(doc),
-                _buildFinancialsTab(doc),
+                _buildSummaryTab(doc, analysis),
+                _buildKeyClausesTab(doc, analysis),
+                _buildDeadlinesTab(doc, analysis),
+                _buildFinancialsTab(doc, analysis),
               ],
             ),
             bottomNavigationBar: _buildBottomActions(context, doc),
@@ -105,156 +105,139 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
     );
   }
 
-  Widget _buildSummaryTab(DocumentModel doc) {
-    return BlocBuilder<DocumentCubit, DocumentState>(
-      builder: (context, state) {
-        if (state is AnalysisLoaded) {
-          final analysis = state.analysis;
-          return SingleChildScrollView(
-            padding: AppSpacing.screenPadding,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildSummaryTab(DocumentModel doc, AnalysisModel? analysis) {
+    if (analysis == null) {
+      return const LoadingState(message: 'Loading analysis...');
+    }
+    return SingleChildScrollView(
+      padding: AppSpacing.screenPadding,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Document info
+          _buildInfoCard(doc),
+          const SizedBox(height: AppSpacing.spacingLg),
+
+          // AI Summary
+          if (analysis.summary != null) ...[
+            Text('AI Summary', style: AppTypography.headlineSmall),
+            const SizedBox(height: AppSpacing.spacingSm),
+            AppCard(
+              child: Text(
+                analysis.summary!,
+                style: AppTypography.bodyMedium,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.spacingLg),
+          ],
+
+          // Key metrics
+          _buildMetricsRow(analysis),
+          const SizedBox(height: AppSpacing.spacingLg),
+
+          // Red flags
+          if (analysis.redFlags.isNotEmpty) ...[
+            Text('Red Flags', style: AppTypography.headlineSmall),
+            const SizedBox(height: AppSpacing.spacingSm),
+            ...analysis.redFlags.map((flag) => _RedFlagCard(flag: flag)),
+            const SizedBox(height: AppSpacing.spacingLg),
+          ],
+
+          // Checklist preview
+          if (analysis.checklistItems.isNotEmpty) ...[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Document info
-                _buildInfoCard(doc),
-                const SizedBox(height: AppSpacing.spacingLg),
-
-                // AI Summary
-                if (analysis.summary != null) ...[
-                  Text('AI Summary', style: AppTypography.headlineSmall),
-                  const SizedBox(height: AppSpacing.spacingSm),
-                  AppCard(
-                    child: Text(
-                      analysis.summary!,
-                      style: AppTypography.bodyMedium,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.spacingLg),
-                ],
-
-                // Key metrics
-                _buildMetricsRow(analysis),
-                const SizedBox(height: AppSpacing.spacingLg),
-
-                // Red flags
-                if (analysis.redFlags.isNotEmpty) ...[
-                  Text('Red Flags', style: AppTypography.headlineSmall),
-                  const SizedBox(height: AppSpacing.spacingSm),
-                  ...analysis.redFlags.map((flag) => _RedFlagCard(flag: flag)),
-                  const SizedBox(height: AppSpacing.spacingLg),
-                ],
-
-                // Checklist preview
-                if (analysis.checklistItems.isNotEmpty) ...[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Checklist', style: AppTypography.headlineSmall),
-                      TertiaryButton(
-                        label: 'View All',
-                        onPressed: () => AppRouter.goToChecklist(context, doc.id),
-                        trailingIcon: Symbols.chevron_right,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.spacingSm),
-                  ...analysis.checklistItems.take(3).map((item) => _ChecklistPreviewItem(item: item)),
-                  if (analysis.checklistItems.length > 3) ...[
-                    const SizedBox(height: AppSpacing.spacingSm),
-                    Center(
-                      child: TertiaryButton(
-                        label: 'View ${analysis.checklistItems.length} items',
-                        onPressed: () => AppRouter.goToChecklist(context, doc.id),
-                      ),
-                    ),
-                  ],
-                ],
+                Text('Checklist', style: AppTypography.headlineSmall),
+                TertiaryButton(
+                  label: 'View All',
+                  onPressed: () => AppRouter.goToChecklist(context, doc.id),
+                  trailingIcon: Symbols.chevron_right,
+                ),
               ],
             ),
-          );
-        }
-        return const LoadingState(message: 'Loading analysis...');
+            const SizedBox(height: AppSpacing.spacingSm),
+            ...analysis.checklistItems.take(3).map((item) => _ChecklistPreviewItem(item: item)),
+            if (analysis.checklistItems.length > 3) ...[
+              const SizedBox(height: AppSpacing.spacingSm),
+              Center(
+                child: TertiaryButton(
+                  label: 'View ${analysis.checklistItems.length} items',
+                  onPressed: () => AppRouter.goToChecklist(context, doc.id),
+                ),
+              ),
+            ],
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildKeyClausesTab(DocumentModel doc, AnalysisModel? analysis) {
+    if (analysis == null) {
+      return const LoadingState(message: 'Loading analysis...');
+    }
+    final clauses = analysis.keyClauses;
+    if (clauses.isEmpty) {
+      return EmptyState(
+        icon: Symbols.description,
+        title: 'No key clauses found',
+        subtitle: 'The AI analysis did not identify any key clauses',
+      );
+    }
+    return ListView.separated(
+      padding: AppSpacing.screenPadding,
+      itemCount: clauses.length,
+      separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.spacingMd),
+      itemBuilder: (context, index) {
+        final clause = clauses[index];
+        return _KeyClauseCard(clause: clause);
       },
     );
   }
 
-  Widget _buildKeyClausesTab(DocumentModel doc) {
-    return BlocBuilder<DocumentCubit, DocumentState>(
-      builder: (context, state) {
-        if (state is AnalysisLoaded) {
-          final clauses = state.analysis.keyClauses;
-          if (clauses.isEmpty) {
-            return EmptyState(
-              icon: Symbols.description,
-              title: 'No key clauses found',
-              subtitle: 'The AI analysis did not identify any key clauses',
-            );
-          }
-          return ListView.separated(
-            padding: AppSpacing.screenPadding,
-            itemCount: clauses.length,
-            separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.spacingMd),
-            itemBuilder: (context, index) {
-              final clause = clauses[index];
-              return _KeyClauseCard(clause: clause);
-            },
-          );
-        }
-        return const LoadingState(message: 'Loading clauses...');
+  Widget _buildDeadlinesTab(DocumentModel doc, AnalysisModel? analysis) {
+    if (analysis == null) {
+      return const LoadingState(message: 'Loading analysis...');
+    }
+    final deadlines = analysis.deadlines;
+    if (deadlines.isEmpty) {
+      return EmptyState(
+        icon: Symbols.event,
+        title: 'No deadlines found',
+        subtitle: 'The AI analysis did not identify any deadlines',
+      );
+    }
+    return ListView.separated(
+      padding: AppSpacing.screenPadding,
+      itemCount: deadlines.length,
+      separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.spacingMd),
+      itemBuilder: (context, index) {
+        final deadline = deadlines[index];
+        return _DeadlineCard(deadline: deadline);
       },
     );
   }
 
-  Widget _buildDeadlinesTab(DocumentModel doc) {
-    return BlocBuilder<DocumentCubit, DocumentState>(
-      builder: (context, state) {
-        if (state is AnalysisLoaded) {
-          final deadlines = state.analysis.deadlines;
-          if (deadlines.isEmpty) {
-            return EmptyState(
-              icon: Symbols.event,
-              title: 'No deadlines found',
-              subtitle: 'The AI analysis did not identify any deadlines',
-            );
-          }
-          return ListView.separated(
-            padding: AppSpacing.screenPadding,
-            itemCount: deadlines.length,
-            separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.spacingMd),
-            itemBuilder: (context, index) {
-              final deadline = deadlines[index];
-              return _DeadlineCard(deadline: deadline);
-            },
-          );
-        }
-        return const LoadingState(message: 'Loading deadlines...');
-      },
-    );
-  }
-
-  Widget _buildFinancialsTab(DocumentModel doc) {
-    return BlocBuilder<DocumentCubit, DocumentState>(
-      builder: (context, state) {
-        if (state is AnalysisLoaded) {
-          final financials = state.analysis.financialObligations;
-          if (financials.isEmpty) {
-            return EmptyState(
-              icon: Symbols.attach_money,
-              title: 'No financial obligations found',
-              subtitle: 'The AI analysis did not identify any financial obligations',
-            );
-          }
-          return ListView.separated(
-            padding: AppSpacing.screenPadding,
-            itemCount: financials.length,
-            separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.spacingMd),
-            itemBuilder: (context, index) {
-              final financial = financials[index];
-              return _FinancialCard(financial: financial);
-            },
-          );
-        }
-        return const LoadingState(message: 'Loading financials...');
+  Widget _buildFinancialsTab(DocumentModel doc, AnalysisModel? analysis) {
+    if (analysis == null) {
+      return const LoadingState(message: 'Loading analysis...');
+    }
+    final financials = analysis.financialObligations;
+    if (financials.isEmpty) {
+      return EmptyState(
+        icon: Symbols.attach_money,
+        title: 'No financial obligations found',
+        subtitle: 'The AI analysis did not identify any financial obligations',
+      );
+    }
+    return ListView.separated(
+      padding: AppSpacing.screenPadding,
+      itemCount: financials.length,
+      separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.spacingMd),
+      itemBuilder: (context, index) {
+        final financial = financials[index];
+        return _FinancialCard(financial: financial);
       },
     );
   }
@@ -369,24 +352,58 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
   Widget _buildBottomActions(BuildContext context, DocumentModel doc) {
     return SafeArea(
       child: Padding(
-        padding: AppSpacing.screenPadding,
+        padding: EdgeInsets.symmetric(
+          horizontal: AppSpacing.spacingMd,
+          vertical: AppSpacing.spacingSm,
+        ),
         child: Row(
           children: [
-            Expanded(
-              child: SecondaryButton(
-                label: 'Chat',
-                onPressed: () => AppRouter.goToDocumentChat(context, doc.id),
-                leadingIcon: Symbols.chat,
-                isFullWidth: true,
+            Flexible(
+              flex: 1,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: SecondaryButton(
+                  label: 'Chat',
+                  onPressed: () => AppRouter.goToDocumentChat(context, doc.id),
+                  leadingIcon: Symbols.chat,
+                  isFullWidth: true,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.spacingSm,
+                    vertical: AppSpacing.spacingSm,
+                  ),
+                ),
               ),
             ),
-            const SizedBox(width: AppSpacing.spacingMd),
-            Expanded(
-              child: PrimaryButton(
-                label: 'Checklist',
-                onPressed: () => AppRouter.goToChecklist(context, doc.id),
-                leadingIcon: Symbols.checklist,
-                isFullWidth: true,
+            Flexible(
+              flex: 1,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: PrimaryButton(
+                  label: 'Checklist',
+                  onPressed: () => AppRouter.goToChecklist(context, doc.id),
+                  leadingIcon: Symbols.checklist,
+                  isFullWidth: true,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.spacingSm,
+                    vertical: AppSpacing.spacingSm,
+                  ),
+                ),
+              ),
+            ),
+            Flexible(
+              flex: 1,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: SecondaryButton(
+                  label: 'Translate',
+                  onPressed: () => AppRouter.goToTranslation(context, doc.id),
+                  leadingIcon: Symbols.translate,
+                  isFullWidth: true,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.spacingSm,
+                    vertical: AppSpacing.spacingSm,
+                  ),
+                ),
               ),
             ),
           ],
@@ -445,9 +462,13 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
           FilledDestructiveButton(
             label: 'Delete',
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(context); // close dialog
               context.read<DocumentCubit>().deleteDocument(doc.id);
-              Navigator.pop(context);
+              if (context.canGoBack) {
+                context.goBack(); // close details screen safely
+              } else {
+                AppRouter.goToHome(context);
+              }
             },
             leadingIcon: Symbols.delete,
           ),
@@ -761,7 +782,14 @@ class _DeadlineCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Text(deadline.title, style: AppTypography.labelMedium),
+                    Expanded(
+                      child: Text(
+                        deadline.title,
+                        style: AppTypography.labelMedium,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                     const SizedBox(width: AppSpacing.spacingXs),
                     if (isOverdue)
                       Container(

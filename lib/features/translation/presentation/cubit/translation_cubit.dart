@@ -1,10 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:dartz/dartz.dart';
 
 import '../../domain/models/translation_model.dart';
 import '../../domain/repositories/translation_repository.dart';
 import 'translation_state.dart';
-import '../../../../core/errors/failures.dart';
 
 /// TranslationCubit manages translation state
 class TranslationCubit extends Cubit<TranslationState> {

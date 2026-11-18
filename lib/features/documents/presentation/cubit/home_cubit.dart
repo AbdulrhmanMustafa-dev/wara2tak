@@ -1,10 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:dartz/dartz.dart';
 
 import '../../domain/models/document_model.dart';
 import '../../domain/repositories/document_repository.dart';
-import '../../../../core/errors/failures.dart';
 
 /// Home state for dashboard
 abstract class HomeState extends Equatable {

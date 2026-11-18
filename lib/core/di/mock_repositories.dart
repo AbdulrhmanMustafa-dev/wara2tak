@@ -77,6 +77,7 @@ class MockAIRepository implements AIRepository {
   @override
   Future<Either<Failure, AnalysisModel>> analyzeDocument({
     required DocumentModel document,
+    required String localFilePath,
     required String userId,
     required Function(int progress, String? message) onProgress,
   }) async => const Left(ServerFailure('AI not connected yet'));

@@ -1,10 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:dartz/dartz.dart';
 
 import '../../domain/models/checklist_model.dart';
 import '../../domain/repositories/checklist_repository.dart';
 import 'checklist_state.dart';
-import '../../../../core/errors/failures.dart';
 
 /// ChecklistCubit manages checklist state
 class ChecklistCubit extends Cubit<ChecklistState> {

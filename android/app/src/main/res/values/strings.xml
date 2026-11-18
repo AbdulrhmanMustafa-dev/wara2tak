@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Wara2tak</string>
     <!-- Google Sign-In configuration -->
     <!-- This should match the GOOGLE_WEB_CLIENT_ID from .env -->
     <string name="google_web_client_id">471240171200-74earbu056i61eav87pdtn0el3sjvcbf.apps.googleusercontent.com</string>

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
@@ -6,11 +6,9 @@ import '../../../../core/design_system/index.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/navigation/app_router.dart';
 import '../../../../shared/widgets/index.dart';
-import '../../index.dart';
-import '../cubit/document_cubit.dart';
-import '../cubit/document_state.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../../auth/presentation/cubit/auth_state.dart';
+import '../../index.dart';
 
 /// My Documents screen
 class MyDocumentsScreen extends StatelessWidget {
@@ -18,24 +16,28 @@ class MyDocumentsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthCubit, AuthState>(
-      listener: (context, state) {
-        if (state is AuthUnauthenticated) {
-          AppRouter.goToAuth(context);
-        }
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (bool didPop) {
+        if (didPop) return;
+        AppRouter.goToHome(context);
       },
-      child: Scaffold(
+      child: BlocListener<AuthCubit, AuthState>(
+        listener: (context, state) {
+          if (state is AuthUnauthenticated) {
+            AppRouter.goToAuth(context);
+          }
+        },
+        child: Scaffold(
         appBar: AppBar(
           title: Text('My Documents', style: AppTypography.titleLarge),
+          leading: AppIconButton(
+            icon: Symbols.arrow_back,
+            onPressed: () => AppRouter.goToHome(context),
+          ),
           actions: [
-            AppIconButton(
-              icon: Symbols.search,
-              onPressed: () {},
-            ),
-            AppIconButton(
-              icon: Symbols.filter_list,
-              onPressed: () {},
-            ),
+            AppIconButton(icon: Symbols.search, onPressed: () {}),
+            AppIconButton(icon: Symbols.filter_list, onPressed: () {}),
           ],
         ),
         body: SafeArea(
@@ -55,7 +57,8 @@ class MyDocumentsScreen extends StatelessWidget {
                 return ListView.separated(
                   padding: AppSpacing.screenPadding,
                   itemCount: state.documents.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.spacingMd),
+                  separatorBuilder: (_, _) =>
+                      const SizedBox(height: AppSpacing.spacingMd),
                   itemBuilder: (context, index) {
                     final doc = state.documents[index];
                     return DocumentCard(
@@ -68,7 +71,8 @@ class MyDocumentsScreen extends StatelessWidget {
                           : null,
                       typeColor: _getTypeColor(context, doc.type),
                       typeIcon: _getTypeIcon(doc.type),
-                      onTap: () => AppRouter.goToDocumentDetails(context, doc.id),
+                      onTap: () =>
+                          AppRouter.goToDocumentDetails(context, doc.id),
                       onDelete: () => _showDeleteDialog(context, doc),
                       trailingActions: _buildTrailingActions(context, doc),
                     );
@@ -81,8 +85,11 @@ class MyDocumentsScreen extends StatelessWidget {
                   title: 'Failed to load documents',
                   subtitle: state.message,
                   actionLabel: 'Retry',
-                  onAction: () => context.read<DocumentCubit>().loadUserDocuments(
-                        (context.read<AuthCubit>().state as AuthAuthenticated).user.id,
+                  onAction: () =>
+                      context.read<DocumentCubit>().loadUserDocuments(
+                        (context.read<AuthCubit>().state as AuthAuthenticated)
+                            .user
+                            .id,
                       ),
                 );
               }
@@ -98,6 +105,7 @@ class MyDocumentsScreen extends StatelessWidget {
           foregroundColor: context.colors.onPrimary,
         ),
       ),
+    ),
     );
   }
 

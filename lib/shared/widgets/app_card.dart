@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 import '../../core/design_system/index.dart';
@@ -16,6 +16,7 @@ class AppCard extends StatelessWidget {
   final BorderRadius? borderRadius;
   final VoidCallback? onTap;
   final bool isInteractive;
+  final bool provideMaterial;
 
   const AppCard({
     super.key,
@@ -28,6 +29,7 @@ class AppCard extends StatelessWidget {
     this.borderRadius,
     this.onTap,
     this.isInteractive = false,
+    this.provideMaterial = false,
   });
 
   @override
@@ -48,6 +50,12 @@ class AppCard extends StatelessWidget {
       child: child,
     );
 
+    // Wrap with Material to provide ancestor for ListTile, InkWell, etc.
+    final withMaterial = Material(
+      color: Colors.transparent,
+      child: card,
+    );
+
     if (onTap != null || isInteractive) {
       return Material(
         color: Colors.transparent,
@@ -57,6 +65,10 @@ class AppCard extends StatelessWidget {
           child: card,
         ),
       );
+    }
+
+    if (provideMaterial) {
+      return withMaterial;
     }
 
     return card;
@@ -193,7 +205,7 @@ class ActionCard extends StatelessWidget {
                   ],
                 ),
               ),
-              if (trailingWidget != null) trailingWidget!,
+              ?trailingWidget,
               if (emblemIcon != null) ...[
                 const SizedBox(width: AppSpacing.spacingMd),
                 Container(

@@ -1,4 +1,5 @@
 /// Features barrel file
+library;
 export 'auth/index.dart';
 export 'documents/index.dart';
 export 'analysis/index.dart' hide ChecklistLoading, ChecklistError, ChecklistGenerated, TranslationCompleted;

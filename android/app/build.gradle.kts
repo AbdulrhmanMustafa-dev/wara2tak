@@ -41,6 +41,10 @@ android {
     }
 }
 
+dependencies {
+    implementation("androidx.core:core-splashscreen:1.2.0")
+}
+
 kotlin {
     compilerOptions {
         jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17

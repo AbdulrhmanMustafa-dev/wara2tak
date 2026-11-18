@@ -10,6 +10,7 @@ abstract class AIRepository {
   /// Analyze a document using Gemini AI
   Future<Either<Failure, AnalysisModel>> analyzeDocument({
     required DocumentModel document,
+    required String localFilePath,
     required String userId,
     required Function(int progress, String? message) onProgress,
   });

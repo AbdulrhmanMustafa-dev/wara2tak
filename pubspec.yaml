@@ -25,6 +25,12 @@ dependencies:
   # Supabase
   supabase_flutter: ^2.5.6
 
+  # AI - Google Generative AI (Gemini)
+  google_generative_ai: ^0.4.6
+
+  # HTTP Client for fallback AI providers
+  http: ^1.2.0
+
   # Auth
   google_sign_in: ^6.2.1
 
@@ -49,6 +55,8 @@ dependencies:
   material_symbols_icons: ^4.2670.0
   flutter_dotenv: ^6.0.2
 
+  material_ui: any
+  gotrue: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

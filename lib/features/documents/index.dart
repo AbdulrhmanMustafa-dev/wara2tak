@@ -1,4 +1,5 @@
 /// Documents feature barrel file
+library;
 export 'presentation/cubit/document_cubit.dart';
 export 'presentation/cubit/document_state.dart';
 export 'presentation/cubit/home_cubit.dart';

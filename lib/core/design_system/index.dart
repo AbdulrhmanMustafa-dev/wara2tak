@@ -6,6 +6,7 @@
 /// ```dart
 /// import 'package:wara2tak/core/design_system/index.dart';
 /// ```
+library;
 
 // Colors
 export 'app_colors.dart';

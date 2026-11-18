@@ -1,10 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:dartz/dartz.dart';
 
 import '../../domain/models/profile_model.dart';
 import '../../domain/repositories/profile_repository.dart';
 import 'profile_state.dart';
-import '../../../../core/errors/failures.dart';
 
 /// ProfileCubit manages profile state
 class ProfileCubit extends Cubit<ProfileState> {

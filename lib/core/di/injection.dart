@@ -1,26 +1,33 @@
 import 'dart:developer';
 
+import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/services/supabase_database_service.dart';
 import '../../core/services/supabase_storage_service.dart';
+import '../../features/analysis/data/repositories/ai_repository_impl.dart';
 import '../../features/analysis/domain/repositories/ai_repository.dart';
 import '../../features/analysis/presentation/cubit/analysis_cubit.dart';
 import '../../features/auth/data/repositories/auth_repository_impl.dart';
 import '../../features/auth/data/repositories/mock_auth_repository.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/presentation/cubit/auth_cubit.dart';
+import '../../features/chat/data/repositories/chat_repository_impl.dart';
 import '../../features/chat/domain/repositories/chat_repository.dart';
 import '../../features/chat/presentation/cubit/chat_cubit.dart';
+import '../../features/checklist/data/repositories/checklist_repository_impl.dart';
 import '../../features/checklist/domain/repositories/checklist_repository.dart';
 import '../../features/checklist/presentation/cubit/checklist_cubit.dart';
+import '../../features/documents/data/repositories/document_repository_impl.dart';
 import '../../features/documents/domain/repositories/document_repository.dart';
 import '../../features/documents/presentation/cubit/document_cubit.dart';
 import '../../features/documents/presentation/cubit/home_cubit.dart';
+import '../../features/profile/data/repositories/profile_repository_impl.dart';
 import '../../features/profile/domain/repositories/profile_repository.dart';
 import '../../features/profile/presentation/cubit/profile_cubit.dart';
+import '../../features/translation/data/repositories/translation_repository_impl.dart';
 import '../../features/translation/domain/repositories/translation_repository.dart';
 import '../../features/translation/presentation/cubit/translation_cubit.dart';
 import '../../supabase_config.dart';
@@ -83,36 +90,101 @@ Future<void> _registerCoreServices({required bool supabaseAvailable}) async {
   }
 }
 
+/// Validate API keys at startup
+void _validateApiKeys() {
+  // Validate Gemini API key
+  final geminiKey = SupabaseConfig.geminiApiKey;
+  if (!SupabaseConfig.isGeminiConfigured || geminiKey.isEmpty) {
+    final error = 'GEMINI_API_KEY is not configured. Set it in supabase_config.dart or via --dart-define.';
+    if (kDebugMode) {
+      log('❌ $error');
+    }
+    throw StateError(error);
+  }
+  if (kDebugMode) {
+    final maskedKey = geminiKey.length > 4 ? '${geminiKey.substring(0, 4)}...${geminiKey.substring(geminiKey.length - 4)}' : '****';
+    log('✅ GEMINI_API_KEY configured: $maskedKey');
+  }
+
+  // Validate Kimi API key
+  final kimiKey = SupabaseConfig.kimiApiKey;
+  if (!SupabaseConfig.isKimiConfigured || kimiKey.isEmpty) {
+    final warning = 'KIMI_API_KEY is not configured. Fallback AI provider will be unavailable.';
+    if (kDebugMode) {
+      log('⚠️ $warning');
+    }
+  } else if (kDebugMode) {
+    final maskedKey = kimiKey.length > 4 ? '${kimiKey.substring(0, 4)}...${kimiKey.substring(kimiKey.length - 4)}' : '****';
+    log('✅ KIMI_API_KEY configured: $maskedKey');
+  }
+
+  // Validate Cerebras API key
+  final cerebrasKey = SupabaseConfig.cerebrasApiKey;
+  if (!SupabaseConfig.isCerebrasConfigured || cerebrasKey.isEmpty) {
+    final warning = 'CEREBRAS_API_KEY is not configured. Ultra-fast inference will be unavailable.';
+    if (kDebugMode) {
+      log('⚠️ $warning');
+    }
+  } else if (kDebugMode) {
+    final maskedKey = cerebrasKey.length > 4 ? '${cerebrasKey.substring(0, 4)}...${cerebrasKey.substring(cerebrasKey.length - 4)}' : '****';
+    log('✅ CEREBRAS_API_KEY configured: $maskedKey');
+  }
+}
+
 /// Register repositories
 void _registerRepositories() {
   try {
     if (getIt.isRegistered<SupabaseClient>()) {
+      // Validate API keys before registering AI repository
+      _validateApiKeys();
+
       getIt.registerLazySingleton<AuthRepository>(
         () =>
             AuthRepositoryImpl(supabaseClient: getIt(), googleSignIn: getIt()),
       );
-      log('Supabase AuthRepository registered');
+      getIt.registerLazySingleton<DocumentRepository>(
+        () => DocumentRepositoryImpl(getIt<SupabaseClient>()),
+      );
+      getIt.registerLazySingleton<ProfileRepository>(
+        () => ProfileRepositoryImpl(getIt<SupabaseClient>()),
+      );
+      getIt.registerLazySingleton<ChecklistRepository>(
+        () => ChecklistRepositoryImpl(getIt<SupabaseClient>()),
+      );
+      getIt.registerLazySingleton<ChatRepository>(
+        () => ChatRepositoryImpl(getIt<SupabaseClient>()),
+      );
+      getIt.registerLazySingleton<TranslationRepository>(
+        () => TranslationRepositoryImpl(getIt<SupabaseClient>()),
+      );
+      // AI Repository - uses Gemini 3.0 Flash via google_generative_ai with Kimi & Cerebras fallback
+      getIt.registerLazySingleton<AIRepository>(
+        () => AIRepositoryImpl(
+          geminiApiKey: SupabaseConfig.geminiApiKey,
+          kimiApiKey: SupabaseConfig.kimiApiKey,
+          cerebrasApiKey: SupabaseConfig.cerebrasApiKey,
+        ),
+      );
+      log('Supabase repositories registered');
     } else {
       throw StateError('Supabase not initialized');
     }
   } catch (e) {
-    log('Using MockAuthRepository for development: $e');
+    log('Using Mock repositories for development: $e');
     getIt.registerLazySingleton<AuthRepository>(() => MockAuthRepository());
+    getIt.registerLazySingleton<DocumentRepository>(
+      () => MockDocumentRepository(),
+    );
+    getIt.registerLazySingleton<AIRepository>(() => MockAIRepository());
+    getIt.registerLazySingleton<ChecklistRepository>(
+      () => MockChecklistRepository(),
+    );
+    getIt.registerLazySingleton<ChatRepository>(() => MockChatRepository());
+    getIt.registerLazySingleton<TranslationRepository>(
+      () => MockTranslationRepository(),
+    );
+    getIt.registerLazySingleton<ProfileRepository>(() => MockProfileRepository());
   }
-
-  // تسجيل باقي الـ Repositories عشان الـ Cubits تشتغل
-  getIt.registerLazySingleton<DocumentRepository>(
-    () => MockDocumentRepository(),
-  );
-  getIt.registerLazySingleton<AIRepository>(() => MockAIRepository());
-  getIt.registerLazySingleton<ChecklistRepository>(
-    () => MockChecklistRepository(),
-  );
-  getIt.registerLazySingleton<ChatRepository>(() => MockChatRepository());
-  getIt.registerLazySingleton<TranslationRepository>(
-    () => MockTranslationRepository(),
-  );
-  getIt.registerLazySingleton<ProfileRepository>(() => MockProfileRepository());
 }
 
 /// Register Cubits/Blocs
@@ -128,7 +200,9 @@ void _registerCubits() {
   getIt.registerFactory<HomeCubit>(() => HomeCubit(getIt()));
 
   // Analysis cubit
-  getIt.registerFactory<AnalysisCubit>(() => AnalysisCubit(getIt()));
+  getIt.registerFactory<AnalysisCubit>(
+    () => AnalysisCubit(getIt<AIRepository>(), getIt<DocumentRepository>()),
+  );
 
   // Checklist cubit
   getIt.registerFactory<ChecklistCubit>(() => ChecklistCubit(getIt()));

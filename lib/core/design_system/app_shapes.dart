@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Wara2tak Design System Shapes & Border Radius
 /// Based on the Stitch design system export

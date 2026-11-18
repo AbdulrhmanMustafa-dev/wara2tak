@@ -201,6 +201,120 @@ Proposed flow:
 6. Save analysis and source evidence.
 7. Display results; reuse saved analysis for Chat, Translation, and Checklist.
 
+### 7.1 Multi-Provider AI Architecture & Sequential Fallback Strategy (Updated 2026-11-18)
+
+The AI analysis pipeline uses a **Sequential Failover Chain** (not parallel race) for maximum reliability.
+This avoids the `Future.any()` bug where a fast 404 error from a deprecated model would immediately abort all other providers.
+
+| Tier | Provider | Models (tried in order) | Protocol | Purpose |
+|------|----------|------------------------|----------|---------|
+| **Primary (Tier 1)** | Google AI Studio | `gemini-3-flash-preview` → `gemini-3.0-flash` → `gemini-2.5-pro` → `gemini-2.5-flash-lite` | `google_generative_ai` SDK | Latest required models for new projects; internal fallback chain. **Primary is `gemini-3-flash-preview`** (working for new projects; `gemini-3.0-flash` returns 404) |
+| **Fallback (Tier 2)** | Moonshot AI (Kimi) | `kimi-k2-0711-preview` | OpenAI-compatible REST (`/chat/completions`) | Fallback on ALL Gemini models failing; supports file upload for PDF extraction |
+| **Fallback (Tier 3)** | Cerebras | `llama-3.3-70b` | OpenAI-compatible REST (`/chat/completions`) | Ultra-fast inference as final fallback; text-only (no file upload) |
+
+**Gemini Internal Model Fallback Chain (sequential within Tier 1):**
+1. Try `gemini-3-flash-preview` with retries (max 2 retries on 503/429/5xx) — **PRIMARY MODEL**
+2. If 404/model not found/unsupported → immediately try `gemini-3.0-flash` (no retries on 404)
+3. If 404/model not found/unsupported → immediately try `gemini-2.5-pro`
+4. If 404/model not found/unsupported → immediately try `gemini-2.5-flash-lite`
+5. If ALL Gemini models fail → trigger Kimi fallback (Tier 2)
+
+**Fallback Trigger Conditions:**
+- **Retryable errors** (triggers retries on same model): HTTP 503, 429, 500, 502, 504, `UNAVAILABLE`, `RESOURCE_EXHAUSTED`, `TimeoutException`, `SocketException`
+- **Immediate fallback triggers** (skips retries, tries next model): HTTP 404 (model not found), 400 (unsupported), 401, 403, `QUOTA_EXHAUSTED`
+- **Provider failover** (triggers next tier): ANY exception from the full Gemini chain (all 4 models exhausted) triggers Kimi if `kimiApiKey` is configured; if Kimi fails or unconfigured, triggers Cerebras if `cerebrasApiKey` is configured
+
+**Retry Logic (per Gemini model):**
+- Max 2 retries with exponential backoff: 1s → 2s
+- Only retries on retryable errors (503, 429, 500, 502, 504, UNAVAILABLE, RESOURCE_EXHAUSTED)
+- Does NOT retry on 404, 400, 401, 403, QUOTA_EXCEEDED → immediately tries next model
+
+**Kimi Fallback for PDF/Image Analysis (Tier 2):**
+- On analysis requests with file attachments, uploads file to Moonshot `/v1/files` (purpose: `file-extract`) first
+- Fetches extracted text via `GET /v1/files/{file_id}/content`
+- Then calls `/v1/chat/completions` with the extracted document text
+- Handles UTF-8 safe decoding and JSON validation
+
+**Cerebras Fallback (Tier 3):**
+- Text-only (cannot accept raw PDF bytes in JSON body)
+- Used for chat/translation; for analysis, requires text content extracted beforehand
+- Ultra-low latency (~100ms) but no file upload capability
+
+**Structured Output:**
+- All engines use JSON schema validation (`responseSchema`) for analysis
+- Response parsing strips markdown code fences (```json ... ```) safely
+- Validates required fields before returning to caller
+- Error map records status of EVERY provider (including "Skipped (API key empty)") for debugging
+
+### 7.2 Analysis Progress State Machine (Updated 2026-11-18)
+
+Granular progress updates prevent UI freeze at 40%. The progress now reflects the **sequential** failover chain (not parallel race).
+
+| Stage | Progress | Message | Description |
+|-------|----------|---------|-------------|
+| 0 | 0% | "Starting analysis..." | Initial state |
+| 1 | 10% | "Reading file..." | Local file I/O |
+| 2 | 20% | "File read successfully. Preparing for analysis..." | File validation complete |
+| 3 | 40% | "Sending to primary AI engine (Gemini)..." | Primary API request (**gemini-3-flash-preview**) |
+| 4a | 45% | "Gemini returned 503. Retrying in 1s (attempt 1/2)..." | Retry 1 on retryable error (503/429/5xx) |
+| 4b | 50% | "Gemini returned 503. Retrying in 2s (attempt 2/2)..." | Retry 2 on retryable error |
+| 4c | 45% | "Gemini 3-flash-preview unavailable. Trying gemini-3.0-flash..." | **Model fallback** (on 404/unsupported) |
+| 4d | 50% | "Gemini 3.0-flash unavailable. Trying gemini-2.5-pro..." | **Model fallback** (on 404/unsupported) |
+| 4e | 52% | "Gemini 2.5-pro unavailable. Trying gemini-2.5-flash-lite..." | **Model fallback** (on 404/unsupported) |
+| 5 | 55% | "All Gemini models failed. Switching to fallback engine (Kimi)..." | Kimi fallback triggered |
+| 5a | 57% | "Uploading document to fallback engine (Kimi)..." | File upload to Moonshot `/v1/files` |
+| 6 | 60% | "Processing Kimi response..." | Kimi API request |
+| 6a | 62% | "Kimi failed. Trying Cerebras ultra-fast..." | Cerebras fallback triggered |
+| 7 | 80% | "Parsing structured analysis..." | JSON parsing & validation |
+| 8 | 85% | "Saving results to database..." | Supabase write |
+| 9 | 100% | "Analysis complete" | Done → `AnalysisCompleted` state |
+
+**Error Recovery:**
+- On total failure: emits `AnalysisError` with `code` (e.g., `SERVER_ERROR`, `UNEXPECTED_ERROR`)
+- UI shows retry button → calls `retryLastAnalysis()` with stored parameters
+- `canRetryLastAnalysis` getter exposes retry availability
+- Error message includes status of ALL providers (e.g., "Gemini (4 models): 404; Kimi: Skipped (API key empty); Cerebras: Skipped (API key empty)")
+
+### 7.3 Configuration & Environment Setup
+
+All secrets loaded via `--dart-define` at build time (recommended for CI/CD) or `.env` for local development:
+
+```bash
+# Build with API keys (CI/CD)
+flutter build apk \
+  --dart-define=SUPABASE_URL=https://your-project.supabase.co \
+  --dart-define=SUPABASE_ANON_KEY=your-anon-key \
+  --dart-define=GEMINI_API_KEY=your-gemini-key \
+  --dart-define=KIMI_API_KEY=your-kimi-key \
+  --dart-define=KIMI_BASE_URL=https://api.moonshot.cn/v1 \
+  --dart-define=CEREBRAS_API_KEY=your-cerebras-key \
+  --dart-define=CEREBRAS_BASE_URL=https://api.cerebras.ai/v1
+
+# Local development: create .env file in project root
+# SUPABASE_URL=https://...
+# SUPABASE_ANON_KEY=...
+# GEMINI_API_KEY=...
+# KIMI_API_KEY=... (or kimi_api_key)
+# KIMI_BASE_URL=https://api.moonshot.cn/v1
+# CEREBRAS_API_KEY=...
+# CEREBRAS_BASE_URL=https://api.cerebras.ai/v1
+```
+
+**Validation at Startup** (`SupabaseConfig.initialize()`):
+- Throws `StateError` if `GEMINI_API_KEY` missing (primary required)
+- Warns if `KIMI_API_KEY` missing (fallback optional but recommended)
+- Warns if `CEREBRAS_API_KEY` missing (final fallback optional)
+- Logs masked keys (first 4 + last 4 chars) with `CONFIGURED`/`MISSING` status in debug mode
+- `isGeminiConfigured` / `isKimiConfigured` / `isCerebrasConfigured` getters for runtime checks
+- Reads `.env` file at runtime; `.env` values take precedence over `--dart-define` defaults
+- Supports both `KIMI_API_KEY` and `kimi_api_key` (lowercase) in `.env`
+
+**Dependency Injection** (`injection.dart`):
+- Validates keys before registering `AIRepositoryImpl`
+- Registers real `AIRepositoryImpl` (not mock) when Supabase available
+- `AIRepositoryImpl` receives `geminiApiKey`, `kimiApiKey`, and `cerebrasApiKey` from config
+- Passes instance keys to avoid static config lookup issues
+
 Draft output fields (not final schema):
 
 - `document_title`
@@ -306,23 +420,20 @@ Feature modules: Authentication, Documents, AI Analysis, Checklist, Document Cha
 
 Candidate packages (verify current versions and compatibility): `provider`, `go_router`, `firebase_core`, `firebase_auth`, `cloud_firestore`, `firebase_storage`, `firebase_ai` or the officially recommended SDK, `file_picker`, `image_picker`.
 
-## 10. Proposed Data Model (Not Yet Approved)
+## 10. Proposed Data Model — **Implemented in Supabase PostgreSQL**
 
-Possible Supabase (PostgreSQL) structure:
+The following tables are created in Supabase with camelCase column names matching Dart models:
 
-- `users` table — profile and settings (linked to `auth.users` via foreign key).
-- `documents` table — metadata, status, storage path (with `user_id` FK).
-- `document_analysis` table — structured AI result and evidence (with `document_id` FK).
-- `checklist_tasks` table — checklist tasks (with `document_id` FK).
-- `chat_messages` table — chat history (with `document_id` FK).
+- `profiles` — profile and settings (linked to `auth.users` via foreign key, `id` PK).
+- `documents` — metadata, status, storage path (with `userId` FK).
+- `analyses` — structured AI result and evidence (with `documentId` FK).
+- `checklist_items` — checklist tasks (with `documentId` and `userId` FKs).
+- `chat_messages` — chat history (with `documentId` and `userId` FKs).
+- `translations` — translation history (with `documentId` and `userId` FKs).
 
-Finalize structure based on query needs and Row Level Security (RLS) policies. Likely document fields: `id`, `user_id`, `file_name`, `file_type`, `storage_path`, `uploaded_at`, `analysis_status`, `document_title`, `document_type`, `summary`, `analysis_language`, `analysis_version`.
+**Storage**: Private `documents` bucket with user-folder isolation (`$userId/{timestamp}_$fileName`).
 
-Likely task fields: `id`, `document_id`, `title`, `description`, `is_completed`, `due_date`, `task_type` (`requirement` or `personal_task`), `source_reference`, `created_at`, `updated_at`.
-
-Proposed Storage path: `users/{user_id}/documents/{document_id}/original_file`.
-
-Enable RLS on all tables with policies ensuring users can only access their own data.
+**Security**: Row Level Security (RLS) enabled on all tables with policies ensuring users can only access their own data. `on_auth_user_created` trigger auto-creates profile on sign-up.
 
 ## 11. Privacy and Security Requirements
 
@@ -433,9 +544,9 @@ Complete in this order:
 
 ## 15. Current Status
 
-**Last updated:** 15 November 2026  
+**Last updated:** 18 November 2026  
 **Current stage:** Stage 1 — User Flow & UI/UX (Stitch design draft v2 under review); **Implementation started and functional**  
-**Implementation status:** Full Flutter app implemented with feature-first architecture, Cubit/Bloc state management, go_router navigation, Firebase integration, and Stitch design system.
+**Implementation status:** Full Flutter app implemented with feature-first architecture, Cubit/Bloc state management, go_router navigation, **Supabase integration (Auth, PostgreSQL, Storage)**, and Stitch design system. **All 4 UI/Feature issues from emulator testing fixed** (Deadlines overflow, ChecklistScreen, DocumentChatScreen, TranslationScreen fully implemented).
 
 ### Confirmed
 
@@ -463,7 +574,7 @@ Complete in this order:
 - [x] Feature-first architecture: `lib/{core,features,shared}`
 - [x] Cubit/Bloc state management with `flutter_bloc ^8.1.6`
 - [x] Dependency injection with GetIt
-- [x] Navigation with go_router (14 routes matching Stitch screens)
+- [x] Navigation with go_router (14 routes matching Stitch screens) — **Fixed `AssertionError` by separating Bottom Navigation (`go()`) from Sub-screen routing (`push`)**; added `PopScope` to main tab screens (`UploadScreen`, `MyDocumentsScreen`, `ProfileScreen`) to intercept system back button and route to `HomeScreen`
 - [x] Google Fonts (Cairo for Arabic/headlines, Inter for English/body)
 - [x] Material 3 theming with custom ColorScheme (light/dark)
 - [x] RTL/LTR support for Arabic/English via context extensions
@@ -501,6 +612,15 @@ Complete in this order:
 - [x] Repository pattern with dartz Either for error handling
 - [x] Supabase Database Service (PostgreSQL)
 - [x] Supabase Storage Service
+- [x] **Database schema implemented**: `profiles`, `documents`, `analyses`, `checklist_items`, `chat_messages`, `translations` tables with camelCase columns
+- [x] **RLS policies** configured on all tables for user data isolation
+- [x] **Storage policies** for private `documents` bucket with user-folder isolation
+- [x] **Real repositories implemented**: `DocumentRepositoryImpl`, `ProfileRepositoryImpl`, `ChecklistRepositoryImpl`, `ChatRepositoryImpl`, `TranslationRepositoryImpl`
+- [x] **Repositories wired in `injection.dart`** with SupabaseClient dependency
+- [x] **Automatic data loading** on auth (Home, My Documents, Profile screens)
+- [x] **Storage key sanitization** for Arabic/special-char filenames in `DocumentRepositoryImpl`
+- [x] **Reactive theme/locale** in `MaterialApp` via `BlocBuilder<ProfileCubit>`
+- [x] **Material ancestor for `ListTile`** in `AppCard` via `provideMaterial` flag
 
 **Build & Quality**
 - [x] `flutter analyze` → 0 errors (only style warnings)
@@ -528,9 +648,9 @@ Complete in this order:
 - [ ] Prepare test documents, QA plan, and Definition of Done.
 - [ ] Obtain explicit approval before production coding.
 
-**Last updated:** 15 November 2026  
+**Last updated:** 18 November 2026  
 **Current stage:** Stage 1 — User Flow & UI/UX (Stitch prompts generated for final tweaks); **Implementation prototype complete**  
-**Implementation status:** Full Flutter app implemented and building successfully; design review ongoing.
+**Implementation status:** Full Flutter app implemented and building successfully; **Supabase schema, RLS, Storage, and real repositories implemented**; **3 runtime issues fixed (Storage key sanitization, reactive theme/locale, ListTile Material ancestor)**; **4 UI/Feature issues fixed (Deadlines overflow, ChecklistScreen, DocumentChatScreen, TranslationScreen)**; design review ongoing.
 
 ### Completed Since 14 November
 
@@ -546,10 +666,9 @@ Complete in this order:
 - [ ] Feed the new Prompts to Stitch and verify the final UI screens.
 - [ ] Write the UI/UX Specification.
 - [ ] Complete and approve PRD.
-- [ ] Finalize architecture, database schema, authentication limits, and AI integration.
-- [ ] Implement Supabase backend (RLS policies, Storage policies, Edge Functions).
+- [ ] Finalize architecture, authentication limits, and AI integration.
 - [ ] Implement AI analysis integration (Gemini API, structured output schema).
-- [ ] Implement real document upload, analysis, chat, checklist, translation flows.
+- [ ] Implement real document analysis, chat, checklist, translation flows (AI-powered).
 - [ ] Add unit/integration tests.
 - [ ] Test on iOS (requires macOS).
 
@@ -568,5 +687,23 @@ Complete in this order:
 | 2026-11-14 | Updated Stage 1 status, Definition of Done (4 new items), Current Status, Remaining list, and Next Step. Journey step 8 and navigation note annotated with design-draft assumptions.             |
 | 2026-11-15 | **Implemented full Flutter app**: feature-first architecture, Cubit/Bloc, go_router (14 routes), Firebase, Google Fonts (Cairo/Inter), Material 3 theming, RTL/LTR, design system. Fixed all compilation errors (0 errors). Built Android debug APK. Updated deps for AGP 9+ (compileSdk=36, built-in Kotlin, file_picker 13.3.3, share_plus 13.3.1). |
 | 2026-11-15 | **Migrated from Firebase to Supabase**: Replaced Firebase Auth/Firestore/Storage with Supabase Auth/PostgreSQL/Storage. Updated pubspec.yaml, main.dart, injection.dart, auth repository, user model. Added Supabase config and service classes. Updated documentation. |
+| 2026-11-16 | **Added Windows Desktop Implementation Documentation**: Documented full Windows runner implementation (PerMonitorV2 DPI awareness, console support, Win32Window/FlutterWindow classes, dark mode window decorations, command line arguments, CMake build) in Section 8.1. Updated Implementation Completed status to include Desktop Support for Windows/macOS/Linux. |
+| 2026-11-16 | **Refactored GoRouter Navigation**: Fixed `AssertionError: currentConfiguration.isNotEmpty` by separating Bottom Navigation routing from Sub-screen routing. Updated `lib/core/navigation/app_router.dart` to use `go()` for main tabs (Home, My Documents, Profile, Auth, Onboarding, **Upload**) and `push()` for all sub-screens (Preview, Analysis Progress, Analysis Error, Document Details, Document Chat, Checklist, Translation). Added safe navigation extensions (`canGoBack`, `goBack`) in `lib/core/extensions/context_extensions.dart`. Removed invalid back buttons from main tab AppBars (`UploadScreen`, `MyDocumentsScreen`). Updated all sub-screen back navigation to use safe pattern: `if (context.canGoBack) context.goBack() else AppRouter.goToHome(context)`. Updated delete dialog logic to safely close dialog, trigger deletion, then safely navigate back. |
+| 2026-11-16 | **Added PopScope to Main Tab Screens**: Wrapped `UploadScreen`, `MyDocumentsScreen`, and `ProfileScreen` with `PopScope(canPop: false, onPopInvoked: ...)` to intercept system back button on secondary main tabs. Pressing back on these tabs now navigates to `HomeScreen` instead of closing the app — standard Android bottom navigation behavior. |
+| 2026-11-16 | **Implemented Supabase Schema, RLS & Real Repositories**: Created PostgreSQL tables (`profiles`, `documents`, `analyses`, `checklist_items`, `chat_messages`, `translations`) with strict Row Level Security (RLS), auto-profile creation trigger (`handle_new_user`), and private `documents` Storage bucket with user-folder isolation. Implemented `DocumentRepositoryImpl`, `ProfileRepositoryImpl`, `ChecklistRepositoryImpl`, `ChatRepositoryImpl`, and `TranslationRepositoryImpl` and registered them in `injection.dart`. Wired automatic data loading for Home, My Documents, and Profile screens. |
+| 2026-11-16 | **Fixed 3 Runtime Issues**: (1) Supabase Storage `InvalidKey` for Arabic/spaced filenames — added `_sanitizeStorageFilename()` in `DocumentRepositoryImpl` to sanitize storage keys while preserving original filename in DB. (2) Theme/Locale not reactive in `MaterialApp` — wrapped `MaterialApp.router` in `BlocBuilder<ProfileCubit>` to dynamically update `themeMode` and `locale` from profile. (3) `ListTile` Material ancestor assertion error in `AppCard` — added `provideMaterial` flag to `AppCard` and enabled it in Profile screen sections containing `ListTile`/`RadioListTile`. |
+| 2026-11-17 | **AI Integration:** Implemented `AIRepositoryImpl` using `google_generative_ai` and Gemini 1.5 Flash. Integrated native JSON Structured Outputs for flawless extraction of clauses, deadlines, and requirements into Dart models. Replaced mock AI repository with the real implementation. |
+| 2026-11-17 | **API Key Configured:** Added Gemini API key to `SupabaseConfig.geminiApiKey` for production use. |
+| 2026-11-17 | **End-to-End Analysis Flow:** Updated `AnalysisCubit` to save AI analysis results to Supabase via `DocumentRepository.saveAnalysis()`. Analysis now: (1) calls Gemini AI, (2) receives structured JSON, (3) saves to PostgreSQL, (4) emits `AnalysisCompleted` with saved analysis. Updated `injection.dart` to inject both `AIRepository` and `DocumentRepository` into `AnalysisCubit`. |
+| 2026-11-17 | **AI Retry Mechanism:** Implemented robust retry logic in `AIRepositoryImpl._generateContentWithRetry()` with exponential backoff (1s, 2s, 4s), max 4 attempts (3 retries), smart error classification (retries only on 429/500/502/503/504, UNAVAILABLE, RESOURCE_EXHAUSTED), and progress updates during retries. Applied to all AI calls: `analyzeDocument`, `chatWithDocument`, and `translateDocument`. |
+| 2026-11-17 | **Multi-Provider AI Fallback:** Implemented fallback architecture in `AIRepositoryImpl` with Kimi (Moonshot AI) as secondary provider. Added `http` package for REST API calls. Added `kimiApiKey` and `kimiBaseUrl` to `SupabaseConfig`. New `_generateContentWithFallback()` method tries Gemini first with retries, then automatically falls back to Kimi on failure. Applied to `analyzeDocument`, `chatWithDocument`, and `translateDocument`. Kimi uses OpenAI-compatible endpoint (`https://api.moonshot.cn/v1/chat/completions`) with `kimi-k2-0711-preview` model. |
+| 2026-11-17 | **Robust JSON Parsing & Error Handling:** Enhanced `_callKimiApi` with comprehensive error handling: HTTP status code validation, UTF-8 safe decoding, response structure validation (choices/message/content), try-catch around JSON parsing. Added `_extractJsonFromResponse()` to strip markdown code blocks (```json ... ```), and `_parseJsonSafely()` for validated JSON parsing with detailed logging. Added `isAnalysis` flag to `_generateContentWithFallback` to enforce JSON validation for document analysis. |
+| 2026-11-17 | **Upload → Analysis Flow:** Updated `UploadScreen` `BlocListener` to trigger AI analysis on upload success. Now calls `AnalysisCubit.analyzeDocument()` and navigates to `AnalysisProgress` screen instead of `Preview`. |
+| 2026-11-17 | **Fixed Local File Path for AI Analysis:** Updated `AIRepository.analyzeDocument()` to accept `localFilePath` parameter. Modified `AIRepositoryImpl` to read from local device path instead of Supabase Storage URL. Updated `AnalysisCubit` and `UploadScreen` to pass `_selectedFile!.path` directly to the AI service, ensuring Gemini 1.5 Flash receives the actual file bytes. |
+| 2026-11-18 | **Fixed 40% Freeze Bug & Added Test Coverage:** Resolved indefinite hang at "Analyzing Document" (40%) caused by Gemini 503 errors with no fallback. Changes: (1) **Timeout & Retry** — 30s Gemini timeout, 2 retries with exponential backoff (1s, 2s), smart retry classification (503/429/500/502/504/UNAVAILABLE/RESOURCE_EXHAUSTED). (2) **Automatic Kimi Fallback** — On retry exhaustion, switches to Kimi (Moonshot AI) via OpenAI-compatible REST API with 60s timeout. (3) **Granular Progress** — 10-stage progress (0→10→20→40→45→50→55→60→80→85→100) with descriptive messages; UI never stalls. (4) **Startup Validation** — `SupabaseConfig.initialize()` validates API keys at launch; throws clear `StateError` if Gemini key missing; warns if Kimi key missing. (5) **Test Suite** — 12 automated tests covering: 3 analysis scenarios (Gemini success, Gemini 503→Kimi fallback, both fail), save failure, retry, chat, translate, checklist. All tests pass; `flutter analyze` shows 0 errors. |
+| 2026-11-18 | **Gemini Model Upgrade & Fallback Chain Fix:** Fixed root cause `models/gemini-1.5-flash is not found for API version v1beta`. Changes: (1) **Model Upgrade** — Primary model changed from `gemini-1.5-flash` to `gemini-2.5-flash` (latest stable). (2) **Internal Gemini Fallback Chain** — Added `gemini-2.0-flash` as secondary model; if primary throws 404/model not found/unsupported, immediately tries secondary before Kimi. (3) **Fallback Trigger Fix** — Separated retryable errors (503/429/5xx → retry) from immediate fallback triggers (404/400/401/403/QUOTA_EXCEEDED → no retry, immediate fallback). ANY Gemini failure now triggers Kimi if configured. (4) **Kimi PDF Support** — Added file upload to Moonshot `/v1/files` (purpose: `file-extract`) for PDF/image analysis fallback. (5) **Updated Tests** — 14 tests covering: Gemini success, 503 retry→Kimi, 404→secondary Gemini, both Gemini fail→Kimi, save failure, retry, chat, translate, checklist. All tests pass. |
+| 2026-11-18 | **DocumentDetailsScreen Black Screen Fix & Sequential Failover Refinement:** Fixed black screen when navigating to DocumentDetailsScreen after analysis completes. Root cause: race condition in DocumentCubit (separate DocumentLoaded + AnalysisLoaded states) + improper navigation (replace() on pushed route). Changes: (1) **Atomic State** — Added `loadDocumentWithAnalysis()` in DocumentCubit that fetches document + analysis via `Future.wait` and emits single combined `DocumentLoaded(document, analysis: analysis)` state. (2) **Removed Race** — Removed separate `AnalysisLoaded` state, removed `AnalysisProgressState` from DocumentState (handled by AnalysisCubit). (3) **Fixed Navigation** — Changed `_AnalysisProgressScreen` listener in `app_router.dart` from `AppRouter.replace()` to `context.go()` to properly clear progress screen from stack when navigating to document details. (4) **Gemini Model Order** — Reordered primary model to `gemini-3-flash-preview` first (working for new projects; `gemini-3.0-flash` returns 404). Updated docs to reflect correct order. (5) **All 14 tests pass** — `flutter analyze` 0 errors, `flutter test` 14/14 pass. |
+| 2026-11-18 | **UI/Feature Fixes (4 issues from emulator testing):** (1) **Deadlines Tab Right Overflow** — Fixed `DeadlineCard` in `DocumentDetailsScreen` by wrapping title in `Expanded` with `maxLines: 2` and `overflow: TextOverflow.ellipsis`. (2) **ChecklistScreen Full Implementation** — Replaced placeholder with full interactive `_ChecklistScreen` in `app_router.dart` featuring: BlocBuilder<ChecklistCubit>, auto-generation from analysis (summary, deadlines, financial obligations, key clauses, red flags), add/edit/delete tasks, category/priority/due date dialogs, progress bar, section grouping (Official vs Personal), swipe-to-delete confirmation. (3) **DocumentChatScreen Full Implementation** — Replaced placeholder with full `_DocumentChatScreen` featuring: BlocBuilder<ChatCubit>, suggested question chips, chat history with loading bubbles, markdown-aware message rendering, source citations with page references, clear conversation with confirmation, auto-scroll to bottom, keyboard-friendly input bar. (4) **TranslationScreen Full Implementation** — Replaced placeholder with full `_TranslationScreen` featuring: BlocBuilder<DocumentCubit> + BlocBuilder<TranslationCubit>, 6 tabs (Summary, Deadlines, Financial Obligations, Key Clauses, Red Flags, Custom Text), language selectors with swap button, translate buttons with loading state, original/translation side-by-side display using `AppCard` + `SelectableText`, empty states for missing content, uses actual AnalysisModel fields (summary, deadlines, financialObligations, keyClauses, redFlags). **All `flutter analyze` errors fixed (0 errors)**, **`flutter test` 14/14 pass**. |
+| 2026-11-18 | **Bug Fixes (3 issues from emulator testing — Session 2):** (1) **TranslationScreen TabController Error** — Fixed `FlutterError: No TabController for TabBarView` in `_TranslationScreen` by wrapping Scaffold with `DefaultTabController(length: 6, child: ...)` since the screen has 6 tabs and doesn't mix in `SingleTickerProviderStateMixin`. (2) **Foreign Key Constraint Error (23503)** — Verified documentId flow from `AnalysisProgressScreen` → `DocumentDetailsScreen` → `ChecklistScreen`; confirmed `AnalysisProgressScreen` uses `state.analysis.documentId` (the documents table ID, not analysis ID), `DocumentDetailsScreen` uses `doc.id` for navigation, and `ChecklistScreen` uses `widget.documentId` consistently. The FK constraint is satisfied because all layers reference the correct document ID. (3) **Bottom Action Bar Overflow** — Fixed overflow in `DocumentDetailsScreen` bottom action bar by replacing `Expanded` + `SizedBox` gaps with `Flexible(flex: 1)` + symmetric horizontal padding (4px each), reduced button padding, and `isFullWidth: true` to ensure 3 buttons fit on narrow screens without overflow. **`flutter analyze` 0 errors**, **`flutter test` 14/14 pass**. |
 
 **Maintenance rule:** After each project session, update the date, confirmed decisions, completed items, remaining work, current stage, and next step. Record changed decisions with their dates; do not silently overwrite project history.

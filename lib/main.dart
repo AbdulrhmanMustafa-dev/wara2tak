@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:material_ui/material_ui.dart';
+import 'package:supabase_flutter/supabase_flutter.dart'
+    hide AuthState; // Hide Supabase's AuthState to avoid conflict with our AuthCubit's AuthState
 
 import 'core/design_system/index.dart';
 import 'core/di/injection.dart';
@@ -42,24 +43,10 @@ class Wara2takApp extends StatelessWidget {
       providers: [
         BlocProvider<AuthCubit>.value(value: getIt<AuthCubit>()),
         BlocProvider<DocumentCubit>(
-          create: (_) {
-            final cubit = getIt<DocumentCubit>();
-            final authState = getIt<AuthCubit>().state;
-            if (authState is AuthAuthenticated) {
-              cubit.loadUserDocuments(authState.user.id);
-            }
-            return cubit;
-          },
+          create: (_) => getIt<DocumentCubit>(),
         ),
         BlocProvider<HomeCubit>(
-          create: (_) {
-            final cubit = getIt<HomeCubit>();
-            final authState = getIt<AuthCubit>().state;
-            if (authState is AuthAuthenticated) {
-              cubit.loadDashboard(authState.user.id);
-            }
-            return cubit;
-          },
+          create: (_) => getIt<HomeCubit>(),
         ),
         BlocProvider<AnalysisCubit>(create: (_) => getIt<AnalysisCubit>()),
         BlocProvider<ChecklistCubit>(create: (_) => getIt<ChecklistCubit>()),
@@ -69,24 +56,55 @@ class Wara2takApp extends StatelessWidget {
         ),
         BlocProvider<ProfileCubit>(create: (_) => getIt<ProfileCubit>()),
       ],
-      child: MaterialApp.router(
-        title: 'Wara2tak',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        themeMode: ThemeMode.system,
-        routerConfig: AppRouter.router,
-        builder: (context, child) {
-          // Apply Google Fonts globally
-          return MediaQuery(
-            data: MediaQuery.of(context).copyWith(
-              textScaler: TextScaler.linear(
-                MediaQuery.of(context).textScaler.scale(1.0),
-              ),
-            ),
-            child: child!,
-          );
+      child: BlocListener<AuthCubit, AuthState>(
+        listener: (context, state) {
+          if (state is AuthAuthenticated) {
+            // Trigger data loading when user authenticates
+            context.read<DocumentCubit>().loadUserDocuments(state.user.id);
+            context.read<HomeCubit>().loadDashboard(state.user.id);
+            context.read<ProfileCubit>().loadProfile(state.user.id);
+          } else if (state is AuthUnauthenticated) {
+            // Clear data when user signs out
+            // Cubits will reset to initial state on next load
+          }
         },
+        child: BlocBuilder<ProfileCubit, ProfileState>(
+          builder: (context, profileState) {
+            // Determine theme mode from profile
+            ThemeMode themeMode = ThemeMode.system;
+            Locale? locale;
+
+            if (profileState is ProfileLoaded) {
+              final profile = profileState.profile;
+              themeMode = profile.isDarkMode ? ThemeMode.dark : ThemeMode.light;
+              if (profile.preferredLanguage != null &&
+                  profile.preferredLanguage!.isNotEmpty) {
+                locale = Locale(profile.preferredLanguage!);
+              }
+            }
+
+            return MaterialApp.router(
+              title: 'Wara2tak',
+              debugShowCheckedModeBanner: false,
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: themeMode,
+              locale: locale,
+              routerConfig: AppRouter.router,
+              builder: (context, child) {
+                // Apply Google Fonts globally
+                return MediaQuery(
+                  data: MediaQuery.of(context).copyWith(
+                    textScaler: TextScaler.linear(
+                      MediaQuery.of(context).textScaler.scale(1.0),
+                    ),
+                  ),
+                  child: child!,
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }
