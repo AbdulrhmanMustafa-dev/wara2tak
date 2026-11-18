@@ -17,6 +17,16 @@ import '../../domain/models/document_model.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
+  Future<void> _onRefresh(BuildContext context) async {
+    final authState = context.read<AuthCubit>().state;
+    if (authState is AuthAuthenticated) {
+      await Future.wait([
+        context.read<HomeCubit>().loadDashboard(authState.user.id),
+        context.read<DocumentCubit>().loadUserDocuments(authState.user.id),
+      ]);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<AuthCubit, AuthState>(
@@ -27,29 +37,31 @@ class HomeScreen extends StatelessWidget {
       },
       child: Scaffold(
         body: SafeArea(
-          child: CustomScrollView(
-            slivers: [
-              // App Bar
-              SliverAppBar(
-                pinned: true,
-                floating: true,
-                snap: true,
-                title: Text(
-                  'Welcome back',
-                  style: AppTypography.headlineSmall,
+          child: RefreshIndicator(
+            onRefresh: () => _onRefresh(context),
+            child: CustomScrollView(
+              slivers: [
+                // App Bar
+                SliverAppBar(
+                  pinned: true,
+                  floating: true,
+                  snap: true,
+                  title: Text(
+                    'Welcome back',
+                    style: AppTypography.headlineSmall,
+                  ),
+                  actions: [
+                    AppIconButton(
+                      icon: Symbols.notifications,
+                      onPressed: () {},
+                    ),
+                    AppIconButton(
+                      icon: Symbols.settings,
+                      onPressed: () => AppRouter.goToProfile(context),
+                    ),
+                    const SizedBox(width: AppSpacing.spacingSm),
+                  ],
                 ),
-                actions: [
-                  AppIconButton(
-                    icon: Symbols.notifications,
-                    onPressed: () {},
-                  ),
-                  AppIconButton(
-                    icon: Symbols.settings,
-                    onPressed: () => AppRouter.goToProfile(context),
-                  ),
-                  const SizedBox(width: AppSpacing.spacingSm),
-                ],
-              ),
 
               // Content
               SliverPadding(
@@ -89,14 +101,19 @@ class HomeScreen extends StatelessWidget {
 
                       const SizedBox(height: AppSpacing.spacingMd),
 
-                      // Documents List
+                      // Documents List - uses DocumentCubit as single source of truth
                       BlocBuilder<DocumentCubit, DocumentState>(
+                        // Only rebuild for expected states; ignore DocumentLoaded/DocumentDetailsLoaded from details screen
+                        buildWhen: (previous, current) =>
+                            current is DocumentsLoaded ||
+                            current is DocumentLoading ||
+                            current is DocumentError,
                         builder: (context, state) {
                           if (state is DocumentsLoaded) {
-                            final recentDocs = state.documents
-                                .where((d) => d.status == DocumentStatus.analyzed)
-                                .take(3)
-                                .toList();
+                            // Show ALL documents regardless of status, sorted by createdAt desc, take 5
+                            final recentDocs = List<DocumentModel>.from(state.documents)
+                              ..sort((a, b) => b.createdAt.compareTo(a.createdAt))
+                              ..take(5);
 
                             if (recentDocs.isEmpty) {
                               return EmptyState(
@@ -141,7 +158,38 @@ class HomeScreen extends StatelessWidget {
                                   ),
                             );
                           }
-                          return const SizedBox.shrink();
+                          // Safety fallback: if state is unexpected (e.g., DocumentLoaded from details screen),
+                          // render from cached documents instead of showing blank screen
+                          final cachedDocs = context.read<DocumentCubit>().cachedDocuments;
+                          final recentCachedDocs = List<DocumentModel>.from(cachedDocs)
+                            ..sort((a, b) => b.createdAt.compareTo(a.createdAt))
+                            ..take(5);
+                          if (recentCachedDocs.isEmpty) {
+                            return EmptyState(
+                              icon: Symbols.description,
+                              title: 'No documents yet',
+                              subtitle: 'Upload your first document to get started',
+                              actionLabel: 'Upload Document',
+                              onAction: () => AppRouter.goToUpload(context),
+                            );
+                          }
+                          return Column(
+                            children: recentCachedDocs
+                                .map((doc) => Padding(
+                                      padding: const EdgeInsets.only(
+                                          bottom: AppSpacing.spacingMd),
+                                      child: DocumentCard(
+                                        title: doc.title,
+                                        type: doc.typeLabel,
+                                        status: doc.status.name,
+                                        typeColor: _getTypeColor(context, doc.type),
+                                        typeIcon: _getTypeIcon(doc.type),
+                                        onTap: () =>
+                                            AppRouter.goToDocumentDetails(context, doc.id),
+                                      ),
+                                    ))
+                                .toList(),
+                          );
                         },
                       ),
 
@@ -192,6 +240,7 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
         ),
+      ),
         bottomNavigationBar: _buildBottomNav(context),
       ),
     );

@@ -33,7 +33,7 @@ void main() {
           document: testDocument,
           localFilePath: '/non/existent/path.pdf',
           userId: testUserId,
-          onProgress: (_, __) {},
+          onProgress: (_, _) {},
         );
 
         expect(result.isLeft(), isTrue);

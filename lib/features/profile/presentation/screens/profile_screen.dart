@@ -13,11 +13,18 @@ import '../../../../shared/widgets/index.dart';
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
+  Future<void> _onRefresh(BuildContext context) async {
+    final authState = context.read<AuthCubit>().state;
+    if (authState is AuthAuthenticated) {
+      await context.read<ProfileCubit>().loadProfile(authState.user.id);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvoked: (bool didPop) {
+      onPopInvokedWithResult: (bool didPop, Object? result) {
         if (didPop) return;
         AppRouter.goToHome(context);
       },
@@ -40,9 +47,12 @@ class ProfileScreen extends StatelessWidget {
               builder: (context, state) {
                 if (state is ProfileLoaded) {
                   final profile = state.profile;
-                  return SingleChildScrollView(
-                    padding: AppSpacing.screenPadding,
-                    child: Column(
+                  return RefreshIndicator(
+                    onRefresh: () => _onRefresh(context),
+                    child: SingleChildScrollView(
+                      padding: AppSpacing.screenPadding,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Profile Header
@@ -193,18 +203,32 @@ class ProfileScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                  );
+                  ),
+                );
                 } else if (state is ProfileLoading) {
                   return const LoadingState(message: 'Loading profile...');
                 } else if (state is ProfileError) {
-                  return ErrorState(
-                    title: 'Failed to load profile',
-                    subtitle: state.message,
-                    actionLabel: 'Retry',
-                    onAction: () => context.read<ProfileCubit>().loadProfile(
-                      (context.read<AuthCubit>().state as AuthAuthenticated)
-                          .user
-                          .id,
+                  return RefreshIndicator(
+                    onRefresh: () => _onRefresh(context),
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: MediaQuery.of(context).size.height -
+                              56.0 -
+                              MediaQuery.of(context).padding.top,
+                        ),
+                        child: ErrorState(
+                          title: 'Failed to load profile',
+                          subtitle: state.message,
+                          actionLabel: 'Retry',
+                          onAction: () => context.read<ProfileCubit>().loadProfile(
+                            (context.read<AuthCubit>().state as AuthAuthenticated)
+                                .user
+                                .id,
+                          ),
+                        ),
+                      ),
                     ),
                   );
                 }

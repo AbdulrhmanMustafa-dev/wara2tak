@@ -14,11 +14,21 @@ import '../../index.dart';
 class MyDocumentsScreen extends StatelessWidget {
   const MyDocumentsScreen({super.key});
 
+  // Default toolbar height (kToolbarHeight = 56.0)
+  static const double _toolbarHeight = 56.0;
+
+  Future<void> _onRefresh(BuildContext context) async {
+    final authState = context.read<AuthCubit>().state;
+    if (authState is AuthAuthenticated) {
+      await context.read<DocumentCubit>().loadUserDocuments(authState.user.id);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvoked: (bool didPop) {
+      onPopInvokedWithResult: (bool didPop, Object? result) {
         if (didPop) return;
         AppRouter.goToHome(context);
       },
@@ -29,83 +39,171 @@ class MyDocumentsScreen extends StatelessWidget {
           }
         },
         child: Scaffold(
-        appBar: AppBar(
-          title: Text('My Documents', style: AppTypography.titleLarge),
-          leading: AppIconButton(
-            icon: Symbols.arrow_back,
-            onPressed: () => AppRouter.goToHome(context),
+          appBar: AppBar(
+            title: Text('My Documents', style: AppTypography.titleLarge),
+            leading: AppIconButton(
+              icon: Symbols.arrow_back,
+              onPressed: () => AppRouter.goToHome(context),
+            ),
+            actions: [
+              AppIconButton(icon: Symbols.search, onPressed: () {}),
+              AppIconButton(icon: Symbols.filter_list, onPressed: () {}),
+            ],
           ),
-          actions: [
-            AppIconButton(icon: Symbols.search, onPressed: () {}),
-            AppIconButton(icon: Symbols.filter_list, onPressed: () {}),
-          ],
-        ),
-        body: SafeArea(
-          child: BlocBuilder<DocumentCubit, DocumentState>(
-            builder: (context, state) {
-              if (state is DocumentsLoaded) {
-                if (state.documents.isEmpty) {
-                  return EmptyState(
-                    icon: Symbols.folder_open,
-                    title: 'No documents yet',
-                    subtitle: 'Upload your first document to get started',
-                    actionLabel: 'Upload Document',
-                    onAction: () => AppRouter.goToUpload(context),
+          body: SafeArea(
+            child: BlocBuilder<DocumentCubit, DocumentState>(
+              // Only rebuild for expected states; ignore DocumentLoaded/DocumentDetailsLoaded from details screen
+              buildWhen: (previous, current) =>
+                  current is DocumentsLoaded ||
+                  current is DocumentLoading ||
+                  current is DocumentError,
+              builder: (context, state) {
+                if (state is DocumentsLoaded) {
+                  // Capture a stable snapshot to avoid RangeError if list mutates mid-frame
+                  final documents = List.of(state.documents);
+
+                  return RefreshIndicator(
+                    onRefresh: () => _onRefresh(context),
+                    child: documents.isEmpty
+                        ? SingleChildScrollView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                minHeight: MediaQuery.of(context).size.height -
+                                    _toolbarHeight -
+                                    MediaQuery.of(context).padding.top,
+                              ),
+                              child: EmptyState(
+                                icon: Symbols.folder_open,
+                                title: 'No documents yet',
+                                subtitle: 'Upload your first document to get started',
+                                actionLabel: 'Upload Document',
+                                onAction: () => AppRouter.goToUpload(context),
+                              ),
+                            ),
+                          )
+                        : ListView.separated(
+                            padding: AppSpacing.screenPadding,
+                            itemCount: documents.length,
+                            separatorBuilder: (_, _) =>
+                                const SizedBox(height: AppSpacing.spacingMd),
+                            itemBuilder: (context, index) {
+                              // Bounds guard - defensive against async mutations
+                              if (index < 0 || index >= documents.length) {
+                                return const SizedBox.shrink();
+                              }
+                              final doc = documents[index];
+                              return DocumentCard(
+                                key: ValueKey(doc.id),
+                                title: doc.title,
+                                type: doc.typeLabel,
+                                status: doc.status.name,
+                                deadlineText: _getDeadlineText(doc),
+                                taskProgressText: doc.status == DocumentStatus.analyzed
+                                    ? 'Ready for review'
+                                    : null,
+                                typeColor: _getTypeColor(context, doc.type),
+                                typeIcon: _getTypeIcon(doc.type),
+                                onTap: () =>
+                                    AppRouter.goToDocumentDetails(context, doc.id),
+                                onDelete: () => _showDeleteDialog(context, doc),
+                                trailingActions: _buildTrailingActions(context, doc),
+                              );
+                            },
+                          ),
+                  );
+                } else if (state is DocumentLoading) {
+                  return const LoadingState(message: 'Loading documents...');
+                } else if (state is DocumentError) {
+                  return RefreshIndicator(
+                    onRefresh: () => _onRefresh(context),
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: MediaQuery.of(context).size.height -
+                              _toolbarHeight -
+                              MediaQuery.of(context).padding.top,
+                        ),
+                        child: ErrorState(
+                          title: 'Failed to load documents',
+                          subtitle: state.message,
+                          actionLabel: 'Retry',
+                          onAction: () =>
+                              context.read<DocumentCubit>().loadUserDocuments(
+                                (context.read<AuthCubit>().state as AuthAuthenticated)
+                                    .user
+                                    .id,
+                              ),
+                        ),
+                      ),
+                    ),
                   );
                 }
-
-                return ListView.separated(
-                  padding: AppSpacing.screenPadding,
-                  itemCount: state.documents.length,
-                  separatorBuilder: (_, _) =>
-                      const SizedBox(height: AppSpacing.spacingMd),
-                  itemBuilder: (context, index) {
-                    final doc = state.documents[index];
-                    return DocumentCard(
-                      title: doc.title,
-                      type: doc.typeLabel,
-                      status: doc.status.name,
-                      deadlineText: _getDeadlineText(doc),
-                      taskProgressText: doc.status == DocumentStatus.analyzed
-                          ? 'Ready for review'
-                          : null,
-                      typeColor: _getTypeColor(context, doc.type),
-                      typeIcon: _getTypeIcon(doc.type),
-                      onTap: () =>
-                          AppRouter.goToDocumentDetails(context, doc.id),
-                      onDelete: () => _showDeleteDialog(context, doc),
-                      trailingActions: _buildTrailingActions(context, doc),
-                    );
-                  },
+                // Safety fallback: if state is unexpected (e.g., DocumentLoaded from details screen),
+                // render from cached documents instead of showing blank screen
+                final cachedDocs = context.read<DocumentCubit>().cachedDocuments;
+                return RefreshIndicator(
+                  onRefresh: () => _onRefresh(context),
+                  child: cachedDocs.isEmpty
+                      ? SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minHeight: MediaQuery.of(context).size.height -
+                                  _toolbarHeight -
+                                  MediaQuery.of(context).padding.top,
+                            ),
+                            child: EmptyState(
+                              icon: Symbols.folder_open,
+                              title: 'No documents yet',
+                              subtitle: 'Upload your first document to get started',
+                              actionLabel: 'Upload Document',
+                              onAction: () => AppRouter.goToUpload(context),
+                            ),
+                          ),
+                        )
+                      : ListView.separated(
+                          padding: AppSpacing.screenPadding,
+                          itemCount: cachedDocs.length,
+                          separatorBuilder: (_, _) =>
+                              const SizedBox(height: AppSpacing.spacingMd),
+                          itemBuilder: (context, index) {
+                            if (index < 0 || index >= cachedDocs.length) {
+                              return const SizedBox.shrink();
+                            }
+                            final doc = cachedDocs[index];
+                            return DocumentCard(
+                              key: ValueKey(doc.id),
+                              title: doc.title,
+                              type: doc.typeLabel,
+                              status: doc.status.name,
+                              deadlineText: _getDeadlineText(doc),
+                              taskProgressText: doc.status == DocumentStatus.analyzed
+                                  ? 'Ready for review'
+                                  : null,
+                              typeColor: _getTypeColor(context, doc.type),
+                              typeIcon: _getTypeIcon(doc.type),
+                              onTap: () =>
+                                  AppRouter.goToDocumentDetails(context, doc.id),
+                              onDelete: () => _showDeleteDialog(context, doc),
+                              trailingActions: _buildTrailingActions(context, doc),
+                            );
+                          },
+                        ),
                 );
-              } else if (state is DocumentLoading) {
-                return const LoadingState(message: 'Loading documents...');
-              } else if (state is DocumentError) {
-                return ErrorState(
-                  title: 'Failed to load documents',
-                  subtitle: state.message,
-                  actionLabel: 'Retry',
-                  onAction: () =>
-                      context.read<DocumentCubit>().loadUserDocuments(
-                        (context.read<AuthCubit>().state as AuthAuthenticated)
-                            .user
-                            .id,
-                      ),
-                );
-              }
-              return const SizedBox.shrink();
-            },
+              },
+            ),
+          ),
+          floatingActionButton: FloatingActionButton.extended(
+            onPressed: () => AppRouter.goToUpload(context),
+            icon: Icon(Symbols.add),
+            label: Text('Upload', style: AppTypography.labelLarge),
+            backgroundColor: context.colors.primary,
+            foregroundColor: context.colors.onPrimary,
           ),
         ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () => AppRouter.goToUpload(context),
-          icon: Icon(Symbols.add),
-          label: Text('Upload', style: AppTypography.labelLarge),
-          backgroundColor: context.colors.primary,
-          foregroundColor: context.colors.onPrimary,
-        ),
       ),
-    ),
     );
   }
 

@@ -80,6 +80,45 @@ class ChecklistRepositoryImpl implements checklist_repo.ChecklistRepository {
   }
 
   @override
+  Future<Either<Failure, ChecklistItemModel>> addChecklistItem(
+    String documentId,
+    ChecklistItemModel item,
+  ) async {
+    try {
+      log('➕ Adding checklist item: ${item.id} for document: $documentId');
+      final userId = _currentUserId;
+      if (userId == null) {
+        return const Left(AuthFailure('User not authenticated'));
+      }
+
+      final insertData = item.toJson();
+      insertData['documentId'] = documentId;
+      insertData['userId'] = userId;
+
+      final response = await _client
+          .from('checklist_items')
+          .insert(insertData)
+          .select()
+          .maybeSingle();
+
+      if (response == null) {
+        log('❌ Add checklist item failed: no rows returned (PGRST116)');
+        return Left(ServerFailure(
+          'Failed to create checklist item: server returned no data',
+          code: 'PGRST116',
+        ));
+      }
+
+      log('✅ Checklist item added');
+      return Right(ChecklistItemModel.fromJson(response));
+    } catch (e, stackTrace) {
+      log('❌ Add checklist item failed: $e');
+      log('❌ Stack trace: $stackTrace');
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, ChecklistItemModel>> updateChecklistItem(
     String documentId,
     ChecklistItemModel item,
@@ -96,8 +135,17 @@ class ChecklistRepositoryImpl implements checklist_repo.ChecklistRepository {
           .from('checklist_items')
           .update(updateData)
           .eq('id', item.id)
+          .eq('documentId', documentId)
           .select()
-          .single();
+          .maybeSingle();
+
+      if (response == null) {
+        log('❌ Update checklist item failed: no rows returned (PGRST116)');
+        return Left(ServerFailure(
+          'Failed to update checklist item: item not found',
+          code: 'PGRST116',
+        ));
+      }
 
       log('✅ Checklist item updated');
       return Right(ChecklistItemModel.fromJson(response));
@@ -119,5 +167,26 @@ class ChecklistRepositoryImpl implements checklist_repo.ChecklistRepository {
         .map((data) => data
             .map((json) => ChecklistItemModel.fromJson(json))
             .toList());
+  }
+
+  @override
+  Future<Either<Failure, void>> deleteChecklistItem(
+    String documentId,
+    String itemId,
+  ) async {
+    try {
+      log('🗑️ Deleting checklist item: $itemId');
+      await _client
+          .from('checklist_items')
+          .delete()
+          .eq('id', itemId)
+          .eq('documentId', documentId);
+      log('✅ Checklist item deleted');
+      return const Right(null);
+    } catch (e, stackTrace) {
+      log('❌ Delete checklist item failed: $e');
+      log('❌ Stack trace: $stackTrace');
+      return Left(ServerFailure(e.toString()));
+    }
   }
 }

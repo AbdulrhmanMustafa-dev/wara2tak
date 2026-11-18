@@ -11,9 +11,15 @@ import 'document_state.dart';
 class DocumentCubit extends Cubit<DocumentState> {
   final DocumentRepository _documentRepository;
 
+  // Cached document list for optimistic updates
+  List<DocumentModel> _cachedDocuments = [];
+
+  /// Expose cached documents for fallback rendering when state is unexpected
+  List<DocumentModel> get cachedDocuments => List.unmodifiable(_cachedDocuments);
+
   DocumentCubit(this._documentRepository) : super(const DocumentInitial());
 
-  /// Load user's documents
+  /// Load user's documents (no real-time subscription - uses Pull-to-Refresh)
   Future<void> loadUserDocuments(String userId) async {
     emit(const DocumentLoading());
 
@@ -21,13 +27,11 @@ class DocumentCubit extends Cubit<DocumentState> {
 
     result.fold(
       (failure) => emit(DocumentError(failure.message, code: failure.code)),
-      (documents) => emit(DocumentsLoaded(documents)),
+      (documents) {
+        _cachedDocuments = List.unmodifiable(documents);
+        emit(DocumentsLoaded(List.unmodifiable(documents)));
+      },
     );
-  }
-
-  /// Watch user's documents (real-time)
-  Stream<List<DocumentModel>> watchUserDocuments(String userId) {
-    return _documentRepository.watchUserDocuments(userId);
   }
 
   /// Get document by ID (without analysis)
@@ -109,7 +113,11 @@ class DocumentCubit extends Cubit<DocumentState> {
 
     result.fold(
       (failure) => emit(DocumentError(failure.message, code: failure.code)),
-      (document) => emit(DocumentUploadSuccess(document)),
+      (document) {
+        // Optimistic update: prepend new document to cached list
+        _cachedDocuments = [document, ..._cachedDocuments];
+        emit(DocumentsLoaded(List.unmodifiable(_cachedDocuments)));
+      },
     );
   }
 
@@ -125,13 +133,16 @@ class DocumentCubit extends Cubit<DocumentState> {
 
   /// Delete document
   Future<void> deleteDocument(String documentId) async {
-    emit(const DocumentLoading());
-
+    // Don't emit loading to avoid flicker - just do the deletion
     final result = await _documentRepository.deleteDocument(documentId);
 
     result.fold(
       (failure) => emit(DocumentError(failure.message, code: failure.code)),
-      (_) => emit(const DocumentInitial()),
+      (_) {
+        // Create new list without the deleted document (never mutate in-place)
+        _cachedDocuments = _cachedDocuments.where((d) => d.id != documentId).toList();
+        emit(DocumentsLoaded(List.unmodifiable(_cachedDocuments)));
+      },
     );
   }
 

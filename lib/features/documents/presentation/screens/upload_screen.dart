@@ -154,31 +154,34 @@ class _UploadScreenState extends State<UploadScreen> {
 
   @override
   Widget build(BuildContext context) {
+    DocumentModel? uploadedDocument;
+
     return PopScope(
       canPop: false,
-      onPopInvoked: (bool didPop) {
+      onPopInvokedWithResult: (bool didPop, Object? result) {
         if (didPop) return;
         AppRouter.goToHome(context);
       },
       child: BlocListener<DocumentCubit, DocumentState>(
         listener: (context, state) {
-          if (state is DocumentUploadSuccess) {
-            context.showSnackBar('Document uploaded successfully!');
-            // Refresh document and home data
-            final authState = context.read<AuthCubit>().state;
-            if (authState is AuthAuthenticated) {
-              context.read<DocumentCubit>().loadUserDocuments(authState.user.id);
-              context.read<HomeCubit>().loadDashboard(authState.user.id);
+          if (state is DocumentsLoaded) {
+            // Check if a new document was added (first in list)
+            if (state.documents.isNotEmpty &&
+                uploadedDocument == null &&
+                state.documents.first.status == DocumentStatus.uploaded) {
+              uploadedDocument = state.documents.first;
+              context.showSnackBar('Document uploaded successfully!');
               // Trigger AI Analysis with local file path
-              if (_selectedFile != null) {
+              final authState = context.read<AuthCubit>().state;
+              if (authState is AuthAuthenticated && _selectedFile != null) {
                 context.read<AnalysisCubit>().analyzeDocument(
-                  document: state.document,
+                  document: uploadedDocument!,
                   localFilePath: _selectedFile!.path,
                   userId: authState.user.id,
                 );
+                // Go to Progress Screen
+                AppRouter.goToAnalysisProgress(context);
               }
-              // Go to Progress Screen
-              AppRouter.goToAnalysisProgress(context);
             }
           } else if (state is DocumentError) {
             context.showErrorSnackBar(state.message);

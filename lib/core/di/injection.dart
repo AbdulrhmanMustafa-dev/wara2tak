@@ -211,7 +211,9 @@ void _registerCubits() {
   getIt.registerFactory<ChatCubit>(() => ChatCubit(getIt()));
 
   // Translation cubit
-  getIt.registerFactory<TranslationCubit>(() => TranslationCubit(getIt()));
+  getIt.registerFactory<TranslationCubit>(
+    () => TranslationCubit(getIt<TranslationRepository>(), getIt<AIRepository>()),
+  );
 
   // Profile cubit
   getIt.registerFactory<ProfileCubit>(() => ProfileCubit(getIt()));

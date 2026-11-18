@@ -57,6 +57,7 @@ dependencies:
 
   material_ui: any
   gotrue: any
+  meta: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

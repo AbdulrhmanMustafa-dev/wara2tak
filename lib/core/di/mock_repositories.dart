@@ -111,6 +111,12 @@ class MockChecklistRepository implements ChecklistRepository {
   ) async => const Right([]);
 
   @override
+  Future<Either<Failure, checklist.ChecklistItemModel>> addChecklistItem(
+    String documentId,
+    checklist.ChecklistItemModel item,
+  ) async => Right(item);
+
+  @override
   Future<Either<Failure, List<checklist.ChecklistItemModel>>> saveChecklist(
     String documentId,
     List<checklist.ChecklistItemModel> items,
@@ -121,6 +127,12 @@ class MockChecklistRepository implements ChecklistRepository {
     String documentId,
     checklist.ChecklistItemModel item,
   ) async => Right(item);
+
+  @override
+  Future<Either<Failure, void>> deleteChecklistItem(
+    String documentId,
+    String itemId,
+  ) async => const Right(null);
 
   @override
   Stream<List<checklist.ChecklistItemModel>> watchChecklist(

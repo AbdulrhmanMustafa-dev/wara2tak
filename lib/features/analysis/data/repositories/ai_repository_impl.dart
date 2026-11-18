@@ -489,7 +489,7 @@ $content
 
         // Exponential backoff: 1s, 2s, 4s...
         final delay = Duration(seconds: 1 << (attempt - 1));
-        final message = 'Gemini returned ${_extractStatusCode(error) ?? 'error'}. Retrying in ${delay.inSeconds}s (attempt $attempt/${_maxRetries})...';
+        final message = 'Gemini returned ${_extractStatusCode(error) ?? 'error'}. Retrying in ${delay.inSeconds}s (attempt $attempt/$_maxRetries)...';
         developer.log(message);
         onProgress?.call(attempt, message);
         await Future<void>.delayed(delay);

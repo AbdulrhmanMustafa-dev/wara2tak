@@ -23,11 +23,12 @@ class ChecklistLoading extends ChecklistState {
 /// Checklist loaded state
 class ChecklistLoaded extends ChecklistState {
   final List<ChecklistItemModel> items;
+  final String? errorMessage; // Non-destructive error for SnackBar (keeps list visible)
 
-  const ChecklistLoaded(this.items);
+  const ChecklistLoaded(this.items, {this.errorMessage});
 
   @override
-  List<Object?> get props => [items];
+  List<Object?> get props => [items, errorMessage];
 }
 
 /// Checklist item updated state

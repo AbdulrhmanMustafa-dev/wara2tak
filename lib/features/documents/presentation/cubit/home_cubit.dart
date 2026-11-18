@@ -58,7 +58,7 @@ class HomeCubit extends Cubit<HomeState> {
 
   HomeCubit(this._documentRepository) : super(const HomeInitial());
 
-  /// Load home dashboard data
+  /// Load home dashboard data (no real-time subscription - uses Pull-to-Refresh)
   Future<void> loadDashboard(String userId) async {
     emit(const HomeLoading());
 
@@ -66,27 +66,31 @@ class HomeCubit extends Cubit<HomeState> {
 
     result.fold(
       (failure) => emit(HomeError(failure.message, code: failure.code)),
-      (documents) {
-        final recentDocuments = documents
-            .where((d) => d.status == DocumentStatus.analyzed)
-            .take(3)
-            .toList();
-        final analyzingDocuments = documents
-            .where((d) => d.status == DocumentStatus.analyzing)
-            .toList();
-        final totalDocuments = documents.length;
-        final analyzedCount = documents
-            .where((d) => d.status == DocumentStatus.analyzed)
-            .length;
-
-        emit(HomeLoaded(
-          recentDocuments: recentDocuments,
-          analyzingDocuments: analyzingDocuments,
-          totalDocuments: totalDocuments,
-          analyzedCount: analyzedCount,
-        ));
-      },
+      (documents) => _emitLoaded(documents),
     );
+  }
+
+  void _emitLoaded(List<DocumentModel> documents) {
+    // Sort by createdAt descending for recent documents
+    final sortedDocs = List<DocumentModel>.from(documents)
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+    // Recent documents: show ALL documents regardless of status, take 5
+    final recentDocuments = sortedDocs.take(5).toList();
+    final analyzingDocuments = documents
+        .where((d) => d.status == DocumentStatus.analyzing)
+        .toList();
+    final totalDocuments = documents.length;
+    final analyzedCount = documents
+        .where((d) => d.status == DocumentStatus.analyzed)
+        .length;
+
+    emit(HomeLoaded(
+      recentDocuments: recentDocuments,
+      analyzingDocuments: analyzingDocuments,
+      totalDocuments: totalDocuments,
+      analyzedCount: analyzedCount,
+    ));
   }
 }
 

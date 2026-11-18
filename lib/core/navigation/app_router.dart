@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -163,7 +164,10 @@ class AppRouter {
         name: 'documentDetails',
         builder: (context, state) {
           final documentId = state.pathParameters['documentId']!;
-          return DocumentDetailsScreen(documentId: documentId);
+          return BlocProvider<DocumentCubit>(
+            create: (_) => getIt<DocumentCubit>()..loadDocumentWithAnalysis(documentId),
+            child: DocumentDetailsScreen(documentId: documentId),
+          );
         },
       ),
 
@@ -612,69 +616,94 @@ class _PreviewScreen extends StatelessWidget {
 class _AnalysisProgressScreen extends StatelessWidget {
   const _AnalysisProgressScreen();
 
+  Future<bool> _handleBackNavigation(BuildContext context) async {
+    // Cancel analysis if possible, then go to home
+    final analysisCubit = context.read<AnalysisCubit>();
+    // Note: AnalysisCubit doesn't have a cancel method yet, just navigate away
+    if (context.canGoBack) {
+      context.goBack();
+    } else {
+      AppRouter.goToHome(context);
+    }
+    return false; // We handled navigation, don't let system pop
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<AnalysisCubit, AnalysisState>(
-      listener: (context, state) {
-        if (state is AnalysisCompleted) {
-          // Use context.go() to replace the progress screen with document details
-          // This properly clears the progress screen from the stack
-          context.go(AppRouter.documentDetailsPath(state.analysis.documentId));
-        } else if (state is AnalysisError) {
-          // For errors, replace current route with error screen
-          context.go(AppRouter.analysisError);
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) {
+          await _handleBackNavigation(context);
         }
       },
-      builder: (context, state) {
-        int progress = 0;
-        String message = 'Starting analysis...';
+      child: BlocConsumer<AnalysisCubit, AnalysisState>(
+        listener: (context, state) {
+          if (state is AnalysisCompleted) {
+            // Use context.pushReplacement() to replace the progress screen with document details
+            // This properly clears the progress screen from the stack
+            context.pushReplacement(
+              AppRouter.documentDetailsPath(state.analysis.documentId),
+            );
+          } else if (state is AnalysisError) {
+            // For errors, replace current route with error screen
+            context.pushReplacement(AppRouter.analysisError);
+          }
+        },
+        builder: (context, state) {
+          int progress = 0;
+          String message = 'Starting analysis...';
 
-        if (state is AnalysisProgress) {
-          progress = state.progress;
-          message = state.message ?? message;
-        }
+          if (state is AnalysisProgress) {
+            progress = state.progress;
+            message = state.message ?? message;
+          }
 
-        return Scaffold(
-          appBar: AppBar(
-            title: Text('Analyzing...', style: AppTypography.titleLarge),
-            automaticallyImplyLeading:
-                false, // Prevent backing out during analysis
-          ),
-          body: Center(
-            child: Padding(
-              padding: AppSpacing.screenPadding,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  const SizedBox(height: AppSpacing.spacingXl),
-                  Text(
-                    '$progress%',
-                    style: AppTypography.displayLargeMobile.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.spacingSm),
-                  Text(
-                    'Analyzing Document',
-                    style: AppTypography.headlineMedium,
-                  ),
-                  const SizedBox(height: AppSpacing.spacingSm),
-                  Text(
-                    message,
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Analyzing...', style: AppTypography.titleLarge),
+              leading: IconButton(
+                icon: Icon(Symbols.arrow_back),
+                onPressed: () => _handleBackNavigation(context),
+                tooltip: 'Cancel',
               ),
             ),
-          ),
-        );
-      },
+            body: Center(
+              child: Padding(
+                padding: AppSpacing.screenPadding,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    const SizedBox(height: AppSpacing.spacingXl),
+                    Text(
+                      '$progress%',
+                      style: AppTypography.displayLargeMobile.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.spacingSm),
+                    Text(
+                      'Analyzing Document',
+                      style: AppTypography.headlineMedium,
+                    ),
+                    const SizedBox(height: AppSpacing.spacingSm),
+                    Text(
+                      message,
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }
@@ -973,11 +1002,7 @@ class _ChecklistScreenState extends State<_ChecklistScreen> {
     );
 
     final checklistCubit = context.read<ChecklistCubit>();
-    final currentState = checklistCubit.state;
-    if (currentState is checklist_state.ChecklistLoaded) {
-      final updatedItems = [...currentState.items, newItem];
-      await checklistCubit.saveChecklist(widget.documentId, updatedItems);
-    }
+    await checklistCubit.addItem(newItem);
   }
 
   Future<void> _confirmDeleteItem(checklist_models.ChecklistItemModel item) async {
@@ -999,11 +1024,7 @@ class _ChecklistScreenState extends State<_ChecklistScreen> {
 
     if (confirmed == true && mounted) {
       final checklistCubit = context.read<ChecklistCubit>();
-      final currentState = checklistCubit.state;
-      if (currentState is checklist_state.ChecklistLoaded) {
-        final updatedItems = currentState.items.where((i) => i.id != item.id).toList();
-        await checklistCubit.saveChecklist(widget.documentId, updatedItems);
-      }
+      await checklistCubit.deleteItem(item.id);
     }
   }
 
@@ -1043,28 +1064,43 @@ class _ChecklistScreenState extends State<_ChecklistScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ChecklistCubit, checklist_state.ChecklistState>(
-      builder: (context, state) {
-        if (state is checklist_state.ChecklistLoading) {
-          return Scaffold(
-            appBar: AppBar(title: Text('Checklist', style: AppTypography.titleLarge)),
-            body: const LoadingState(message: 'Loading checklist...'),
-          );
-        }
-
+    return BlocListener<ChecklistCubit, checklist_state.ChecklistState>(
+      listener: (context, state) {
+        // Show SnackBar for mutation errors (toggle, add, delete, save)
+        // Only show for errors that happen after initial load (ChecklistLoaded -> ChecklistError)
         if (state is checklist_state.ChecklistError) {
-          return Scaffold(
-            appBar: AppBar(title: Text('Checklist', style: AppTypography.titleLarge)),
-            body: ErrorState(
-              title: 'Failed to load checklist',
-              subtitle: state.message,
-              actionLabel: 'Retry',
-              onAction: _loadChecklist,
-            ),
-          );
+          if (mounted) {
+            context.showSnackBar(state.message);
+          }
         }
+      },
+      child: BlocBuilder<ChecklistCubit, checklist_state.ChecklistState>(
+        builder: (context, state) {
+          // Only show loading for initial load
+          final isInitialLoad = state is checklist_state.ChecklistLoading ||
+              state is checklist_state.ChecklistInitial;
 
-        if (state is checklist_state.ChecklistLoaded) {
+          if (isInitialLoad) {
+            return Scaffold(
+              appBar: AppBar(title: Text('Checklist', style: AppTypography.titleLarge)),
+              body: const LoadingState(message: 'Loading checklist...'),
+            );
+          }
+
+          // Show error screen only for initial load failures
+          if (state is checklist_state.ChecklistError) {
+            return Scaffold(
+              appBar: AppBar(title: Text('Checklist', style: AppTypography.titleLarge)),
+              body: ErrorState(
+                title: 'Failed to load checklist',
+                subtitle: state.message,
+                actionLabel: 'Retry',
+                onAction: _loadChecklist,
+              ),
+            );
+          }
+
+          if (state is checklist_state.ChecklistLoaded) {
           final items = state.items;
           final officialItems = items.where((i) => i.category != checklist_models.ChecklistCategory.other).toList();
           final personalItems = items.where((i) => i.category == checklist_models.ChecklistCategory.other).toList();
@@ -1111,42 +1147,56 @@ class _ChecklistScreenState extends State<_ChecklistScreen> {
                   ),
                 ),
                 const Divider(height: 1),
-                // Checklist items
+                // Checklist items with pull-to-refresh
                 Expanded(
-                  child: items.isEmpty
-                      ? EmptyState(
-                          icon: Symbols.checklist,
-                          title: 'No checklist items',
-                          subtitle: 'Tasks will be generated from document analysis',
-                          actionLabel: 'Add Task',
-                          onAction: _showAddTaskDialog,
-                        )
-                      : ListView(
-                          padding: AppSpacing.screenPadding,
-                          children: [
-                            if (officialItems.isNotEmpty) ...[
-                              _buildSectionHeader('From Document', officialItems.length, context.colors.primary),
-                              ...officialItems.map((item) => _ChecklistItemWidget(
-                                item: item,
-                                onToggle: () => context.read<ChecklistCubit>().toggleItem(item),
-                                onDelete: () => _confirmDeleteItem(item),
-                                categoryColor: _getCategoryColor(item.category, context),
-                                categoryLabel: _getCategoryLabel(item.category),
-                              )),
-                              const SizedBox(height: AppSpacing.spacingLg),
+                  child: RefreshIndicator(
+                    onRefresh: () => _loadChecklist(),
+                    child: items.isEmpty
+                        ? SingleChildScrollView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                minHeight: MediaQuery.of(context).size.height -
+                                    56.0 - // toolbar height
+                                    MediaQuery.of(context).padding.top -
+                                    120.0, // progress bar + divider approximate height
+                              ),
+                              child: EmptyState(
+                                icon: Symbols.checklist,
+                                title: 'No checklist items',
+                                subtitle: 'Tasks will be generated from document analysis',
+                                actionLabel: 'Add Task',
+                                onAction: _showAddTaskDialog,
+                              ),
+                            ),
+                          )
+                        : ListView(
+                            padding: AppSpacing.screenPadding,
+                            children: [
+                              if (officialItems.isNotEmpty) ...[
+                                _buildSectionHeader('From Document', officialItems.length, context.colors.primary),
+                                ...officialItems.map((item) => _ChecklistItemWidget(
+                                  item: item,
+                                  onToggle: () => context.read<ChecklistCubit>().toggleItem(item),
+                                  onDelete: () => _confirmDeleteItem(item),
+                                  categoryColor: _getCategoryColor(item.category, context),
+                                  categoryLabel: _getCategoryLabel(item.category),
+                                )),
+                                const SizedBox(height: AppSpacing.spacingLg),
+                              ],
+                              if (personalItems.isNotEmpty) ...[
+                                _buildSectionHeader('Personal Tasks', personalItems.length, context.colors.secondary),
+                                ...personalItems.map((item) => _ChecklistItemWidget(
+                                  item: item,
+                                  onToggle: () => context.read<ChecklistCubit>().toggleItem(item),
+                                  onDelete: () => _confirmDeleteItem(item),
+                                  categoryColor: _getCategoryColor(item.category, context),
+                                  categoryLabel: _getCategoryLabel(item.category),
+                                )),
+                              ],
                             ],
-                            if (personalItems.isNotEmpty) ...[
-                              _buildSectionHeader('Personal Tasks', personalItems.length, context.colors.secondary),
-                              ...personalItems.map((item) => _ChecklistItemWidget(
-                                item: item,
-                                onToggle: () => context.read<ChecklistCubit>().toggleItem(item),
-                                onDelete: () => _confirmDeleteItem(item),
-                                categoryColor: _getCategoryColor(item.category, context),
-                                categoryLabel: _getCategoryLabel(item.category),
-                              )),
-                            ],
-                          ],
-                        ),
+                          ),
+                  ),
                 ),
               ],
             ),
@@ -1158,7 +1208,7 @@ class _ChecklistScreenState extends State<_ChecklistScreen> {
           body: const LoadingState(message: 'Loading checklist...'),
         );
       },
-    );
+    ));
   }
 
   Widget _buildSectionHeader(String title, int count, Color color) {
@@ -1686,7 +1736,6 @@ class _TranslationScreenState extends State<_TranslationScreen> {
   final _customTextController = TextEditingController();
   String _selectedTargetLanguage = 'ar';
   String _selectedSourceLanguage = 'en';
-  bool _isTranslating = false;
 
   static const List<String> _translationTabs = [
     'Summary',
@@ -1698,15 +1747,33 @@ class _TranslationScreenState extends State<_TranslationScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    // Load existing translations for this document
+    context.read<TranslationCubit>().loadTranslations(widget.documentId);
+  }
+
+  @override
   void dispose() {
     _customTextController.dispose();
     super.dispose();
   }
 
-  Future<void> _translateContent(String content) async {
-    if (content.trim().isEmpty || _isTranslating) return;
+  // Auto-detect source language from content
+  String _detectSourceLanguage(String content) {
+    final arabicRegex = RegExp(r'[؀-ۿ]');
+    if (arabicRegex.hasMatch(content)) {
+      return 'ar';
+    }
+    return 'en';
+  }
 
-    setState(() => _isTranslating = true);
+  Future<void> _translateContent(String content) async {
+    if (content.trim().isEmpty) return;
+
+    // Auto-detect source language if not custom text tab
+    final sourceLang = _selectedSourceLanguage;
+    final targetLang = _selectedTargetLanguage;
 
     final authCubit = context.read<AuthCubit>();
     final authState = authCubit.state;
@@ -1719,14 +1786,10 @@ class _TranslationScreenState extends State<_TranslationScreen> {
     await translationCubit.translate(
       documentId: widget.documentId,
       userId: userId,
-      sourceLanguage: _selectedSourceLanguage,
-      targetLanguage: _selectedTargetLanguage,
+      sourceLanguage: sourceLang,
+      targetLanguage: targetLang,
       content: content,
     );
-
-    if (mounted) {
-      setState(() => _isTranslating = false);
-    }
   }
 
   String _getContentForTab(int tabIndex, doc_models.AnalysisModel? analysis) {
@@ -1798,20 +1861,31 @@ class _TranslationScreenState extends State<_TranslationScreen> {
     return BlocBuilder<TranslationCubit, translation_state.TranslationState>(
       builder: (context, state) {
         String? translatedText;
-        bool isLoading = _isTranslating;
+        bool isLoading = false;
+        String? errorMessage;
 
         if (state is translation_state.TranslationCompleted) {
           translatedText = state.translation.translatedContent;
         } else if (state is translation_state.TranslationLoading) {
           isLoading = true;
         } else if (state is translation_state.TranslationError) {
-          // Show error
+          errorMessage = state.message;
         }
 
         final content = _getContentForTab(tabIndex, analysis);
         final hasContent = content.trim().isNotEmpty;
 
-        if (tabIndex == 4) {
+        // Auto-detect and set source language for predefined tabs
+        if (tabIndex != 5 && hasContent && _selectedSourceLanguage == 'en') {
+          final detected = _detectSourceLanguage(content);
+          if (detected != _selectedSourceLanguage) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) setState(() => _selectedSourceLanguage = detected);
+            });
+          }
+        }
+
+        if (tabIndex == 5) {
           // Custom text tab
           return SingleChildScrollView(
             padding: AppSpacing.screenPadding,
@@ -1871,11 +1945,42 @@ class _TranslationScreenState extends State<_TranslationScreen> {
                     leadingIcon: Symbols.translate,
                   ),
                 ),
+                if (errorMessage != null) ...[
+                  const SizedBox(height: AppSpacing.spacingMd),
+                  AppCard(
+                    color: AppColors.errorLight,
+                    child: Row(
+                      children: [
+                        Icon(Symbols.error, color: AppColors.error, size: 20),
+                        const SizedBox(width: AppSpacing.spacingSm),
+                        Expanded(
+                          child: Text(
+                            errorMessage,
+                            style: AppTypography.bodySmall.copyWith(color: AppColors.error),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
                 if (translatedText != null) ...[
                   const SizedBox(height: AppSpacing.spacingLg),
                   const Divider(),
                   const SizedBox(height: AppSpacing.spacingMd),
-                  Text('Translation', style: AppTypography.labelLarge),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Translation', style: AppTypography.labelLarge),
+                      TextButton.icon(
+                        onPressed: () {
+                          Clipboard.setData(ClipboardData(text: translatedText!));
+                          context.showSnackBar('Translation copied to clipboard');
+                        },
+                        icon: Icon(Symbols.content_copy, size: 18),
+                        label: Text('Copy', style: AppTypography.labelMedium),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: AppSpacing.spacingSm),
                   AppCard(
                     child: SelectableText(
@@ -1941,11 +2046,42 @@ class _TranslationScreenState extends State<_TranslationScreen> {
                     leadingIcon: Symbols.translate,
                   ),
                 ),
+                if (errorMessage != null) ...[
+                  const SizedBox(height: AppSpacing.spacingMd),
+                  AppCard(
+                    color: AppColors.errorLight,
+                    child: Row(
+                      children: [
+                        Icon(Symbols.error, color: AppColors.error, size: 20),
+                        const SizedBox(width: AppSpacing.spacingSm),
+                        Expanded(
+                          child: Text(
+                            errorMessage,
+                            style: AppTypography.bodySmall.copyWith(color: AppColors.error),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
                 if (translatedText != null) ...[
                   const SizedBox(height: AppSpacing.spacingLg),
                   const Divider(),
                   const SizedBox(height: AppSpacing.spacingMd),
-                  Text('Translation (${translation_models.SupportedLanguages.getLanguageName(_selectedTargetLanguage)})', style: AppTypography.labelMedium),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Translation (${translation_models.SupportedLanguages.getLanguageName(_selectedTargetLanguage)})', style: AppTypography.labelMedium),
+                      TextButton.icon(
+                        onPressed: () {
+                          Clipboard.setData(ClipboardData(text: translatedText!));
+                          context.showSnackBar('Translation copied to clipboard');
+                        },
+                        icon: Icon(Symbols.content_copy, size: 18),
+                        label: Text('Copy', style: AppTypography.labelMedium),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: AppSpacing.spacingSm),
                   AppCard(
                     child: SelectableText(

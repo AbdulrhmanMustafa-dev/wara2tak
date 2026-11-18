@@ -42,23 +42,49 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
     context.read<DocumentCubit>().loadDocumentWithAnalysis(widget.documentId);
   }
 
+  Future<void> _onRefresh() async {
+    _loadData();
+  }
+
+  Future<bool> _handleBackNavigation() async {
+    // Return true to allow pop, false to prevent
+    if (context.canGoBack) {
+      context.goBack();
+    } else {
+      AppRouter.goToHome(context);
+    }
+    return false; // We handled navigation, don't let system pop
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<DocumentCubit, DocumentState>(
-      builder: (context, state) {
-        if (state is DocumentLoaded) {
-          final doc = state.document;
-          final analysis = state.analysis;
-          return Scaffold(
-            appBar: AppBar(
-              title: Text(doc.title, style: AppTypography.headlineSmall),
-              actions: [
-                AppIconButton(
-                  icon: Symbols.more_vert,
-                  onPressed: () => _showMoreOptions(context, doc),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) {
+          await _handleBackNavigation();
+        }
+      },
+      child: BlocBuilder<DocumentCubit, DocumentState>(
+        builder: (context, state) {
+          if (state is DocumentLoaded) {
+            final doc = state.document;
+            final analysis = state.analysis;
+            return Scaffold(
+              appBar: AppBar(
+                title: Text(doc.title, style: AppTypography.headlineSmall),
+                leading: IconButton(
+                  icon: Icon(Symbols.arrow_back),
+                  onPressed: _handleBackNavigation,
+                  tooltip: 'Back',
                 ),
-              ],
-              bottom: TabBar(
+                actions: [
+                  AppIconButton(
+                    icon: Symbols.more_vert,
+                    onPressed: () => _showMoreOptions(context, doc),
+                  ),
+                ],
+                bottom: TabBar(
                 controller: _tabController,
                 tabs: const [
                   Tab(text: 'Summary'),
@@ -102,6 +128,7 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
         }
         return const SizedBox.shrink();
       },
+    ),
     );
   }
 
@@ -109,66 +136,70 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
     if (analysis == null) {
       return const LoadingState(message: 'Loading analysis...');
     }
-    return SingleChildScrollView(
-      padding: AppSpacing.screenPadding,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Document info
-          _buildInfoCard(doc),
-          const SizedBox(height: AppSpacing.spacingLg),
+    return RefreshIndicator(
+      onRefresh: _onRefresh,
+      child: SingleChildScrollView(
+        padding: AppSpacing.screenPadding,
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Document info
+            _buildInfoCard(doc),
+            const SizedBox(height: AppSpacing.spacingLg),
 
-          // AI Summary
-          if (analysis.summary != null) ...[
-            Text('AI Summary', style: AppTypography.headlineSmall),
-            const SizedBox(height: AppSpacing.spacingSm),
-            AppCard(
-              child: Text(
-                analysis.summary!,
-                style: AppTypography.bodyMedium,
+            // AI Summary
+            if (analysis.summary != null) ...[
+              Text('AI Summary', style: AppTypography.headlineSmall),
+              const SizedBox(height: AppSpacing.spacingSm),
+              AppCard(
+                child: Text(
+                  analysis.summary!,
+                  style: AppTypography.bodyMedium,
+                ),
               ),
-            ),
+              const SizedBox(height: AppSpacing.spacingLg),
+            ],
+
+            // Key metrics
+            _buildMetricsRow(analysis),
             const SizedBox(height: AppSpacing.spacingLg),
-          ],
 
-          // Key metrics
-          _buildMetricsRow(analysis),
-          const SizedBox(height: AppSpacing.spacingLg),
+            // Red flags
+            if (analysis.redFlags.isNotEmpty) ...[
+              Text('Red Flags', style: AppTypography.headlineSmall),
+              const SizedBox(height: AppSpacing.spacingSm),
+              ...analysis.redFlags.map((flag) => _RedFlagCard(flag: flag)),
+              const SizedBox(height: AppSpacing.spacingLg),
+            ],
 
-          // Red flags
-          if (analysis.redFlags.isNotEmpty) ...[
-            Text('Red Flags', style: AppTypography.headlineSmall),
-            const SizedBox(height: AppSpacing.spacingSm),
-            ...analysis.redFlags.map((flag) => _RedFlagCard(flag: flag)),
-            const SizedBox(height: AppSpacing.spacingLg),
-          ],
-
-          // Checklist preview
-          if (analysis.checklistItems.isNotEmpty) ...[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Checklist', style: AppTypography.headlineSmall),
-                TertiaryButton(
-                  label: 'View All',
-                  onPressed: () => AppRouter.goToChecklist(context, doc.id),
-                  trailingIcon: Symbols.chevron_right,
+            // Checklist preview
+            if (analysis.checklistItems.isNotEmpty) ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Checklist', style: AppTypography.headlineSmall),
+                  TertiaryButton(
+                    label: 'View All',
+                    onPressed: () => AppRouter.goToChecklist(context, doc.id),
+                    trailingIcon: Symbols.chevron_right,
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.spacingSm),
+              ...analysis.checklistItems.take(3).map((item) => _ChecklistPreviewItem(item: item)),
+              if (analysis.checklistItems.length > 3) ...[
+                const SizedBox(height: AppSpacing.spacingSm),
+                Center(
+                  child: TertiaryButton(
+                    label: 'View ${analysis.checklistItems.length} items',
+                    onPressed: () => AppRouter.goToChecklist(context, doc.id),
+                  ),
                 ),
               ],
-            ),
-            const SizedBox(height: AppSpacing.spacingSm),
-            ...analysis.checklistItems.take(3).map((item) => _ChecklistPreviewItem(item: item)),
-            if (analysis.checklistItems.length > 3) ...[
-              const SizedBox(height: AppSpacing.spacingSm),
-              Center(
-                child: TertiaryButton(
-                  label: 'View ${analysis.checklistItems.length} items',
-                  onPressed: () => AppRouter.goToChecklist(context, doc.id),
-                ),
-              ),
             ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -422,6 +453,14 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            ListTile(
+              leading: Icon(Symbols.refresh, color: context.colors.primary),
+              title: Text('Refresh', style: AppTypography.labelLarge),
+              onTap: () {
+                Navigator.pop(context);
+                _onRefresh();
+              },
+            ),
             ListTile(
               leading: Icon(Symbols.translate, color: context.colors.primary),
               title: Text('Translate', style: AppTypography.labelLarge),

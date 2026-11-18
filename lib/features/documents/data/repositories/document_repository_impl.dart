@@ -207,6 +207,14 @@ class DocumentRepositoryImpl implements document_repo.DocumentRepository {
         }
       }
 
+      // Delete child records first to avoid FK constraint violations
+      // (in case DB cascade isn't set up)
+      log('🗑️ Deleting child records for document: $documentId');
+      await _client.from('checklist_items').delete().eq('documentId', documentId);
+      await _client.from('chat_messages').delete().eq('documentId', documentId);
+      await _client.from('translations').delete().eq('documentId', documentId);
+      await _client.from('analyses').delete().eq('documentId', documentId);
+
       // Delete from database
       await _client.from('documents').delete().eq('id', documentId);
 
@@ -247,13 +255,26 @@ class DocumentRepositoryImpl implements document_repo.DocumentRepository {
   Future<Either<Failure, AnalysisModel>> saveAnalysis(AnalysisModel analysis) async {
     try {
       log('💾 Saving analysis for document: ${analysis.documentId}');
+
+      // Force the correct documentId (in case AI returned wrong ID)
+      final analysisJson = analysis.toJson();
+      analysisJson['documentId'] = analysis.documentId;
+
       final response = await _client
           .from('analyses')
-          .upsert(analysis.toJson(), onConflict: 'documentId')
+          .upsert(analysisJson, onConflict: 'documentId')
           .select()
           .single();
 
       log('✅ Analysis saved');
+
+      // Update document status to 'analyzed' after successful analysis save
+      await _client
+          .from('documents')
+          .update({'status': DocumentStatus.analyzed.name})
+          .eq('id', analysis.documentId);
+
+      log('✅ Document status updated to analyzed');
       return Right(AnalysisModel.fromJson(response));
     } catch (e, stackTrace) {
       log('❌ Save analysis failed: $e');
