@@ -170,39 +170,6 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
               ...analysis.redFlags.map((flag) => _RedFlagCard(flag: flag)),
               const SizedBox(height: AppSpacing.spacingLg),
             ],
-
-            // Checklist preview
-            if (analysis.checklistItems.isNotEmpty) ...[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    context.l10n.checklist,
-                    style: AppTypography.headlineSmall,
-                  ),
-                  TertiaryButton(
-                    label: context.l10n.viewAllItems,
-                    onPressed: () => AppRouter.goToChecklist(context, doc.id),
-                    trailingIcon: Symbols.chevron_right,
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.spacingSm),
-              ...analysis.checklistItems
-                  .take(3)
-                  .map((item) => _ChecklistPreviewItem(item: item)),
-              if (analysis.checklistItems.length > 3) ...[
-                const SizedBox(height: AppSpacing.spacingSm),
-                Center(
-                  child: TertiaryButton(
-                    label: context.l10n.viewChecklistItems(
-                      analysis.checklistItems.length,
-                    ),
-                    onPressed: () => AppRouter.goToChecklist(context, doc.id),
-                  ),
-                ),
-              ],
-            ],
           ],
         ),
       ),
@@ -404,20 +371,6 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
         ),
         child: Row(
           children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                child: SecondaryButton(
-                  label: context.l10n.chat,
-                  onPressed: () {
-                    debugPrint('[DocumentDetailsScreen] Chat button tapped, documentId=${doc.id}');
-                    AppRouter.goToDocumentChat(context, doc.id);
-                  },
-                  leadingIcon: Symbols.chat,
-                  isFullWidth: true,
-                ),
-              ),
-            ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4.0),
@@ -1280,47 +1233,3 @@ class _RedFlagCard extends StatelessWidget {
   }
 }
 
-/// Checklist preview item
-class _ChecklistPreviewItem extends StatelessWidget {
-  final ChecklistItemModel item;
-
-  const _ChecklistPreviewItem({required this.item});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.spacingXs),
-      child: Row(
-        children: [
-          Checkbox(
-            value: item.isCompleted,
-            onChanged: null,
-            activeColor: context.colors.primary,
-            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          ),
-          const SizedBox(width: AppSpacing.spacingSm),
-          Expanded(
-            child: Text(
-              item.title,
-              style: AppTypography.bodyMedium.copyWith(
-                decoration: item.isCompleted
-                    ? TextDecoration.lineThrough
-                    : null,
-                color: item.isCompleted
-                    ? context.colors.onSurfaceVariant
-                    : context.colors.onSurface,
-              ),
-            ),
-          ),
-          if (item.dueDate != null)
-            Text(
-              '${item.dueDate!.day}/${item.dueDate!.month}',
-              style: AppTypography.tiny.copyWith(
-                color: context.colors.onSurfaceVariant,
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
