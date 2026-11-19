@@ -1,15 +1,16 @@
-import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../../../core/design_system/index.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/navigation/app_router.dart';
 import '../../../../shared/widgets/index.dart';
+import '../../domain/models/analysis_model.dart';
+import '../../domain/models/document_model.dart';
 import '../cubit/document_cubit.dart';
 import '../cubit/document_state.dart';
-import '../../domain/models/document_model.dart';
-import '../../domain/models/analysis_model.dart';
 
 /// Document details screen
 class DocumentDetailsScreen extends StatefulWidget {
@@ -76,7 +77,7 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
                 leading: IconButton(
                   icon: Icon(Symbols.arrow_back),
                   onPressed: _handleBackNavigation,
-                  tooltip: 'Back',
+                  tooltip: context.l10n.back,
                 ),
                 actions: [
                   AppIconButton(
@@ -85,56 +86,56 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
                   ),
                 ],
                 bottom: TabBar(
-                controller: _tabController,
-                tabs: const [
-                  Tab(text: 'Summary'),
-                  Tab(text: 'Key Clauses'),
-                  Tab(text: 'Deadlines'),
-                  Tab(text: 'Financials'),
-                ],
-                labelStyle: AppTypography.labelMedium,
-                unselectedLabelStyle: AppTypography.labelMedium,
-                indicatorColor: context.colors.primary,
-                labelColor: context.colors.primary,
-                unselectedLabelColor: context.colors.onSurfaceVariant,
+                  controller: _tabController,
+                  tabs: [
+                    Tab(text: context.l10n.summary),
+                    Tab(text: context.l10n.keyClauses),
+                    Tab(text: context.l10n.deadlines),
+                    Tab(text: context.l10n.financials),
+                  ],
+                  labelStyle: AppTypography.labelMedium,
+                  unselectedLabelStyle: AppTypography.labelMedium,
+                  indicatorColor: context.colors.primary,
+                  labelColor: context.colors.primary,
+                  unselectedLabelColor: context.colors.onSurfaceVariant,
+                ),
               ),
-            ),
-            body: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildSummaryTab(doc, analysis),
-                _buildKeyClausesTab(doc, analysis),
-                _buildDeadlinesTab(doc, analysis),
-                _buildFinancialsTab(doc, analysis),
-              ],
-            ),
-            bottomNavigationBar: _buildBottomActions(context, doc),
-          );
-        } else if (state is DocumentLoading) {
-          return Scaffold(
-            appBar: AppBar(title: const Text('Document Details')),
-            body: const LoadingState(message: 'Loading document...'),
-          );
-        } else if (state is DocumentError) {
-          return Scaffold(
-            appBar: AppBar(title: const Text('Document Details')),
-            body: ErrorState(
-              title: 'Failed to load document',
-              subtitle: state.message,
-              actionLabel: 'Retry',
-              onAction: _loadData,
-            ),
-          );
-        }
-        return const SizedBox.shrink();
-      },
-    ),
+              body: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildSummaryTab(doc, analysis),
+                  _buildKeyClausesTab(doc, analysis),
+                  _buildDeadlinesTab(doc, analysis),
+                  _buildFinancialsTab(doc, analysis),
+                ],
+              ),
+              bottomNavigationBar: _buildBottomActions(context, doc),
+            );
+          } else if (state is DocumentLoading) {
+            return Scaffold(
+              appBar: AppBar(title: Text(context.l10n.documentDetails)),
+              body: LoadingState(message: context.l10n.loadingDocument),
+            );
+          } else if (state is DocumentError) {
+            return Scaffold(
+              appBar: AppBar(title: Text(context.l10n.documentDetails)),
+              body: ErrorState(
+                title: context.l10n.failedToLoadDocument,
+                subtitle: context.localizedErrorMessage(state.message),
+                actionLabel: context.l10n.retry,
+                onAction: _loadData,
+              ),
+            );
+          }
+          return const SizedBox.shrink();
+        },
+      ),
     );
   }
 
   Widget _buildSummaryTab(DocumentModel doc, AnalysisModel? analysis) {
     if (analysis == null) {
-      return const LoadingState(message: 'Loading analysis...');
+      return LoadingState(message: context.l10n.loadingAnalysis);
     }
     return RefreshIndicator(
       onRefresh: _onRefresh,
@@ -150,13 +151,10 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
 
             // AI Summary
             if (analysis.summary != null) ...[
-              Text('AI Summary', style: AppTypography.headlineSmall),
+              Text(context.l10n.aiSummary, style: AppTypography.headlineSmall),
               const SizedBox(height: AppSpacing.spacingSm),
               AppCard(
-                child: Text(
-                  analysis.summary!,
-                  style: AppTypography.bodyMedium,
-                ),
+                child: Text(analysis.summary!, style: AppTypography.bodyMedium),
               ),
               const SizedBox(height: AppSpacing.spacingLg),
             ],
@@ -167,7 +165,7 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
 
             // Red flags
             if (analysis.redFlags.isNotEmpty) ...[
-              Text('Red Flags', style: AppTypography.headlineSmall),
+              Text(context.l10n.redFlags, style: AppTypography.headlineSmall),
               const SizedBox(height: AppSpacing.spacingSm),
               ...analysis.redFlags.map((flag) => _RedFlagCard(flag: flag)),
               const SizedBox(height: AppSpacing.spacingLg),
@@ -178,21 +176,28 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Checklist', style: AppTypography.headlineSmall),
+                  Text(
+                    context.l10n.checklist,
+                    style: AppTypography.headlineSmall,
+                  ),
                   TertiaryButton(
-                    label: 'View All',
+                    label: context.l10n.viewAllItems,
                     onPressed: () => AppRouter.goToChecklist(context, doc.id),
                     trailingIcon: Symbols.chevron_right,
                   ),
                 ],
               ),
               const SizedBox(height: AppSpacing.spacingSm),
-              ...analysis.checklistItems.take(3).map((item) => _ChecklistPreviewItem(item: item)),
+              ...analysis.checklistItems
+                  .take(3)
+                  .map((item) => _ChecklistPreviewItem(item: item)),
               if (analysis.checklistItems.length > 3) ...[
                 const SizedBox(height: AppSpacing.spacingSm),
                 Center(
                   child: TertiaryButton(
-                    label: 'View ${analysis.checklistItems.length} items',
+                    label: context.l10n.viewChecklistItems(
+                      analysis.checklistItems.length,
+                    ),
                     onPressed: () => AppRouter.goToChecklist(context, doc.id),
                   ),
                 ),
@@ -206,14 +211,14 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
 
   Widget _buildKeyClausesTab(DocumentModel doc, AnalysisModel? analysis) {
     if (analysis == null) {
-      return const LoadingState(message: 'Loading analysis...');
+      return LoadingState(message: context.l10n.loadingAnalysis);
     }
     final clauses = analysis.keyClauses;
     if (clauses.isEmpty) {
       return EmptyState(
         icon: Symbols.description,
-        title: 'No key clauses found',
-        subtitle: 'The AI analysis did not identify any key clauses',
+        title: context.l10n.noKeyClausesFound,
+        subtitle: context.l10n.noKeyClausesDescription,
       );
     }
     return ListView.separated(
@@ -229,14 +234,14 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
 
   Widget _buildDeadlinesTab(DocumentModel doc, AnalysisModel? analysis) {
     if (analysis == null) {
-      return const LoadingState(message: 'Loading analysis...');
+      return LoadingState(message: context.l10n.loadingAnalysis);
     }
     final deadlines = analysis.deadlines;
     if (deadlines.isEmpty) {
       return EmptyState(
         icon: Symbols.event,
-        title: 'No deadlines found',
-        subtitle: 'The AI analysis did not identify any deadlines',
+        title: context.l10n.noDeadlinesFound,
+        subtitle: context.l10n.noDeadlinesDescription,
       );
     }
     return ListView.separated(
@@ -252,14 +257,14 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
 
   Widget _buildFinancialsTab(DocumentModel doc, AnalysisModel? analysis) {
     if (analysis == null) {
-      return const LoadingState(message: 'Loading analysis...');
+      return LoadingState(message: context.l10n.loadingAnalysis);
     }
     final financials = analysis.financialObligations;
     if (financials.isEmpty) {
       return EmptyState(
         icon: Symbols.attach_money,
-        title: 'No financial obligations found',
-        subtitle: 'The AI analysis did not identify any financial obligations',
+        title: context.l10n.noFinancialObligationsFound,
+        subtitle: context.l10n.noFinancialObligationsDescription,
       );
     }
     return ListView.separated(
@@ -287,7 +292,11 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
                   color: _getTypeColor(doc.type).withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(AppShapes.radiusMd),
                 ),
-                child: Icon(_getTypeIcon(doc.type), color: _getTypeColor(doc.type), size: 24),
+                child: Icon(
+                  _getTypeIcon(doc.type),
+                  color: _getTypeColor(doc.type),
+                  size: 24,
+                ),
               ),
               const SizedBox(width: AppSpacing.spacingMd),
               Expanded(
@@ -296,8 +305,10 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
                   children: [
                     Text(doc.title, style: AppTypography.labelLarge),
                     Text(
-                      doc.typeLabel,
-                      style: AppTypography.bodySmall.copyWith(color: context.colors.onSurfaceVariant),
+                      _getTypeLabel(context, doc.type),
+                      style: AppTypography.bodySmall.copyWith(
+                        color: context.colors.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ),
@@ -312,21 +323,21 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
             children: [
               Expanded(
                 child: _InfoItem(
-                  label: 'Pages',
+                  label: context.l10n.pages,
                   value: doc.pageCount.toString(),
                   icon: Symbols.description,
                 ),
               ),
               Expanded(
                 child: _InfoItem(
-                  label: 'Size',
+                  label: context.l10n.size,
                   value: doc.formattedFileSize,
                   icon: Symbols.data_object,
                 ),
               ),
               Expanded(
                 child: _InfoItem(
-                  label: 'Uploaded',
+                  label: context.l10n.uploaded,
                   value: _formatDate(doc.createdAt),
                   icon: Symbols.calendar_today,
                 ),
@@ -343,7 +354,7 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
       children: [
         Expanded(
           child: _MetricCard(
-            label: 'Clauses',
+            label: context.l10n.clauses,
             value: analysis.keyClauses.length.toString(),
             icon: Symbols.description,
             color: context.colors.primary,
@@ -352,7 +363,7 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
         const SizedBox(width: AppSpacing.spacingMd),
         Expanded(
           child: _MetricCard(
-            label: 'Deadlines',
+            label: context.l10n.deadlines,
             value: analysis.deadlines.length.toString(),
             icon: Symbols.event,
             color: AppColors.warning,
@@ -361,7 +372,7 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
         const SizedBox(width: AppSpacing.spacingMd),
         Expanded(
           child: _MetricCard(
-            label: 'Financials',
+            label: context.l10n.financialObligations,
             value: analysis.financialObligations.length.toString(),
             icon: Symbols.attach_money,
             color: AppColors.success,
@@ -370,7 +381,7 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
         const SizedBox(width: AppSpacing.spacingMd),
         Expanded(
           child: _MetricCard(
-            label: 'Red Flags',
+            label: context.l10n.redFlags,
             value: analysis.redFlags.length.toString(),
             icon: Symbols.flag,
             color: AppColors.error,
@@ -381,7 +392,11 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
   }
 
   Widget _buildBottomActions(BuildContext context, DocumentModel doc) {
+    // Wrap in SafeArea(top: false) to avoid Android gesture/navigation bar overlap.
+    // This is needed because Scaffold.bottomNavigationBar does NOT automatically
+    // apply bottom safe area padding - it places content at the very bottom.
     return SafeArea(
+      top: false,
       child: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: AppSpacing.spacingMd,
@@ -389,51 +404,45 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
         ),
         child: Row(
           children: [
-            Flexible(
-              flex: 1,
+            Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4.0),
                 child: SecondaryButton(
-                  label: 'Chat',
-                  onPressed: () => AppRouter.goToDocumentChat(context, doc.id),
+                  label: context.l10n.chat,
+                  onPressed: () {
+                    debugPrint('[DocumentDetailsScreen] Chat button tapped, documentId=${doc.id}');
+                    AppRouter.goToDocumentChat(context, doc.id);
+                  },
                   leadingIcon: Symbols.chat,
                   isFullWidth: true,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.spacingSm,
-                    vertical: AppSpacing.spacingSm,
-                  ),
                 ),
               ),
             ),
-            Flexible(
-              flex: 1,
+            Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4.0),
                 child: PrimaryButton(
-                  label: 'Checklist',
-                  onPressed: () => AppRouter.goToChecklist(context, doc.id),
+                  label: context.l10n.checklist,
+                  onPressed: () {
+                    debugPrint('[DocumentDetailsScreen] Checklist button tapped, documentId=${doc.id}');
+                    AppRouter.goToChecklist(context, doc.id);
+                  },
                   leadingIcon: Symbols.checklist,
                   isFullWidth: true,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.spacingSm,
-                    vertical: AppSpacing.spacingSm,
-                  ),
                 ),
               ),
             ),
-            Flexible(
-              flex: 1,
+            Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4.0),
                 child: SecondaryButton(
-                  label: 'Translate',
-                  onPressed: () => AppRouter.goToTranslation(context, doc.id),
+                  label: context.l10n.translate,
+                  onPressed: () {
+                    debugPrint('[DocumentDetailsScreen] Translate button tapped, documentId=${doc.id}');
+                    AppRouter.goToTranslation(context, doc.id);
+                  },
                   leadingIcon: Symbols.translate,
                   isFullWidth: true,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.spacingSm,
-                    vertical: AppSpacing.spacingSm,
-                  ),
                 ),
               ),
             ),
@@ -447,7 +456,9 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppShapes.radiusXl)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppShapes.radiusXl),
+        ),
       ),
       builder: (context) => SafeArea(
         child: Column(
@@ -455,7 +466,10 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
           children: [
             ListTile(
               leading: Icon(Symbols.refresh, color: context.colors.primary),
-              title: Text('Refresh', style: AppTypography.labelLarge),
+              title: Text(
+                context.l10n.refresh,
+                style: AppTypography.labelLarge,
+              ),
               onTap: () {
                 Navigator.pop(context);
                 _onRefresh();
@@ -463,7 +477,10 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
             ),
             ListTile(
               leading: Icon(Symbols.translate, color: context.colors.primary),
-              title: Text('Translate', style: AppTypography.labelLarge),
+              title: Text(
+                context.l10n.translate,
+                style: AppTypography.labelLarge,
+              ),
               onTap: () {
                 Navigator.pop(context);
                 AppRouter.goToTranslation(context, doc.id);
@@ -471,7 +488,12 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
             ),
             ListTile(
               leading: Icon(Symbols.delete, color: AppColors.error),
-              title: Text('Delete', style: AppTypography.labelLarge.copyWith(color: AppColors.error)),
+              title: Text(
+                context.l10n.delete,
+                style: AppTypography.labelLarge.copyWith(
+                  color: AppColors.error,
+                ),
+              ),
               onTap: () {
                 Navigator.pop(context);
                 _showDeleteDialog(context, doc);
@@ -487,19 +509,22 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Delete Document', style: AppTypography.headlineSmall),
+        title: Text(
+          context.l10n.deleteDocumentTitle,
+          style: AppTypography.headlineSmall,
+        ),
         content: Text(
-          'Are you sure you want to delete "${doc.title}"? This action cannot be undone.',
+          context.l10n.deleteDocumentConfirmation(doc.title),
           style: AppTypography.bodyMedium,
         ),
         shape: RoundedRectangleBorder(borderRadius: AppShapes.cardLg),
         actions: [
           TertiaryButton(
-            label: 'Cancel',
+            label: context.l10n.cancel,
             onPressed: () => Navigator.pop(context),
           ),
           FilledDestructiveButton(
-            label: 'Delete',
+            label: context.l10n.delete,
             onPressed: () {
               Navigator.pop(context); // close dialog
               context.read<DocumentCubit>().deleteDocument(doc.id);
@@ -517,7 +542,22 @@ class _DocumentDetailsScreenState extends State<DocumentDetailsScreen>
   }
 
   String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
+    return DateFormat.yMd(context.locale.toString()).format(date);
+  }
+
+  String _getTypeLabel(BuildContext context, DocumentType type) {
+    switch (type) {
+      case DocumentType.rentalContract:
+        return context.l10n.rentalContract;
+      case DocumentType.employmentContract:
+        return context.l10n.employmentContract;
+      case DocumentType.termsOfService:
+        return context.l10n.termsOfServiceType;
+      case DocumentType.privacyPolicy:
+        return context.l10n.privacyPolicyType;
+      case DocumentType.other:
+        return context.l10n.otherType;
+    }
   }
 
   Color _getTypeColor(DocumentType type) {
@@ -583,7 +623,12 @@ class _StatusBadge extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: AppSpacing.spacing2xs),
-              Text('Analyzed', style: AppTypography.tinyBold.copyWith(color: AppColors.success)),
+              Text(
+                context.l10n.statusAnalyzed,
+                style: AppTypography.tinyBold.copyWith(
+                  color: AppColors.success,
+                ),
+              ),
             ],
           ),
         );
@@ -617,9 +662,11 @@ class _StatusBadge extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.spacing2xs),
               Text(
-                'Analyzing',
+                context.l10n.statusAnalyzing,
                 style: AppTypography.tinyBold.copyWith(
-                  color: context.isDarkMode ? AppColors.tealHover : AppColors.teal,
+                  color: context.isDarkMode
+                      ? AppColors.tealHover
+                      : AppColors.teal,
                 ),
               ),
             ],
@@ -641,7 +688,10 @@ class _StatusBadge extends StatelessWidget {
             children: [
               Icon(Symbols.error, size: 10, color: AppColors.error),
               const SizedBox(width: AppSpacing.spacing2xs),
-              Text('Failed', style: AppTypography.tinyBold.copyWith(color: AppColors.error)),
+              Text(
+                context.l10n.statusFailed,
+                style: AppTypography.tinyBold.copyWith(color: AppColors.error),
+              ),
             ],
           ),
         );
@@ -652,13 +702,22 @@ class _StatusBadge extends StatelessWidget {
             vertical: AppSpacing.spacing2xs,
           ),
           decoration: BoxDecoration(
-            color: context.isDarkMode ? AppColors.darkSurfaceVariant : AppColors.lightSurfaceVariant,
+            color: context.isDarkMode
+                ? AppColors.darkSurfaceVariant
+                : AppColors.lightSurfaceVariant,
             borderRadius: AppShapes.chip,
             border: Border.all(
-              color: context.isDarkMode ? AppColors.darkOutlineVariant : AppColors.lightOutlineVariant,
+              color: context.isDarkMode
+                  ? AppColors.darkOutlineVariant
+                  : AppColors.lightOutlineVariant,
             ),
           ),
-          child: Text(status, style: AppTypography.tiny.copyWith(color: context.colors.onSurfaceVariant)),
+          child: Text(
+            context.l10n.statusUploaded,
+            style: AppTypography.tiny.copyWith(
+              color: context.colors.onSurfaceVariant,
+            ),
+          ),
         );
     }
   }
@@ -683,7 +742,12 @@ class _InfoItem extends StatelessWidget {
         Icon(icon, size: 20, color: context.colors.onSurfaceVariant),
         const SizedBox(height: AppSpacing.spacingXs),
         Text(value, style: AppTypography.labelMedium),
-        Text(label, style: AppTypography.tiny.copyWith(color: context.colors.onSurfaceVariant)),
+        Text(
+          label,
+          style: AppTypography.tiny.copyWith(
+            color: context.colors.onSurfaceVariant,
+          ),
+        ),
       ],
     );
   }
@@ -716,7 +780,13 @@ class _MetricCard extends StatelessWidget {
         children: [
           Icon(icon, size: 24, color: color),
           const SizedBox(height: AppSpacing.spacingXs),
-          Text(value, style: AppTypography.headlineSmall.copyWith(color: color, fontWeight: FontWeight.w700)),
+          Text(
+            value,
+            style: AppTypography.headlineSmall.copyWith(
+              color: color,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
           Text(label, style: AppTypography.tiny.copyWith(color: color)),
         ],
       ),
@@ -744,25 +814,35 @@ class _KeyClauseCard extends StatelessWidget {
                   vertical: AppSpacing.spacing2xs,
                 ),
                 decoration: BoxDecoration(
-                  color: _getImportanceColor(clause.importance).withValues(alpha: 0.2),
+                  color: _getImportanceColor(clause.importance)
+                      .withValues(alpha: 0.2),
                   borderRadius: AppShapes.chip,
                 ),
                 child: Text(
-                  clause.importance.name.toUpperCase(),
-                  style: AppTypography.tinyBold.copyWith(color: _getImportanceColor(clause.importance)),
+                  _getImportanceLabel(context, clause.importance),
+                  style: AppTypography.tinyBold.copyWith(
+                    color: _getImportanceColor(clause.importance),
+                  ),
                 ),
               ),
               const Spacer(),
               Text(
-                'Page ${clause.pageNumber}',
-                style: AppTypography.tiny.copyWith(color: context.colors.onSurfaceVariant),
+                context.l10n.pageNumber(clause.pageNumber),
+                style: AppTypography.tiny.copyWith(
+                  color: context.colors.onSurfaceVariant,
+                ),
               ),
             ],
           ),
           const SizedBox(height: AppSpacing.spacingSm),
           Text(clause.title, style: AppTypography.labelLarge),
           const SizedBox(height: AppSpacing.spacingXs),
-          Text(clause.description, style: AppTypography.bodySmall.copyWith(color: context.colors.onSurfaceVariant)),
+          Text(
+            clause.description,
+            style: AppTypography.bodySmall.copyWith(
+              color: context.colors.onSurfaceVariant,
+            ),
+          ),
           const SizedBox(height: AppSpacing.spacingSm),
           Text(
             clause.clauseText,
@@ -790,6 +870,22 @@ class _KeyClauseCard extends StatelessWidget {
         return AppColors.success;
     }
   }
+
+  String _getImportanceLabel(
+    BuildContext context,
+    ClauseImportance importance,
+  ) {
+    switch (importance) {
+      case ClauseImportance.critical:
+        return context.l10n.importanceCritical;
+      case ClauseImportance.high:
+        return context.l10n.importanceHigh;
+      case ClauseImportance.medium:
+        return context.l10n.importanceMedium;
+      case ClauseImportance.low:
+        return context.l10n.importanceLow;
+    }
+  }
 }
 
 /// Deadline card
@@ -800,7 +896,8 @@ class _DeadlineCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isOverdue = deadline.dueDate.isBefore(DateTime.now()) && !deadline.isCompleted;
+    final isOverdue =
+        deadline.dueDate.isBefore(DateTime.now()) && !deadline.isCompleted;
 
     return AppCard(
       child: Row(
@@ -809,10 +906,17 @@ class _DeadlineCard extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: _getTypeColor(deadline.type, context).withValues(alpha: 0.2),
+              color: _getTypeColor(
+                deadline.type,
+                context,
+              ).withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(AppShapes.radiusMd),
             ),
-            child: Icon(_getTypeIcon(deadline.type), color: _getTypeColor(deadline.type, context), size: 24),
+            child: Icon(
+              _getTypeIcon(deadline.type),
+              color: _getTypeColor(deadline.type, context),
+              size: 24,
+            ),
           ),
           const SizedBox(width: AppSpacing.spacingMd),
           Expanded(
@@ -841,8 +945,10 @@ class _DeadlineCard extends StatelessWidget {
                           borderRadius: AppShapes.chip,
                         ),
                         child: Text(
-                          'OVERDUE',
-                          style: AppTypography.tinyBold.copyWith(color: AppColors.error),
+                          context.l10n.overdue,
+                          style: AppTypography.tinyBold.copyWith(
+                            color: AppColors.error,
+                          ),
                         ),
                       ),
                     if (deadline.isCompleted) ...[
@@ -857,18 +963,27 @@ class _DeadlineCard extends StatelessWidget {
                           borderRadius: AppShapes.chip,
                         ),
                         child: Text(
-                          'DONE',
-                          style: AppTypography.tinyBold.copyWith(color: AppColors.success),
+                          context.l10n.completed,
+                          style: AppTypography.tinyBold.copyWith(
+                            color: AppColors.success,
+                          ),
                         ),
                       ),
                     ],
                   ],
                 ),
-                Text(deadline.description, style: AppTypography.bodySmall.copyWith(color: context.colors.onSurfaceVariant)),
                 Text(
-                  'Due: ${_formatDate(deadline.dueDate)}',
+                  deadline.description,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: context.colors.onSurfaceVariant,
+                  ),
+                ),
+                Text(
+                  context.l10n.dueDate(_formatDate(context, deadline.dueDate)),
                   style: AppTypography.tiny.copyWith(
-                    color: isOverdue ? AppColors.error : context.colors.onSurfaceVariant,
+                    color: isOverdue
+                        ? AppColors.error
+                        : context.colors.onSurfaceVariant,
                     fontWeight: isOverdue ? FontWeight.w600 : FontWeight.normal,
                   ),
                 ),
@@ -923,8 +1038,8 @@ class _DeadlineCard extends StatelessWidget {
     }
   }
 
-  String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
+  String _formatDate(BuildContext context, DateTime date) {
+    return DateFormat.yMd(context.locale.toString()).format(date);
   }
 }
 
@@ -943,10 +1058,17 @@ class _FinancialCard extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: _getTypeColor(financial.type, context).withValues(alpha: 0.2),
+              color: _getTypeColor(
+                financial.type,
+                context,
+              ).withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(AppShapes.radiusMd),
             ),
-            child: Icon(_getTypeIcon(financial.type), color: _getTypeColor(financial.type, context), size: 24),
+            child: Icon(
+              _getTypeIcon(financial.type),
+              color: _getTypeColor(financial.type, context),
+              size: 24,
+            ),
           ),
           const SizedBox(width: AppSpacing.spacingMd),
           Expanded(
@@ -954,16 +1076,29 @@ class _FinancialCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(financial.title, style: AppTypography.labelMedium),
-                Text(financial.description, style: AppTypography.bodySmall.copyWith(color: context.colors.onSurfaceVariant)),
+                Text(
+                  financial.description,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: context.colors.onSurfaceVariant,
+                  ),
+                ),
                 if (financial.dueDate != null)
                   Text(
-                    'Due: ${_formatDate(financial.dueDate!)}',
-                    style: AppTypography.tiny.copyWith(color: context.colors.onSurfaceVariant),
+                    context.l10n.dueDate(
+                      _formatDate(context, financial.dueDate!),
+                    ),
+                    style: AppTypography.tiny.copyWith(
+                      color: context.colors.onSurfaceVariant,
+                    ),
                   ),
                 if (financial.isRecurring)
                   Text(
-                    'Recurring: ${financial.frequency}',
-                    style: AppTypography.tiny.copyWith(color: context.colors.primary),
+                    context.l10n.recurring(
+                      _localizedFrequency(context, financial.frequency),
+                    ),
+                    style: AppTypography.tiny.copyWith(
+                      color: context.colors.primary,
+                    ),
                   ),
               ],
             ),
@@ -1018,8 +1153,17 @@ class _FinancialCard extends StatelessWidget {
     }
   }
 
-  String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
+  String _formatDate(BuildContext context, DateTime date) {
+    return DateFormat.yMd(context.locale.toString()).format(date);
+  }
+
+  String _localizedFrequency(BuildContext context, String? frequency) {
+    return switch (frequency?.toLowerCase()) {
+      'monthly' => context.l10n.frequencyMonthly,
+      'quarterly' => context.l10n.frequencyQuarterly,
+      'yearly' || 'annually' => context.l10n.frequencyYearly,
+      _ => frequency ?? '',
+    };
   }
 }
 
@@ -1033,7 +1177,9 @@ class _RedFlagCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppCard(
       color: _getSeverityColor(flag.severity).withValues(alpha: 0.05),
-      border: Border.all(color: _getSeverityColor(flag.severity).withValues(alpha: 0.3)),
+      border: Border.all(
+        color: _getSeverityColor(flag.severity).withValues(alpha: 0.3),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1045,19 +1191,24 @@ class _RedFlagCard extends StatelessWidget {
                   vertical: AppSpacing.spacing2xs,
                 ),
                 decoration: BoxDecoration(
-                  color: _getSeverityColor(flag.severity).withValues(alpha: 0.2),
+                  color: _getSeverityColor(flag.severity)
+                      .withValues(alpha: 0.2),
                   borderRadius: AppShapes.chip,
                 ),
                 child: Text(
-                  flag.severity.name.toUpperCase(),
-                  style: AppTypography.tinyBold.copyWith(color: _getSeverityColor(flag.severity)),
+                  _getSeverityLabel(context, flag.severity),
+                  style: AppTypography.tinyBold.copyWith(
+                    color: _getSeverityColor(flag.severity),
+                  ),
                 ),
               ),
               if (flag.pageNumber != null) ...[
                 const Spacer(),
                 Text(
-                  'Page ${flag.pageNumber}',
-                  style: AppTypography.tiny.copyWith(color: context.colors.onSurfaceVariant),
+                  context.l10n.pageNumber(flag.pageNumber!),
+                  style: AppTypography.tiny.copyWith(
+                    color: context.colors.onSurfaceVariant,
+                  ),
                 ),
               ],
             ],
@@ -1065,7 +1216,12 @@ class _RedFlagCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.spacingSm),
           Text(flag.title, style: AppTypography.labelMedium),
           const SizedBox(height: AppSpacing.spacingXs),
-          Text(flag.description, style: AppTypography.bodySmall.copyWith(color: context.colors.onSurfaceVariant)),
+          Text(
+            flag.description,
+            style: AppTypography.bodySmall.copyWith(
+              color: context.colors.onSurfaceVariant,
+            ),
+          ),
           const SizedBox(height: AppSpacing.spacingSm),
           Container(
             padding: const EdgeInsets.all(AppSpacing.spacingSm),
@@ -1075,12 +1231,18 @@ class _RedFlagCard extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Icon(Symbols.lightbulb, size: 16, color: context.colors.primary),
+                Icon(
+                  Symbols.lightbulb,
+                  size: 16,
+                  color: context.colors.primary,
+                ),
                 const SizedBox(width: AppSpacing.spacingXs),
                 Expanded(
                   child: Text(
-                    'Recommendation: ${flag.recommendation}',
-                    style: AppTypography.bodySmall.copyWith(color: context.colors.primary),
+                    context.l10n.recommendation(flag.recommendation),
+                    style: AppTypography.bodySmall.copyWith(
+                      color: context.colors.primary,
+                    ),
                   ),
                 ),
               ],
@@ -1101,6 +1263,19 @@ class _RedFlagCard extends StatelessWidget {
         return AppColors.warning;
       case RedFlagSeverity.low:
         return AppColors.success;
+    }
+  }
+
+  String _getSeverityLabel(BuildContext context, RedFlagSeverity severity) {
+    switch (severity) {
+      case RedFlagSeverity.critical:
+        return context.l10n.severityCritical;
+      case RedFlagSeverity.high:
+        return context.l10n.severityHigh;
+      case RedFlagSeverity.medium:
+        return context.l10n.severityMedium;
+      case RedFlagSeverity.low:
+        return context.l10n.severityLow;
     }
   }
 }
@@ -1128,15 +1303,21 @@ class _ChecklistPreviewItem extends StatelessWidget {
             child: Text(
               item.title,
               style: AppTypography.bodyMedium.copyWith(
-                decoration: item.isCompleted ? TextDecoration.lineThrough : null,
-                color: item.isCompleted ? context.colors.onSurfaceVariant : context.colors.onSurface,
+                decoration: item.isCompleted
+                    ? TextDecoration.lineThrough
+                    : null,
+                color: item.isCompleted
+                    ? context.colors.onSurfaceVariant
+                    : context.colors.onSurface,
               ),
             ),
           ),
           if (item.dueDate != null)
             Text(
               '${item.dueDate!.day}/${item.dueDate!.month}',
-              style: AppTypography.tiny.copyWith(color: context.colors.onSurfaceVariant),
+              style: AppTypography.tiny.copyWith(
+                color: context.colors.onSurfaceVariant,
+              ),
             ),
         ],
       ),

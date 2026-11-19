@@ -157,6 +157,27 @@ class ProfileRepositoryImpl implements profile_repo.ProfileRepository {
   }
 
   @override
+  Future<Either<Failure, void>> updateTranslationLanguagePreference(
+    String userId,
+    String language,
+  ) async {
+    try {
+      log('📝 Updating translation language preference for user: $userId');
+      await _client.from('profiles').update({
+        'defaultTranslationLanguage': language,
+        'updatedAt': DateTime.now().toIso8601String(),
+      }).eq('id', userId);
+
+      log('✅ Translation language preference updated');
+      return const Right(null);
+    } catch (e, stackTrace) {
+      log('❌ Update translation language preference failed: $e');
+      log('❌ Stack trace: $stackTrace');
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, void>> deleteAccount(String userId) async {
     try {
       log('🗑️ Deleting account for user: $userId');

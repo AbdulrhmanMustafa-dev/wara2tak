@@ -1,11 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../core/design_system/index.dart';
@@ -16,13 +17,16 @@ import '../../features/analysis/presentation/cubit/analysis_state.dart';
 import '../../features/auth/presentation/cubit/auth_cubit.dart';
 import '../../features/auth/presentation/cubit/auth_state.dart';
 import '../../features/auth/presentation/screens/auth_screen.dart';
-import '../../features/checklist/domain/models/checklist_model.dart' as checklist_models;
-import '../../features/checklist/presentation/cubit/checklist_cubit.dart';
-import '../../features/checklist/presentation/cubit/checklist_state.dart' as checklist_state;
 import '../../features/chat/domain/models/chat_model.dart';
 import '../../features/chat/presentation/cubit/chat_cubit.dart';
 import '../../features/chat/presentation/cubit/chat_state.dart';
-import '../../features/documents/domain/models/analysis_model.dart' as doc_models;
+import '../../features/checklist/domain/models/checklist_model.dart'
+    as checklist_models;
+import '../../features/checklist/presentation/cubit/checklist_cubit.dart';
+import '../../features/checklist/presentation/cubit/checklist_state.dart'
+    as checklist_state;
+import '../../features/documents/domain/models/analysis_model.dart'
+    as doc_models;
 import '../../features/documents/presentation/cubit/document_cubit.dart';
 import '../../features/documents/presentation/cubit/document_state.dart';
 import '../../features/documents/presentation/screens/document_details_screen.dart';
@@ -30,10 +34,69 @@ import '../../features/documents/presentation/screens/home_screen.dart';
 import '../../features/documents/presentation/screens/my_documents_screen.dart';
 import '../../features/documents/presentation/screens/upload_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
-import '../../features/translation/domain/models/translation_model.dart' as translation_models;
+import '../../features/translation/domain/models/translation_model.dart'
+    as translation_models;
 import '../../features/translation/presentation/cubit/translation_cubit.dart';
-import '../../features/translation/presentation/cubit/translation_state.dart' as translation_state;
+import '../../features/translation/presentation/cubit/translation_state.dart'
+    as translation_state;
 import '../../shared/widgets/index.dart';
+
+String _localizedAnalysisProgress(
+  BuildContext context,
+  int progress,
+  String? originalMessage,
+) {
+  if (!context.isArabic) {
+    return originalMessage ?? context.l10n.analysisProgress;
+  }
+
+  if (progress < 10) return context.l10n.analysisProgress;
+  if (progress < 20) return context.l10n.readingFile;
+  if (progress < 40) return context.l10n.preparingAnalysis;
+  if (progress < 80) return context.l10n.analyzing;
+  if (progress < 95) return context.l10n.processingAnalysis;
+  return context.l10n.savingResults;
+}
+
+String _localizedLanguageName(BuildContext context, String code) {
+  return switch (code) {
+    'ar' => context.l10n.languageArabic,
+    'en' => context.l10n.languageEnglish,
+    'fr' => context.l10n.languageFrench,
+    'es' => context.l10n.languageSpanish,
+    'de' => context.l10n.languageGerman,
+    'zh' => context.l10n.languageChinese,
+    'hi' => context.l10n.languageHindi,
+    'ur' => context.l10n.languageUrdu,
+    'tr' => context.l10n.languageTurkish,
+    'fa' => context.l10n.languagePersian,
+    _ => code.toUpperCase(),
+  };
+}
+
+String _localizedImportance(
+  BuildContext context,
+  doc_models.ClauseImportance importance,
+) {
+  return switch (importance) {
+    doc_models.ClauseImportance.critical => context.l10n.importanceCritical,
+    doc_models.ClauseImportance.high => context.l10n.importanceHigh,
+    doc_models.ClauseImportance.medium => context.l10n.importanceMedium,
+    doc_models.ClauseImportance.low => context.l10n.importanceLow,
+  };
+}
+
+String _localizedSeverity(
+  BuildContext context,
+  doc_models.RedFlagSeverity severity,
+) {
+  return switch (severity) {
+    doc_models.RedFlagSeverity.critical => context.l10n.severityCritical,
+    doc_models.RedFlagSeverity.high => context.l10n.severityHigh,
+    doc_models.RedFlagSeverity.medium => context.l10n.severityMedium,
+    doc_models.RedFlagSeverity.low => context.l10n.severityLow,
+  };
+}
 
 /// A simple Listenable that notifies when auth state changes
 class _AuthStateListenable extends ChangeNotifier {
@@ -165,7 +228,7 @@ class AppRouter {
         builder: (context, state) {
           final documentId = state.pathParameters['documentId']!;
           return BlocProvider<DocumentCubit>(
-            create: (_) => getIt<DocumentCubit>()..loadDocumentWithAnalysis(documentId),
+            create: (_) => getIt<DocumentCubit>(),
             child: DocumentDetailsScreen(documentId: documentId),
           );
         },
@@ -187,7 +250,11 @@ class AppRouter {
         name: 'checklist',
         builder: (context, state) {
           final documentId = state.pathParameters['documentId']!;
-          return _ChecklistScreen(documentId: documentId);
+          return BlocProvider<DocumentCubit>(
+            create: (_) =>
+                getIt<DocumentCubit>()..loadDocumentWithAnalysis(documentId),
+            child: _ChecklistScreen(documentId: documentId),
+          );
         },
       ),
 
@@ -217,7 +284,10 @@ class AppRouter {
     ],
 
     // Error handling
-    errorBuilder: (context, state) => _ErrorScreen(error: state.error),
+    errorBuilder: (context, state) {
+      debugPrint('Router error: ${state.error}');
+      return const _ErrorScreen();
+    },
 
     // Redirect logic (auth guards)
     redirect: (context, state) {
@@ -471,9 +541,9 @@ class _SplashScreenState extends State<_SplashScreen>
                   const SizedBox(height: 28),
                   Text(
                     'ورقتك',
-                    textDirection: TextDirection.rtl,
                     style: AppTypography.displayLarge.copyWith(
                       color: colors.onSurface,
+                      letterSpacing: 0,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -486,7 +556,7 @@ class _SplashScreenState extends State<_SplashScreen>
                   ),
                   const SizedBox(height: 14),
                   Text(
-                    'Understand every document. Plan your next step.',
+                    context.l10n.homeScreenTagline,
                     textAlign: TextAlign.center,
                     style: AppTypography.bodyMedium.copyWith(
                       color: colors.onSurfaceVariant,
@@ -506,10 +576,10 @@ class _SplashScreenState extends State<_SplashScreen>
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'PREPARING YOUR WORKSPACE',
+                    context.l10n.prepareYourWorkspace,
                     style: AppTypography.labelSmall.copyWith(
                       color: colors.onSurfaceVariant,
-                      letterSpacing: 1.1,
+                      letterSpacing: context.isArabic ? 0 : 1.1,
                     ),
                   ),
                   const SizedBox(height: 34),
@@ -551,7 +621,7 @@ class _OnboardingScreen extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.spacingXl),
               Text(
-                'Welcome to Wara2tak',
+                context.l10n.welcomeToWara2tak,
                 style: AppTypography.displayLargeMobile.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
@@ -559,7 +629,7 @@ class _OnboardingScreen extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.spacingLg),
               Text(
-                'Upload your documents and let AI extract key clauses, deadlines, and financial obligations.',
+                context.l10n.onboardingDescription,
                 style: AppTypography.bodyLarge.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
@@ -567,7 +637,7 @@ class _OnboardingScreen extends StatelessWidget {
               ),
               const Spacer(),
               PrimaryButton(
-                label: 'Get Started',
+                label: context.l10n.getStarted,
                 onPressed: () => AppRouter.goToAuth(context),
                 isFullWidth: true,
               ),
@@ -586,7 +656,10 @@ class _PreviewScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Review Document', style: AppTypography.titleLarge),
+        title: Text(
+          context.l10n.reviewDocument,
+          style: AppTypography.titleLarge,
+        ),
       ),
       body: Center(
         child: Column(
@@ -598,10 +671,13 @@ class _PreviewScreen extends StatelessWidget {
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             const SizedBox(height: AppSpacing.spacingLg),
-            Text('Preview Screen', style: AppTypography.headlineMedium),
+            Text(
+              context.l10n.previewScreenTitle,
+              style: AppTypography.headlineMedium,
+            ),
             const SizedBox(height: AppSpacing.spacingSm),
             Text(
-              'Document preview and confirmation',
+              context.l10n.previewScreenDescription,
               style: AppTypography.bodyMedium.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -618,7 +694,6 @@ class _AnalysisProgressScreen extends StatelessWidget {
 
   Future<bool> _handleBackNavigation(BuildContext context) async {
     // Cancel analysis if possible, then go to home
-    final analysisCubit = context.read<AnalysisCubit>();
     // Note: AnalysisCubit doesn't have a cancel method yet, just navigate away
     if (context.canGoBack) {
       context.goBack();
@@ -652,20 +727,27 @@ class _AnalysisProgressScreen extends StatelessWidget {
         },
         builder: (context, state) {
           int progress = 0;
-          String message = 'Starting analysis...';
+          String message = context.l10n.analysisProgress;
 
           if (state is AnalysisProgress) {
             progress = state.progress;
-            message = state.message ?? message;
+            message = _localizedAnalysisProgress(
+              context,
+              progress,
+              state.message,
+            );
           }
 
           return Scaffold(
             appBar: AppBar(
-              title: Text('Analyzing...', style: AppTypography.titleLarge),
+              title: Text(
+                context.l10n.analyzing,
+                style: AppTypography.titleLarge,
+              ),
               leading: IconButton(
                 icon: Icon(Symbols.arrow_back),
                 onPressed: () => _handleBackNavigation(context),
-                tooltip: 'Cancel',
+                tooltip: context.l10n.cancel,
               ),
             ),
             body: Center(
@@ -686,7 +768,7 @@ class _AnalysisProgressScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: AppSpacing.spacingSm),
                     Text(
-                      'Analyzing Document',
+                      context.l10n.analyzingDocument,
                       style: AppTypography.headlineMedium,
                     ),
                     const SizedBox(height: AppSpacing.spacingSm),
@@ -716,11 +798,14 @@ class _AnalysisErrorScreen extends StatelessWidget {
     return BlocBuilder<AnalysisCubit, AnalysisState>(
       builder: (context, state) {
         final errorMessage = state is AnalysisError
-            ? state.message
-            : 'Something went wrong during analysis. Please try again.';
+            ? context.localizedErrorMessage(state.message)
+            : context.l10n.analysisErrorMessage;
         return Scaffold(
           appBar: AppBar(
-            title: Text('Analysis Error', style: AppTypography.titleLarge),
+            title: Text(
+              context.l10n.analysisError,
+              style: AppTypography.titleLarge,
+            ),
           ),
           body: Center(
             child: Padding(
@@ -731,7 +816,7 @@ class _AnalysisErrorScreen extends StatelessWidget {
                   Icon(Symbols.error, size: 64, color: AppColors.error),
                   const SizedBox(height: AppSpacing.spacingLg),
                   Text(
-                    'Analysis Failed',
+                    context.l10n.analysisFailed,
                     style: AppTypography.headlineMedium.copyWith(
                       color: AppColors.error,
                     ),
@@ -746,7 +831,7 @@ class _AnalysisErrorScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: AppSpacing.spacingXl),
                   PrimaryButton(
-                    label: 'Retry',
+                    label: context.l10n.retry,
                     onPressed: () {
                       final analysisCubit = context.read<AnalysisCubit>();
                       if (!analysisCubit.canRetryLastAnalysis) {
@@ -793,105 +878,15 @@ class _ChecklistScreenState extends State<_ChecklistScreen> {
   Future<void> _loadChecklist() async {
     final checklistCubit = context.read<ChecklistCubit>();
     await checklistCubit.loadChecklist(widget.documentId);
-
-    // Check if checklist is empty and needs to be generated from analysis
-    if (!mounted) return;
-    final state = checklistCubit.state;
-    if (state is checklist_state.ChecklistLoaded && state.items.isEmpty) {
-      await _generateChecklistFromAnalysis();
-    }
-  }
-
-  Future<void> _generateChecklistFromAnalysis() async {
-    final documentCubit = context.read<DocumentCubit>();
-    final documentState = documentCubit.state;
-
-    if (documentState is DocumentLoaded && documentState.analysis != null) {
-      final analysis = documentState.analysis!;
-      final checklistItems = <checklist_models.ChecklistItemModel>[];
-
-      // Generate from summary
-      if (analysis.summary != null && analysis.summary!.isNotEmpty) {
-        checklistItems.add(checklist_models.ChecklistItemModel(
-          id: _uuid.v4(),
-          title: 'Review Document Summary',
-          description: analysis.summary!,
-          isCompleted: false,
-          category: checklist_models.ChecklistCategory.beforeSigning,
-          priority: 1,
-          pageNumber: null,
-        ));
-      }
-
-      // Generate from deadlines
-      for (final deadline in analysis.deadlines) {
-        checklistItems.add(checklist_models.ChecklistItemModel(
-          id: _uuid.v4(),
-          title: deadline.title,
-          description: deadline.description,
-          isCompleted: false,
-          category: checklist_models.ChecklistCategory.ongoing,
-          priority: 1,
-          dueDate: deadline.dueDate,
-          pageNumber: deadline.pageNumber,
-        ));
-      }
-
-      // Generate from financial obligations
-      for (final financial in analysis.financialObligations) {
-        checklistItems.add(checklist_models.ChecklistItemModel(
-          id: _uuid.v4(),
-          title: 'Financial: ${financial.title}',
-          description: financial.description,
-          isCompleted: false,
-          category: checklist_models.ChecklistCategory.financial,
-          priority: 1,
-          dueDate: financial.dueDate,
-          pageNumber: financial.pageNumber,
-        ));
-      }
-
-      // Generate from key clauses (critical and high importance)
-      for (final clause in analysis.keyClauses.where(
-          (c) => c.importance == doc_models.ClauseImportance.critical ||
-              c.importance == doc_models.ClauseImportance.high)) {
-        checklistItems.add(checklist_models.ChecklistItemModel(
-          id: _uuid.v4(),
-          title: 'Review: ${clause.title}',
-          description: clause.description,
-          isCompleted: false,
-          category: checklist_models.ChecklistCategory.legal,
-          priority: clause.importance == doc_models.ClauseImportance.critical ? 1 : 2,
-          pageNumber: clause.pageNumber,
-          relatedClauseId: clause.id,
-        ));
-      }
-
-      // Generate from red flags
-      for (final flag in analysis.redFlags) {
-        checklistItems.add(checklist_models.ChecklistItemModel(
-          id: _uuid.v4(),
-          title: 'Red Flag: ${flag.title}',
-          description: flag.description,
-          isCompleted: false,
-          category: checklist_models.ChecklistCategory.legal,
-          priority: flag.severity == doc_models.RedFlagSeverity.critical ? 1 : 2,
-          pageNumber: flag.pageNumber,
-        ));
-      }
-
-      // Save generated checklist
-      if (checklistItems.isNotEmpty) {
-        final checklistCubit = context.read<ChecklistCubit>();
-        await checklistCubit.saveChecklist(widget.documentId, checklistItems);
-      }
-    }
+    // Auto-generation from analysis is now handled inside ChecklistCubit.loadChecklist()
+    // when the checklist is empty (idempotent, runs once per document).
   }
 
   Future<void> _showAddTaskDialog() async {
     final titleController = TextEditingController();
     final descriptionController = TextEditingController();
-    checklist_models.ChecklistCategory selectedCategory = checklist_models.ChecklistCategory.other;
+    checklist_models.ChecklistCategory selectedCategory =
+        checklist_models.ChecklistCategory.other;
     int? selectedPriority;
     DateTime? selectedDueDate;
 
@@ -899,53 +894,73 @@ class _ChecklistScreenState extends State<_ChecklistScreen> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: Text('Add Task', style: AppTypography.headlineSmall),
+          title: Text(context.l10n.addTask, style: AppTypography.headlineSmall),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
                   controller: titleController,
-                  decoration: const InputDecoration(labelText: 'Task Title'),
+                  decoration: InputDecoration(
+                    labelText: context.l10n.taskTitle,
+                  ),
                   textCapitalization: TextCapitalization.sentences,
                 ),
                 const SizedBox(height: AppSpacing.spacingMd),
                 TextField(
                   controller: descriptionController,
-                  decoration: const InputDecoration(labelText: 'Description (optional)'),
+                  decoration: InputDecoration(
+                    labelText: context.l10n.taskDescription,
+                  ),
                   maxLines: 3,
                   textCapitalization: TextCapitalization.sentences,
                 ),
                 const SizedBox(height: AppSpacing.spacingMd),
                 DropdownButtonFormField<checklist_models.ChecklistCategory>(
                   initialValue: selectedCategory,
-                  decoration: const InputDecoration(labelText: 'Category'),
+                  decoration: InputDecoration(labelText: context.l10n.category),
                   items: checklist_models.ChecklistCategory.values
-                      .map((c) => DropdownMenuItem(
-                            value: c,
-                            child: Text(c.name.toUpperCase()),
-                          ))
+                      .map(
+                        (c) => DropdownMenuItem(
+                          value: c,
+                          child: Text(_getCategoryLabel(context, c)),
+                        ),
+                      )
                       .toList(),
                   onChanged: (v) => setState(() => selectedCategory = v!),
                 ),
                 const SizedBox(height: AppSpacing.spacingMd),
                 DropdownButtonFormField<int?>(
                   initialValue: selectedPriority,
-                  decoration: const InputDecoration(labelText: 'Priority (1-5, optional)'),
+                  decoration: InputDecoration(labelText: context.l10n.priority),
                   items: [null, 1, 2, 3, 4, 5]
-                      .map((p) => DropdownMenuItem(
-                            value: p,
-                            child: Text(p == null ? 'None' : 'Priority $p'),
-                          ))
+                      .map(
+                        (p) => DropdownMenuItem(
+                          value: p,
+                          child: Text(
+                            p == null
+                                ? context.l10n.none
+                                : context.l10n.priorityLevel(p),
+                          ),
+                        ),
+                      )
                       .toList(),
                   onChanged: (v) => setState(() => selectedPriority = v),
                 ),
                 const SizedBox(height: AppSpacing.spacingMd),
                 ListTile(
-                  title: Text(selectedDueDate == null
-                      ? 'Set Due Date (optional)'
-                      : 'Due: ${selectedDueDate!.day}/${selectedDueDate!.month}/${selectedDueDate!.year}'),
-                  trailing: Icon(Symbols.calendar_today, color: Theme.of(context).colorScheme.primary),
+                  title: Text(
+                    selectedDueDate == null
+                        ? context.l10n.dueDateOptional
+                        : context.l10n.dueDate(
+                            DateFormat.yMd(context.locale.toString())
+                                .format(selectedDueDate!),
+                          ),
+                  ),
+                  trailing: Icon(
+                    Symbols.calendar_today,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                   onTap: () async {
                     final date = await showDatePicker(
                       context: context,
@@ -961,11 +976,11 @@ class _ChecklistScreenState extends State<_ChecklistScreen> {
           ),
           actions: [
             TertiaryButton(
-              label: 'Cancel',
+              label: context.l10n.cancel,
               onPressed: () => Navigator.pop(context),
             ),
             PrimaryButton(
-              label: 'Add',
+              label: context.l10n.add,
               onPressed: () {
                 if (titleController.text.trim().isEmpty) return;
                 Navigator.pop(context);
@@ -1005,16 +1020,27 @@ class _ChecklistScreenState extends State<_ChecklistScreen> {
     await checklistCubit.addItem(newItem);
   }
 
-  Future<void> _confirmDeleteItem(checklist_models.ChecklistItemModel item) async {
+  Future<void> _confirmDeleteItem(
+    checklist_models.ChecklistItemModel item,
+  ) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Delete Task', style: AppTypography.headlineSmall),
-        content: Text('Are you sure you want to delete "${item.title}"?', style: AppTypography.bodyMedium),
+        title: Text(
+          context.l10n.deleteTask,
+          style: AppTypography.headlineSmall,
+        ),
+        content: Text(
+          context.l10n.deleteTaskConfirmation(item.title),
+          style: AppTypography.bodyMedium,
+        ),
         actions: [
-          TertiaryButton(label: 'Cancel', onPressed: () => Navigator.pop(context, false)),
+          TertiaryButton(
+            label: context.l10n.cancel,
+            onPressed: () => Navigator.pop(context, false),
+          ),
           FilledDestructiveButton(
-            label: 'Delete',
+            label: context.l10n.delete,
             onPressed: () => Navigator.pop(context, true),
             leadingIcon: Symbols.delete,
           ),
@@ -1028,24 +1054,30 @@ class _ChecklistScreenState extends State<_ChecklistScreen> {
     }
   }
 
-  String _getCategoryLabel(checklist_models.ChecklistCategory category) {
+  String _getCategoryLabel(
+    BuildContext context,
+    checklist_models.ChecklistCategory category,
+  ) {
     switch (category) {
       case checklist_models.ChecklistCategory.beforeSigning:
-        return 'Before Signing';
+        return context.l10n.beforeSigning;
       case checklist_models.ChecklistCategory.afterSigning:
-        return 'After Signing';
+        return context.l10n.afterSigning;
       case checklist_models.ChecklistCategory.ongoing:
-        return 'Ongoing';
+        return context.l10n.ongoing;
       case checklist_models.ChecklistCategory.legal:
-        return 'Legal';
+        return context.l10n.legal;
       case checklist_models.ChecklistCategory.financial:
-        return 'Financial';
+        return context.l10n.financial;
       case checklist_models.ChecklistCategory.other:
-        return 'Other';
+        return context.l10n.otherCategory;
     }
   }
 
-  Color _getCategoryColor(checklist_models.ChecklistCategory category, BuildContext context) {
+  Color _getCategoryColor(
+    checklist_models.ChecklistCategory category,
+    BuildContext context,
+  ) {
     switch (category) {
       case checklist_models.ChecklistCategory.beforeSigning:
         return context.colors.primary;
@@ -1070,145 +1102,212 @@ class _ChecklistScreenState extends State<_ChecklistScreen> {
         // Only show for errors that happen after initial load (ChecklistLoaded -> ChecklistError)
         if (state is checklist_state.ChecklistError) {
           if (mounted) {
-            context.showSnackBar(state.message);
+            context.showSnackBar(context.localizedErrorMessage(state.message));
           }
         }
       },
       child: BlocBuilder<ChecklistCubit, checklist_state.ChecklistState>(
         builder: (context, state) {
           // Only show loading for initial load
-          final isInitialLoad = state is checklist_state.ChecklistLoading ||
+          final isInitialLoad =
+              state is checklist_state.ChecklistLoading ||
               state is checklist_state.ChecklistInitial;
 
           if (isInitialLoad) {
             return Scaffold(
-              appBar: AppBar(title: Text('Checklist', style: AppTypography.titleLarge)),
-              body: const LoadingState(message: 'Loading checklist...'),
+              appBar: AppBar(
+                title: Text(
+                  context.l10n.checklist,
+                  style: AppTypography.titleLarge,
+                ),
+              ),
+              body: LoadingState(message: context.l10n.loadingChecklist),
             );
           }
 
           // Show error screen only for initial load failures
           if (state is checklist_state.ChecklistError) {
             return Scaffold(
-              appBar: AppBar(title: Text('Checklist', style: AppTypography.titleLarge)),
+              appBar: AppBar(
+                title: Text(
+                  context.l10n.checklist,
+                  style: AppTypography.titleLarge,
+                ),
+              ),
               body: ErrorState(
-                title: 'Failed to load checklist',
-                subtitle: state.message,
-                actionLabel: 'Retry',
+                title: context.l10n.failedToLoadChecklist,
+                subtitle: context.localizedErrorMessage(state.message),
+                actionLabel: context.l10n.retry,
                 onAction: _loadChecklist,
               ),
             );
           }
 
           if (state is checklist_state.ChecklistLoaded) {
-          final items = state.items;
-          final officialItems = items.where((i) => i.category != checklist_models.ChecklistCategory.other).toList();
-          final personalItems = items.where((i) => i.category == checklist_models.ChecklistCategory.other).toList();
+            final items = state.items;
+            final officialItems = items
+                .where(
+                  (i) => i.category != checklist_models.ChecklistCategory.other,
+                )
+                .toList();
+            final personalItems = items
+                .where(
+                  (i) => i.category == checklist_models.ChecklistCategory.other,
+                )
+                .toList();
 
-          final total = items.length;
-          final completed = items.where((i) => i.isCompleted).length;
-          final progress = total > 0 ? completed / total : 0.0;
+            final total = items.length;
+            final completed = items.where((i) => i.isCompleted).length;
+            final progress = total > 0 ? completed / total : 0.0;
+
+            return Scaffold(
+              appBar: AppBar(
+                title: Text(
+                  context.l10n.checklist,
+                  style: AppTypography.titleLarge,
+                ),
+                actions: [
+                  IconButton(
+                    icon: const Icon(Symbols.add),
+                    onPressed: _showAddTaskDialog,
+                    tooltip: context.l10n.addTask,
+                  ),
+                ],
+              ),
+              body: Column(
+                children: [
+                  // Progress bar
+                  Container(
+                    padding: AppSpacing.screenPadding,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              context.l10n.checklistProgress,
+                              style: AppTypography.labelMedium,
+                            ),
+                            Text(
+                              '$completed / $total',
+                              style: AppTypography.labelMedium.copyWith(
+                                color: context.colors.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.spacingXs),
+                        LinearProgressIndicator(
+                          value: progress,
+                          backgroundColor:
+                              context.colors.surfaceContainerHighest,
+                          color: context.colors.primary,
+                          minHeight: 8,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(height: 1),
+                  // Checklist items with pull-to-refresh
+                  Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: () => _loadChecklist(),
+                      child: items.isEmpty
+                          ? SingleChildScrollView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  minHeight:
+                                      MediaQuery.of(context).size.height -
+                                      56.0 - // toolbar height
+                                      MediaQuery.of(context).padding.top -
+                                      120.0, // progress bar + divider approximate height
+                                ),
+                                child: EmptyState(
+                                  icon: Symbols.checklist,
+                                  title: context.l10n.noChecklistItems,
+                                  subtitle:
+                                      context.l10n.tasksGeneratedFromAnalysis,
+                                  actionLabel: context.l10n.addTask,
+                                  onAction: _showAddTaskDialog,
+                                ),
+                              ),
+                            )
+                          : ListView(
+                              padding: AppSpacing.screenPadding,
+                              children: [
+                                if (officialItems.isNotEmpty) ...[
+                                  _buildSectionHeader(
+                                    context.l10n.fromDocument,
+                                    officialItems.length,
+                                    context.colors.primary,
+                                  ),
+                                  ...officialItems.map(
+                                    (item) => _ChecklistItemWidget(
+                                      item: item,
+                                      onToggle: () => context
+                                          .read<ChecklistCubit>()
+                                          .toggleItem(item),
+                                      onDelete: () => _confirmDeleteItem(item),
+                                      categoryColor: _getCategoryColor(
+                                        item.category,
+                                        context,
+                                      ),
+                                      categoryLabel: _getCategoryLabel(
+                                        context,
+                                        item.category,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: AppSpacing.spacingLg),
+                                ],
+                                if (personalItems.isNotEmpty) ...[
+                                  _buildSectionHeader(
+                                    context.l10n.personalTasks,
+                                    personalItems.length,
+                                    context.colors.secondary,
+                                  ),
+                                  ...personalItems.map(
+                                    (item) => _ChecklistItemWidget(
+                                      item: item,
+                                      onToggle: () => context
+                                          .read<ChecklistCubit>()
+                                          .toggleItem(item),
+                                      onDelete: () => _confirmDeleteItem(item),
+                                      categoryColor: _getCategoryColor(
+                                        item.category,
+                                        context,
+                                      ),
+                                      categoryLabel: _getCategoryLabel(
+                                        context,
+                                        item.category,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
 
           return Scaffold(
             appBar: AppBar(
-              title: Text('Checklist', style: AppTypography.titleLarge),
-              actions: [
-                IconButton(
-                  icon: const Icon(Symbols.add),
-                  onPressed: _showAddTaskDialog,
-                  tooltip: 'Add Task',
-                ),
-              ],
+              title: Text(
+                context.l10n.checklist,
+                style: AppTypography.titleLarge,
+              ),
             ),
-            body: Column(
-              children: [
-                // Progress bar
-                Container(
-                  padding: AppSpacing.screenPadding,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Progress', style: AppTypography.labelMedium),
-                          Text('$completed / $total', style: AppTypography.labelMedium.copyWith(color: context.colors.primary)),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.spacingXs),
-                      LinearProgressIndicator(
-                        value: progress,
-                        backgroundColor: context.colors.surfaceContainerHighest,
-                        color: context.colors.primary,
-                        minHeight: 8,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ],
-                  ),
-                ),
-                const Divider(height: 1),
-                // Checklist items with pull-to-refresh
-                Expanded(
-                  child: RefreshIndicator(
-                    onRefresh: () => _loadChecklist(),
-                    child: items.isEmpty
-                        ? SingleChildScrollView(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            child: ConstrainedBox(
-                              constraints: BoxConstraints(
-                                minHeight: MediaQuery.of(context).size.height -
-                                    56.0 - // toolbar height
-                                    MediaQuery.of(context).padding.top -
-                                    120.0, // progress bar + divider approximate height
-                              ),
-                              child: EmptyState(
-                                icon: Symbols.checklist,
-                                title: 'No checklist items',
-                                subtitle: 'Tasks will be generated from document analysis',
-                                actionLabel: 'Add Task',
-                                onAction: _showAddTaskDialog,
-                              ),
-                            ),
-                          )
-                        : ListView(
-                            padding: AppSpacing.screenPadding,
-                            children: [
-                              if (officialItems.isNotEmpty) ...[
-                                _buildSectionHeader('From Document', officialItems.length, context.colors.primary),
-                                ...officialItems.map((item) => _ChecklistItemWidget(
-                                  item: item,
-                                  onToggle: () => context.read<ChecklistCubit>().toggleItem(item),
-                                  onDelete: () => _confirmDeleteItem(item),
-                                  categoryColor: _getCategoryColor(item.category, context),
-                                  categoryLabel: _getCategoryLabel(item.category),
-                                )),
-                                const SizedBox(height: AppSpacing.spacingLg),
-                              ],
-                              if (personalItems.isNotEmpty) ...[
-                                _buildSectionHeader('Personal Tasks', personalItems.length, context.colors.secondary),
-                                ...personalItems.map((item) => _ChecklistItemWidget(
-                                  item: item,
-                                  onToggle: () => context.read<ChecklistCubit>().toggleItem(item),
-                                  onDelete: () => _confirmDeleteItem(item),
-                                  categoryColor: _getCategoryColor(item.category, context),
-                                  categoryLabel: _getCategoryLabel(item.category),
-                                )),
-                              ],
-                            ],
-                          ),
-                  ),
-                ),
-              ],
-            ),
+            body: LoadingState(message: context.l10n.loadingChecklist),
           );
-        }
-
-        return Scaffold(
-          appBar: AppBar(title: Text('Checklist', style: AppTypography.titleLarge)),
-          body: const LoadingState(message: 'Loading checklist...'),
-        );
-      },
-    ));
+        },
+      ),
+    );
   }
 
   Widget _buildSectionHeader(String title, int count, Color color) {
@@ -1225,7 +1324,13 @@ class _ChecklistScreenState extends State<_ChecklistScreen> {
             ),
           ),
           const SizedBox(width: AppSpacing.spacingSm),
-          Text(title, style: AppTypography.labelLarge.copyWith(color: color, fontWeight: FontWeight.w600)),
+          Text(
+            title,
+            style: AppTypography.labelLarge.copyWith(
+              color: color,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           const SizedBox(width: AppSpacing.spacingXs),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -1233,7 +1338,10 @@ class _ChecklistScreenState extends State<_ChecklistScreen> {
               color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Text('$count', style: AppTypography.tinyBold.copyWith(color: color)),
+            child: Text(
+              '$count',
+              style: AppTypography.tinyBold.copyWith(color: color),
+            ),
           ),
         ],
       ),
@@ -1259,7 +1367,8 @@ class _ChecklistItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isOverdue = item.dueDate != null &&
+    final isOverdue =
+        item.dueDate != null &&
         item.dueDate!.isBefore(DateTime.now()) &&
         !item.isCompleted;
 
@@ -1283,8 +1392,12 @@ class _ChecklistItemWidget extends StatelessWidget {
                     Text(
                       item.title,
                       style: AppTypography.labelMedium.copyWith(
-                        decoration: item.isCompleted ? TextDecoration.lineThrough : null,
-                        color: item.isCompleted ? context.colors.onSurfaceVariant : context.colors.onSurface,
+                        decoration: item.isCompleted
+                            ? TextDecoration.lineThrough
+                            : null,
+                        color: item.isCompleted
+                            ? context.colors.onSurfaceVariant
+                            : context.colors.onSurface,
                       ),
                     ),
                     if (item.description.isNotEmpty)
@@ -1292,7 +1405,9 @@ class _ChecklistItemWidget extends StatelessWidget {
                         item.description,
                         style: AppTypography.bodySmall.copyWith(
                           color: item.isCompleted
-                              ? context.colors.onSurfaceVariant.withValues(alpha: 0.7)
+                              ? context.colors.onSurfaceVariant.withValues(
+                                  alpha: 0.7,
+                                )
                               : context.colors.onSurfaceVariant,
                         ),
                       ),
@@ -1302,11 +1417,18 @@ class _ChecklistItemWidget extends StatelessWidget {
               if (item.dueDate != null) ...[
                 const SizedBox(width: AppSpacing.spacingSm),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.spacingSm, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.spacingSm,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
-                    color: isOverdue ? AppColors.errorLight : context.colors.surfaceContainerHighest,
+                    color: isOverdue
+                        ? AppColors.errorLight
+                        : context.colors.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(AppShapes.radiusSm),
-                    border: isOverdue ? Border.all(color: AppColors.error) : null,
+                    border: isOverdue
+                        ? Border.all(color: AppColors.error)
+                        : null,
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -1314,14 +1436,20 @@ class _ChecklistItemWidget extends StatelessWidget {
                       Icon(
                         isOverdue ? Symbols.warning : Symbols.calendar_today,
                         size: 12,
-                        color: isOverdue ? AppColors.error : context.colors.onSurfaceVariant,
+                        color: isOverdue
+                            ? AppColors.error
+                            : context.colors.onSurfaceVariant,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         '${item.dueDate!.day}/${item.dueDate!.month}/${item.dueDate!.year}',
                         style: AppTypography.tiny.copyWith(
-                          color: isOverdue ? AppColors.error : context.colors.onSurfaceVariant,
-                          fontWeight: isOverdue ? FontWeight.w600 : FontWeight.normal,
+                          color: isOverdue
+                              ? AppColors.error
+                              : context.colors.onSurfaceVariant,
+                          fontWeight: isOverdue
+                              ? FontWeight.w600
+                              : FontWeight.normal,
                         ),
                       ),
                     ],
@@ -1330,12 +1458,25 @@ class _ChecklistItemWidget extends StatelessWidget {
               ],
               const SizedBox(width: AppSpacing.spacingXs),
               PopupMenuButton<String>(
-                icon: Icon(Symbols.more_vert, size: 20, color: context.colors.onSurfaceVariant),
+                icon: Icon(
+                  Symbols.more_vert,
+                  size: 20,
+                  color: context.colors.onSurfaceVariant,
+                ),
                 onSelected: (value) {
                   if (value == 'delete') onDelete();
                 },
                 itemBuilder: (context) => [
-                  const PopupMenuItem(value: 'delete', child: Row(children: [Icon(Symbols.delete, size: 18), SizedBox(width: 8), Text('Delete')])),
+                  PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        const Icon(Symbols.delete, size: 18),
+                        const SizedBox(width: 8),
+                        Text(context.l10n.delete),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -1345,16 +1486,29 @@ class _ChecklistItemWidget extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.spacingSm, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.spacingSm,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: categoryColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppShapes.radiusSm),
                   ),
-                  child: Text(categoryLabel, style: AppTypography.tinyBold.copyWith(color: categoryColor)),
+                  child: Text(
+                    categoryLabel,
+                    style: AppTypography.tinyBold.copyWith(
+                      color: categoryColor,
+                    ),
+                  ),
                 ),
                 if (item.pageNumber != null) ...[
                   const SizedBox(width: AppSpacing.spacingSm),
-                  Text('Page ${item.pageNumber}', style: AppTypography.tiny.copyWith(color: context.colors.onSurfaceVariant)),
+                  Text(
+                    context.l10n.pageNumber(item.pageNumber!),
+                    style: AppTypography.tiny.copyWith(
+                      color: context.colors.onSurfaceVariant,
+                    ),
+                  ),
                 ],
               ],
             ),
@@ -1379,12 +1533,12 @@ class _DocumentChatScreenState extends State<_DocumentChatScreen> {
   final _scrollController = ScrollController();
   bool _isLoading = false;
 
-  static const List<String> _suggestedQuestions = [
-    'What are the key deadlines?',
-    'What documents do I need to prepare?',
-    'What are the termination conditions?',
-    'Are there any penalties or fees?',
-    'Summarize the financial obligations.',
+  List<String> _suggestedQuestions(BuildContext context) => [
+    context.l10n.keyDeadlinesQuestion,
+    context.l10n.documentsToPrepareQuestion,
+    context.l10n.terminationConditionsQuestion,
+    context.l10n.penaltiesFeesQuestion,
+    context.l10n.summarizeFinancialsQuestion,
   ];
 
   @override
@@ -1450,11 +1604,23 @@ class _DocumentChatScreenState extends State<_DocumentChatScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Clear Conversation', style: AppTypography.headlineSmall),
-        content: Text('Are you sure you want to delete all messages? This cannot be undone.', style: AppTypography.bodyMedium),
+        title: Text(
+          context.l10n.clearConversation,
+          style: AppTypography.headlineSmall,
+        ),
+        content: Text(
+          context.l10n.clearConversationConfirmation,
+          style: AppTypography.bodyMedium,
+        ),
         actions: [
-          TertiaryButton(label: 'Cancel', onPressed: () => Navigator.pop(context, false)),
-          FilledDestructiveButton(label: 'Clear', onPressed: () => Navigator.pop(context, true)),
+          TertiaryButton(
+            label: context.l10n.cancel,
+            onPressed: () => Navigator.pop(context, false),
+          ),
+          FilledDestructiveButton(
+            label: context.l10n.clear,
+            onPressed: () => Navigator.pop(context, true),
+          ),
         ],
       ),
     );
@@ -1486,21 +1652,23 @@ class _DocumentChatScreenState extends State<_DocumentChatScreen> {
 
         return Scaffold(
           appBar: AppBar(
-            title: Text('Document Chat', style: AppTypography.titleLarge),
+            title: Text(
+              context.l10n.documentChat,
+              style: AppTypography.titleLarge,
+            ),
             actions: [
               if (messages.isNotEmpty)
                 IconButton(
                   icon: Icon(Symbols.delete_sweep, color: AppColors.error),
                   onPressed: _clearChat,
-                  tooltip: 'Clear Conversation',
+                  tooltip: context.l10n.clearConversation,
                 ),
             ],
           ),
           body: Column(
             children: [
               // Suggested questions (only when empty)
-              if (messages.isEmpty)
-                _buildSuggestions(),
+              if (messages.isEmpty) _buildSuggestions(),
               // Messages list
               Expanded(
                 child: messages.isEmpty
@@ -1532,20 +1700,27 @@ class _DocumentChatScreenState extends State<_DocumentChatScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Suggested Questions', style: AppTypography.labelMedium),
+          Text(
+            context.l10n.suggestedQuestions,
+            style: AppTypography.labelMedium,
+          ),
           const SizedBox(height: AppSpacing.spacingSm),
           Wrap(
             spacing: AppSpacing.spacingSm,
             runSpacing: AppSpacing.spacingSm,
-            children: _suggestedQuestions.map((q) => ActionChip(
-              label: Text(q, style: AppTypography.bodySmall),
-              onPressed: () {
-                _messageController.text = q;
-                _sendMessage();
-              },
-              backgroundColor: context.colors.surfaceContainerHighest,
-              side: BorderSide(color: context.colors.outlineVariant),
-            )).toList(),
+            children: _suggestedQuestions(context)
+                .map(
+                  (q) => ActionChip(
+                    label: Text(q, style: AppTypography.bodySmall),
+                    onPressed: () {
+                      _messageController.text = q;
+                      _sendMessage();
+                    },
+                    backgroundColor: context.colors.surfaceContainerHighest,
+                    side: BorderSide(color: context.colors.outlineVariant),
+                  ),
+                )
+                .toList(),
           ),
           const Divider(height: AppSpacing.spacingLg),
         ],
@@ -1560,13 +1735,22 @@ class _DocumentChatScreenState extends State<_DocumentChatScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Symbols.chat, size: 64, color: context.colors.onSurfaceVariant),
+            Icon(
+              Symbols.chat,
+              size: 64,
+              color: context.colors.onSurfaceVariant,
+            ),
             const SizedBox(height: AppSpacing.spacingLg),
-            Text('Start a Conversation', style: AppTypography.headlineMedium),
+            Text(
+              context.l10n.startConversation,
+              style: AppTypography.headlineMedium,
+            ),
             const SizedBox(height: AppSpacing.spacingSm),
             Text(
-              'Ask questions about your document. The AI will answer based on the analyzed content.',
-              style: AppTypography.bodyMedium.copyWith(color: context.colors.onSurfaceVariant),
+              context.l10n.askQuestionsAboutDocument,
+              style: AppTypography.bodyMedium.copyWith(
+                color: context.colors.onSurfaceVariant,
+              ),
               textAlign: TextAlign.center,
             ),
           ],
@@ -1577,7 +1761,7 @@ class _DocumentChatScreenState extends State<_DocumentChatScreen> {
 
   Widget _buildLoadingBubble() {
     return Align(
-      alignment: Alignment.centerLeft,
+      alignment: AlignmentDirectional.centerStart,
       child: Container(
         margin: const EdgeInsets.only(bottom: AppSpacing.spacingMd),
         padding: const EdgeInsets.all(AppSpacing.spacingMd),
@@ -1591,10 +1775,18 @@ class _DocumentChatScreenState extends State<_DocumentChatScreen> {
             SizedBox(
               width: 20,
               height: 20,
-              child: CircularProgressIndicator(strokeWidth: 2, color: context.colors.primary),
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: context.colors.primary,
+              ),
             ),
             const SizedBox(width: AppSpacing.spacingMd),
-            Text('Thinking...', style: AppTypography.bodyMedium.copyWith(color: context.colors.onSurfaceVariant)),
+            Text(
+              context.l10n.thinking,
+              style: AppTypography.bodyMedium.copyWith(
+                color: context.colors.onSurfaceVariant,
+              ),
+            ),
           ],
         ),
       ),
@@ -1615,14 +1807,19 @@ class _DocumentChatScreenState extends State<_DocumentChatScreen> {
               child: TextField(
                 controller: _messageController,
                 decoration: InputDecoration(
-                  hintText: 'Ask about the document...',
+                  hintText: context.l10n.askAboutDocument,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppShapes.radiusMd),
-                    borderSide: BorderSide(color: context.colors.outlineVariant),
+                    borderSide: BorderSide(
+                      color: context.colors.outlineVariant,
+                    ),
                   ),
                   filled: true,
                   fillColor: context.colors.surfaceContainerHighest,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.spacingMd, vertical: AppSpacing.spacingSm),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.spacingMd,
+                    vertical: AppSpacing.spacingSm,
+                  ),
                 ),
                 style: AppTypography.bodyMedium,
                 onSubmitted: (_) => _sendMessage(),
@@ -1636,7 +1833,8 @@ class _DocumentChatScreenState extends State<_DocumentChatScreen> {
               onPressed: _isLoading ? null : _sendMessage,
               style: IconButton.styleFrom(
                 backgroundColor: context.colors.primary,
-                disabledBackgroundColor: context.colors.onSurfaceVariant.withValues(alpha: 0.12),
+                disabledBackgroundColor: context.colors.onSurfaceVariant
+                    .withValues(alpha: 0.12),
               ),
             ),
           ],
@@ -1655,28 +1853,36 @@ class _ChatBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isUser = message.role == 'user';
-    final bubbleColor = isUser ? context.colors.primary : context.colors.surfaceContainerHighest;
-    final textColor = isUser ? context.colors.onPrimary : context.colors.onSurface;
-    final alignment = isUser ? Alignment.centerRight : Alignment.centerLeft;
+    final bubbleColor = isUser
+        ? context.colors.primary
+        : context.colors.surfaceContainerHighest;
+    final textColor = isUser
+        ? context.colors.onPrimary
+        : context.colors.onSurface;
+    final alignment = isUser
+        ? AlignmentDirectional.centerEnd
+        : AlignmentDirectional.centerStart;
     final borderRadius = isUser
-        ? BorderRadius.only(
-            topLeft: Radius.circular(AppShapes.radiusLg),
-            topRight: Radius.circular(AppShapes.radiusLg),
-            bottomLeft: Radius.circular(AppShapes.radiusLg),
-            bottomRight: Radius.circular(AppShapes.radiusSm),
+        ? BorderRadiusDirectional.only(
+            topStart: Radius.circular(AppShapes.radiusLg),
+            topEnd: Radius.circular(AppShapes.radiusLg),
+            bottomStart: Radius.circular(AppShapes.radiusLg),
+            bottomEnd: Radius.circular(AppShapes.radiusSm),
           )
-        : BorderRadius.only(
-            topLeft: Radius.circular(AppShapes.radiusLg),
-            topRight: Radius.circular(AppShapes.radiusLg),
-            bottomLeft: Radius.circular(AppShapes.radiusSm),
-            bottomRight: Radius.circular(AppShapes.radiusLg),
+        : BorderRadiusDirectional.only(
+            topStart: Radius.circular(AppShapes.radiusLg),
+            topEnd: Radius.circular(AppShapes.radiusLg),
+            bottomStart: Radius.circular(AppShapes.radiusSm),
+            bottomEnd: Radius.circular(AppShapes.radiusLg),
           );
 
     return Align(
       alignment: alignment,
       child: Container(
         margin: const EdgeInsets.only(bottom: AppSpacing.spacingMd),
-        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.8,
+        ),
         padding: const EdgeInsets.all(AppSpacing.spacingMd),
         decoration: BoxDecoration(
           color: bubbleColor,
@@ -1685,31 +1891,51 @@ class _ChatBubble extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(message.content, style: AppTypography.bodyMedium.copyWith(color: textColor)),
+            Text(
+              message.content == 'This is a placeholder AI response. The actual implementation would call the AI repository.'
+                  ? context.l10n.chatPlaceholderResponse
+                  : message.content,
+              style: AppTypography.bodyMedium.copyWith(color: textColor),
+            ),
             if (message.sources != null && message.sources!.isNotEmpty) ...[
               const SizedBox(height: AppSpacing.spacingXs),
               Wrap(
                 spacing: AppSpacing.spacingXs,
-                children: message.sources!.map((source) => Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.spacingSm, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: isUser ? context.colors.onPrimary.withValues(alpha: 0.2) : context.colors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppShapes.radiusSm),
-                  ),
-                  child: Text(
-                    'Source: $source',
-                    style: AppTypography.tiny.copyWith(
-                      color: isUser ? context.colors.onPrimary : context.colors.primary,
-                    ),
-                  ),
-                )).toList(),
+                children: message.sources!
+                    .map(
+                      (source) => Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.spacingSm,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isUser
+                              ? context.colors.onPrimary.withValues(alpha: 0.2)
+                              : context.colors.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(
+                            AppShapes.radiusSm,
+                          ),
+                        ),
+                        child: Text(
+                          context.l10n.sourceLabel(source),
+                          style: AppTypography.tiny.copyWith(
+                            color: isUser
+                                ? context.colors.onPrimary
+                                : context.colors.primary,
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
               ),
             ],
             const SizedBox(height: AppSpacing.spacingXs),
             Text(
-              _formatTime(message.timestamp),
+              _formatTime(context, message.timestamp),
               style: AppTypography.tiny.copyWith(
-                color: isUser ? context.colors.onPrimary.withValues(alpha: 0.7) : context.colors.onSurfaceVariant,
+                color: isUser
+                    ? context.colors.onPrimary.withValues(alpha: 0.7)
+                    : context.colors.onSurfaceVariant,
               ),
             ),
           ],
@@ -1718,8 +1944,8 @@ class _ChatBubble extends StatelessWidget {
     );
   }
 
-  String _formatTime(DateTime time) {
-    return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+  String _formatTime(BuildContext context, DateTime time) {
+    return DateFormat.Hm(context.locale.toString()).format(time);
   }
 }
 
@@ -1737,13 +1963,13 @@ class _TranslationScreenState extends State<_TranslationScreen> {
   String _selectedTargetLanguage = 'ar';
   String _selectedSourceLanguage = 'en';
 
-  static const List<String> _translationTabs = [
-    'Summary',
-    'Deadlines',
-    'Financial Obligations',
-    'Key Clauses',
-    'Red Flags',
-    'Custom Text',
+  List<String> _translationTabs(BuildContext context) => [
+    context.l10n.summaryTab,
+    context.l10n.deadlinesTab,
+    context.l10n.financialObligationsTab,
+    context.l10n.keyClausesTab,
+    context.l10n.redFlagsTab,
+    context.l10n.customTextTab,
   ];
 
   @override
@@ -1792,7 +2018,11 @@ class _TranslationScreenState extends State<_TranslationScreen> {
     );
   }
 
-  String _getContentForTab(int tabIndex, doc_models.AnalysisModel? analysis) {
+  String _getContentForTab(
+    BuildContext context,
+    int tabIndex,
+    doc_models.AnalysisModel? analysis,
+  ) {
     if (analysis == null) return '';
 
     switch (tabIndex) {
@@ -1800,21 +2030,32 @@ class _TranslationScreenState extends State<_TranslationScreen> {
         return analysis.summary ?? '';
       case 1:
         return analysis.deadlines
-            .map((d) => '${d.title}: ${d.description} (Due: ${d.dueDate.day}/${d.dueDate.month}/${d.dueDate.year})')
+            .map(
+              (d) =>
+                  '${d.title}: ${d.description} (${context.l10n.dueDate(DateFormat.yMd(context.locale.toString()).format(d.dueDate))})',
+            )
             .join('\n\n');
       case 2:
         return analysis.financialObligations
-            .map((f) => f.dueDate != null
-                ? '${f.title}: ${f.description} (Due: ${f.dueDate!.day}/${f.dueDate!.month}/${f.dueDate!.year})'
-                : '${f.title}: ${f.description} (No due date)')
+            .map(
+              (f) => f.dueDate != null
+                  ? '${f.title}: ${f.description} (${context.l10n.dueDate(DateFormat.yMd(context.locale.toString()).format(f.dueDate!))})'
+                  : '${f.title}: ${f.description} (${context.l10n.noDueDate})',
+            )
             .join('\n\n');
       case 3:
         return analysis.keyClauses
-            .map((c) => '${c.title}: ${c.description} (Importance: ${c.importance.name})')
+            .map(
+              (c) =>
+                  '${c.title}: ${c.description} (${context.l10n.importanceLabel(_localizedImportance(context, c.importance))})',
+            )
             .join('\n\n');
       case 4:
         return analysis.redFlags
-            .map((r) => '${r.title}: ${r.description} (Severity: ${r.severity.name})')
+            .map(
+              (r) =>
+                  '${r.title}: ${r.description} (${context.l10n.severityLabel(_localizedSeverity(context, r.severity))})',
+            )
             .join('\n\n');
       case 5:
         return _customTextController.text;
@@ -1825,6 +2066,7 @@ class _TranslationScreenState extends State<_TranslationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final tabs = _translationTabs(context);
     return BlocBuilder<DocumentCubit, DocumentState>(
       builder: (context, docState) {
         doc_models.AnalysisModel? analysis;
@@ -1834,19 +2076,22 @@ class _TranslationScreenState extends State<_TranslationScreen> {
 
         // Wrap with DefaultTabController to provide TabController for TabBar/TabBarView
         return DefaultTabController(
-          length: _translationTabs.length,
+          length: tabs.length,
           child: Scaffold(
             appBar: AppBar(
-              title: Text('Translate', style: AppTypography.titleLarge),
+              title: Text(
+                context.l10n.translation,
+                style: AppTypography.titleLarge,
+              ),
               bottom: TabBar(
                 isScrollable: true,
-                tabs: _translationTabs.map((t) => Tab(text: t)).toList(),
+                tabs: tabs.map((t) => Tab(text: t)).toList(),
                 labelStyle: AppTypography.labelMedium,
                 unselectedLabelStyle: AppTypography.labelMedium,
               ),
             ),
             body: TabBarView(
-              children: _translationTabs.asMap().entries.map((entry) {
+              children: tabs.asMap().entries.map((entry) {
                 final index = entry.key;
                 return _buildTranslationTab(index, analysis);
               }).toList(),
@@ -1857,7 +2102,10 @@ class _TranslationScreenState extends State<_TranslationScreen> {
     );
   }
 
-  Widget _buildTranslationTab(int tabIndex, doc_models.AnalysisModel? analysis) {
+  Widget _buildTranslationTab(
+    int tabIndex,
+    doc_models.AnalysisModel? analysis,
+  ) {
     return BlocBuilder<TranslationCubit, translation_state.TranslationState>(
       builder: (context, state) {
         String? translatedText;
@@ -1869,10 +2117,10 @@ class _TranslationScreenState extends State<_TranslationScreen> {
         } else if (state is translation_state.TranslationLoading) {
           isLoading = true;
         } else if (state is translation_state.TranslationError) {
-          errorMessage = state.message;
+          errorMessage = context.localizedErrorMessage(state.message);
         }
 
-        final content = _getContentForTab(tabIndex, analysis);
+        final content = _getContentForTab(context, tabIndex, analysis);
         final hasContent = content.trim().isNotEmpty;
 
         // Auto-detect and set source language for predefined tabs
@@ -1898,11 +2146,24 @@ class _TranslationScreenState extends State<_TranslationScreen> {
                     Expanded(
                       child: DropdownButtonFormField<String>(
                         initialValue: _selectedSourceLanguage,
-                        decoration: const InputDecoration(labelText: 'From'),
-                        items: translation_models.SupportedLanguages.languages.entries
-                            .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
+                        decoration: InputDecoration(
+                          labelText: context.l10n.from,
+                        ),
+                        items: translation_models
+                            .SupportedLanguages
+                            .languages
+                            .entries
+                            .map(
+                              (e) => DropdownMenuItem(
+                                value: e.key,
+                                child: Text(
+                                  _localizedLanguageName(context, e.key),
+                                ),
+                              ),
+                            )
                             .toList(),
-                        onChanged: (v) => setState(() => _selectedSourceLanguage = v!),
+                        onChanged: (v) =>
+                            setState(() => _selectedSourceLanguage = v!),
                       ),
                     ),
                     const SizedBox(width: AppSpacing.spacingMd),
@@ -1911,11 +2172,22 @@ class _TranslationScreenState extends State<_TranslationScreen> {
                     Expanded(
                       child: DropdownButtonFormField<String>(
                         initialValue: _selectedTargetLanguage,
-                        decoration: const InputDecoration(labelText: 'To'),
-                        items: translation_models.SupportedLanguages.languages.entries
-                            .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
+                        decoration: InputDecoration(labelText: context.l10n.to),
+                        items: translation_models
+                            .SupportedLanguages
+                            .languages
+                            .entries
+                            .map(
+                              (e) => DropdownMenuItem(
+                                value: e.key,
+                                child: Text(
+                                  _localizedLanguageName(context, e.key),
+                                ),
+                              ),
+                            )
                             .toList(),
-                        onChanged: (v) => setState(() => _selectedTargetLanguage = v!),
+                        onChanged: (v) =>
+                            setState(() => _selectedTargetLanguage = v!),
                       ),
                     ),
                   ],
@@ -1925,9 +2197,11 @@ class _TranslationScreenState extends State<_TranslationScreen> {
                   controller: _customTextController,
                   maxLines: 6,
                   decoration: InputDecoration(
-                    labelText: 'Text to Translate',
-                    hintText: 'Enter text to translate...',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppShapes.radiusMd)),
+                    labelText: context.l10n.textToTranslate,
+                    hintText: context.l10n.enterTextToTranslate,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(AppShapes.radiusMd),
+                    ),
                     filled: true,
                     fillColor: context.colors.surfaceContainerHighest,
                   ),
@@ -1937,7 +2211,7 @@ class _TranslationScreenState extends State<_TranslationScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: PrimaryButton(
-                    label: 'Translate',
+                    label: context.l10n.translate,
                     onPressed: hasContent && !isLoading
                         ? () => _translateContent(_customTextController.text)
                         : null,
@@ -1956,7 +2230,9 @@ class _TranslationScreenState extends State<_TranslationScreen> {
                         Expanded(
                           child: Text(
                             errorMessage,
-                            style: AppTypography.bodySmall.copyWith(color: AppColors.error),
+                            style: AppTypography.bodySmall.copyWith(
+                              color: AppColors.error,
+                            ),
                           ),
                         ),
                       ],
@@ -1970,14 +2246,22 @@ class _TranslationScreenState extends State<_TranslationScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Translation', style: AppTypography.labelLarge),
+                      Text(
+                        context.l10n.translation,
+                        style: AppTypography.labelLarge,
+                      ),
                       TextButton.icon(
                         onPressed: () {
-                          Clipboard.setData(ClipboardData(text: translatedText!));
-                          context.showSnackBar('Translation copied to clipboard');
+                          Clipboard.setData(
+                            ClipboardData(text: translatedText!),
+                          );
+                          context.showSnackBar(context.l10n.translationCopied);
                         },
                         icon: Icon(Symbols.content_copy, size: 18),
-                        label: Text('Copy', style: AppTypography.labelMedium),
+                        label: Text(
+                          context.l10n.copy,
+                          style: AppTypography.labelMedium,
+                        ),
                       ),
                     ],
                   ),
@@ -2006,11 +2290,22 @@ class _TranslationScreenState extends State<_TranslationScreen> {
                   Expanded(
                     child: DropdownButtonFormField<String>(
                       initialValue: _selectedSourceLanguage,
-                      decoration: const InputDecoration(labelText: 'From'),
-                      items: translation_models.SupportedLanguages.languages.entries
-                          .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
+                      decoration: InputDecoration(labelText: context.l10n.from),
+                      items: translation_models
+                          .SupportedLanguages
+                          .languages
+                          .entries
+                          .map(
+                            (e) => DropdownMenuItem(
+                              value: e.key,
+                              child: Text(
+                                _localizedLanguageName(context, e.key),
+                              ),
+                            ),
+                          )
                           .toList(),
-                      onChanged: (v) => setState(() => _selectedSourceLanguage = v!),
+                      onChanged: (v) =>
+                          setState(() => _selectedSourceLanguage = v!),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.spacingMd),
@@ -2019,11 +2314,22 @@ class _TranslationScreenState extends State<_TranslationScreen> {
                   Expanded(
                     child: DropdownButtonFormField<String>(
                       initialValue: _selectedTargetLanguage,
-                      decoration: const InputDecoration(labelText: 'To'),
-                      items: translation_models.SupportedLanguages.languages.entries
-                          .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
+                      decoration: InputDecoration(labelText: context.l10n.to),
+                      items: translation_models
+                          .SupportedLanguages
+                          .languages
+                          .entries
+                          .map(
+                            (e) => DropdownMenuItem(
+                              value: e.key,
+                              child: Text(
+                                _localizedLanguageName(context, e.key),
+                              ),
+                            ),
+                          )
                           .toList(),
-                      onChanged: (v) => setState(() => _selectedTargetLanguage = v!),
+                      onChanged: (v) =>
+                          setState(() => _selectedTargetLanguage = v!),
                     ),
                   ),
                 ],
@@ -2031,17 +2337,22 @@ class _TranslationScreenState extends State<_TranslationScreen> {
               const SizedBox(height: AppSpacing.spacingLg),
               // Original content
               if (hasContent) ...[
-                Text('Original (${translation_models.SupportedLanguages.getLanguageName(_selectedSourceLanguage)})', style: AppTypography.labelMedium),
-                const SizedBox(height: AppSpacing.spacingSm),
-                AppCard(
-                  child: Text(content, style: AppTypography.bodyMedium),
+                Text(
+                  context.l10n.originalContent(
+                    _localizedLanguageName(context, _selectedSourceLanguage),
+                  ),
+                  style: AppTypography.labelMedium,
                 ),
+                const SizedBox(height: AppSpacing.spacingSm),
+                AppCard(child: Text(content, style: AppTypography.bodyMedium)),
                 const SizedBox(height: AppSpacing.spacingMd),
                 SizedBox(
                   width: double.infinity,
                   child: PrimaryButton(
-                    label: 'Translate',
-                    onPressed: !isLoading ? () => _translateContent(content) : null,
+                    label: context.l10n.translate,
+                    onPressed: !isLoading
+                        ? () => _translateContent(content)
+                        : null,
                     isLoading: isLoading,
                     leadingIcon: Symbols.translate,
                   ),
@@ -2057,7 +2368,9 @@ class _TranslationScreenState extends State<_TranslationScreen> {
                         Expanded(
                           child: Text(
                             errorMessage,
-                            style: AppTypography.bodySmall.copyWith(color: AppColors.error),
+                            style: AppTypography.bodySmall.copyWith(
+                              color: AppColors.error,
+                            ),
                           ),
                         ),
                       ],
@@ -2071,14 +2384,27 @@ class _TranslationScreenState extends State<_TranslationScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Translation (${translation_models.SupportedLanguages.getLanguageName(_selectedTargetLanguage)})', style: AppTypography.labelMedium),
+                      Text(
+                        context.l10n.translationResult(
+                          _localizedLanguageName(
+                            context,
+                            _selectedTargetLanguage,
+                          ),
+                        ),
+                        style: AppTypography.labelMedium,
+                      ),
                       TextButton.icon(
                         onPressed: () {
-                          Clipboard.setData(ClipboardData(text: translatedText!));
-                          context.showSnackBar('Translation copied to clipboard');
+                          Clipboard.setData(
+                            ClipboardData(text: translatedText!),
+                          );
+                          context.showSnackBar(context.l10n.translationCopied);
                         },
                         icon: Icon(Symbols.content_copy, size: 18),
-                        label: Text('Copy', style: AppTypography.labelMedium),
+                        label: Text(
+                          context.l10n.copy,
+                          style: AppTypography.labelMedium,
+                        ),
                       ),
                     ],
                   ),
@@ -2093,8 +2419,8 @@ class _TranslationScreenState extends State<_TranslationScreen> {
               ] else ...[
                 EmptyState(
                   icon: Symbols.translate,
-                  title: 'No content to translate',
-                  subtitle: 'The analysis does not have content for this section',
+                  title: context.l10n.noContentToTranslate,
+                  subtitle: context.l10n.analysisHasNoContent,
                 ),
               ],
             ],
@@ -2106,13 +2432,14 @@ class _TranslationScreenState extends State<_TranslationScreen> {
 }
 
 class _ErrorScreen extends StatelessWidget {
-  final Exception? error;
-  const _ErrorScreen({this.error});
+  const _ErrorScreen();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Error', style: AppTypography.titleLarge)),
+      appBar: AppBar(
+        title: Text(context.l10n.error, style: AppTypography.titleLarge),
+      ),
       body: Center(
         child: Padding(
           padding: AppSpacing.screenPadding,
@@ -2121,10 +2448,13 @@ class _ErrorScreen extends StatelessWidget {
             children: [
               Icon(Symbols.error, size: 64, color: AppColors.error),
               const SizedBox(height: AppSpacing.spacingLg),
-              Text('Something went wrong', style: AppTypography.headlineMedium),
+              Text(
+                context.l10n.errorScreenTitle,
+                style: AppTypography.headlineMedium,
+              ),
               const SizedBox(height: AppSpacing.spacingSm),
               Text(
-                error?.toString() ?? 'Unknown error',
+                context.l10n.errorScreenMessage,
                 style: AppTypography.bodyMedium.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
@@ -2132,7 +2462,7 @@ class _ErrorScreen extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.spacingXl),
               PrimaryButton(
-                label: 'Go Home',
+                label: context.l10n.goHome,
                 onPressed: () => AppRouter.goToHome(context),
               ),
             ],

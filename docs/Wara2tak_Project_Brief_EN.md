@@ -208,24 +208,24 @@ This avoids the `Future.any()` bug where a fast 404 error from a deprecated mode
 
 | Tier | Provider | Models (tried in order) | Protocol | Purpose |
 |------|----------|------------------------|----------|---------|
-| **Primary (Tier 1)** | Google AI Studio | `gemini-3-flash-preview` → `gemini-3.0-flash` → `gemini-2.5-pro` → `gemini-2.5-flash-lite` | `google_generative_ai` SDK | Latest required models for new projects; internal fallback chain. **Primary is `gemini-3-flash-preview`** (working for new projects; `gemini-3.0-flash` returns 404) |
+| **Primary (Tier 1)** | Google AI Studio | `gemini-3-flash-preview` → `gemini-3.5-flash-lite` → `gemini-3.1-pro-preview` | `google_generative_ai` SDK | Sequential fallback chain for document analysis |
 | **Fallback (Tier 2)** | Moonshot AI (Kimi) | `kimi-k2-0711-preview` | OpenAI-compatible REST (`/chat/completions`) | Fallback on ALL Gemini models failing; supports file upload for PDF extraction |
 | **Fallback (Tier 3)** | Cerebras | `llama-3.3-70b` | OpenAI-compatible REST (`/chat/completions`) | Ultra-fast inference as final fallback; text-only (no file upload) |
 
 **Gemini Internal Model Fallback Chain (sequential within Tier 1):**
-1. Try `gemini-3-flash-preview` with retries (max 2 retries on 503/429/5xx) — **PRIMARY MODEL**
-2. If 404/model not found/unsupported → immediately try `gemini-3.0-flash` (no retries on 404)
-3. If 404/model not found/unsupported → immediately try `gemini-2.5-pro`
-4. If 404/model not found/unsupported → immediately try `gemini-2.5-flash-lite`
-5. If ALL Gemini models fail → trigger Kimi fallback (Tier 2)
+1. Try `gemini-3-flash-preview` — **PRIMARY MODEL**
+2. If the primary fails after retries, try `gemini-3.5-flash-lite`
+3. If fallback 1 fails after retries, try `gemini-3.1-pro-preview`
+4. If ALL Gemini models fail → trigger Kimi fallback (Tier 2)
 
 **Fallback Trigger Conditions:**
-- **Retryable errors** (triggers retries on same model): HTTP 503, 429, 500, 502, 504, `UNAVAILABLE`, `RESOURCE_EXHAUSTED`, `TimeoutException`, `SocketException`
+- **Retryable errors** (triggers retries on same model): HTTP 503, 429, 500, 502, 504, `UNAVAILABLE`, `RESOURCE_EXHAUSTED`, `TimeoutException`, `SocketException`. Timeouts retry once before moving to the next model.
 - **Immediate fallback triggers** (skips retries, tries next model): HTTP 404 (model not found), 400 (unsupported), 401, 403, `QUOTA_EXHAUSTED`
 - **Provider failover** (triggers next tier): ANY exception from the full Gemini chain (all 4 models exhausted) triggers Kimi if `kimiApiKey` is configured; if Kimi fails or unconfigured, triggers Cerebras if `cerebrasApiKey` is configured
 
 **Retry Logic (per Gemini model):**
-- Max 2 retries with exponential backoff: 1s → 2s
+- Max 2 retries with exponential backoff: 1s → 2s; timeouts retry once.
+- Document analysis uses a 90-second Gemini timeout; chat and translation use 45 seconds.
 - Only retries on retryable errors (503, 429, 500, 502, 504, UNAVAILABLE, RESOURCE_EXHAUSTED)
 - Does NOT retry on 404, 400, 401, 403, QUOTA_EXCEEDED → immediately tries next model
 
@@ -258,9 +258,8 @@ Granular progress updates prevent UI freeze at 40%. The progress now reflects th
 | 3 | 40% | "Sending to primary AI engine (Gemini)..." | Primary API request (**gemini-3-flash-preview**) |
 | 4a | 45% | "Gemini returned 503. Retrying in 1s (attempt 1/2)..." | Retry 1 on retryable error (503/429/5xx) |
 | 4b | 50% | "Gemini returned 503. Retrying in 2s (attempt 2/2)..." | Retry 2 on retryable error |
-| 4c | 45% | "Gemini 3-flash-preview unavailable. Trying gemini-3.0-flash..." | **Model fallback** (on 404/unsupported) |
-| 4d | 50% | "Gemini 3.0-flash unavailable. Trying gemini-2.5-pro..." | **Model fallback** (on 404/unsupported) |
-| 4e | 52% | "Gemini 2.5-pro unavailable. Trying gemini-2.5-flash-lite..." | **Model fallback** (on 404/unsupported) |
+| 4c | 45% | "Gemini 3-flash-preview unavailable. Trying gemini-3.5-flash-lite..." | **Model fallback** |
+| 4d | 50% | "Gemini 3.5-flash-lite unavailable. Trying gemini-3.1-pro-preview..." | **Model fallback** |
 | 5 | 55% | "All Gemini models failed. Switching to fallback engine (Kimi)..." | Kimi fallback triggered |
 | 5a | 57% | "Uploading document to fallback engine (Kimi)..." | File upload to Moonshot `/v1/files` |
 | 6 | 60% | "Processing Kimi response..." | Kimi API request |
@@ -286,7 +285,7 @@ flutter build apk \
   --dart-define=SUPABASE_ANON_KEY=your-anon-key \
   --dart-define=GEMINI_API_KEY=your-gemini-key \
   --dart-define=KIMI_API_KEY=your-kimi-key \
-  --dart-define=KIMI_BASE_URL=https://api.moonshot.cn/v1 \
+  --dart-define=KIMI_BASE_URL=https://api.moonshot.ai/v1 \
   --dart-define=CEREBRAS_API_KEY=your-cerebras-key \
   --dart-define=CEREBRAS_BASE_URL=https://api.cerebras.ai/v1
 
@@ -295,7 +294,7 @@ flutter build apk \
 # SUPABASE_ANON_KEY=...
 # GEMINI_API_KEY=...
 # KIMI_API_KEY=... (or kimi_api_key)
-# KIMI_BASE_URL=https://api.moonshot.cn/v1
+# KIMI_BASE_URL=https://api.moonshot.ai/v1
 # CEREBRAS_API_KEY=...
 # CEREBRAS_BASE_URL=https://api.cerebras.ai/v1
 ```
@@ -579,6 +578,17 @@ Complete in this order:
 - [x] Material 3 theming with custom ColorScheme (light/dark)
 - [x] RTL/LTR support for Arabic/English via context extensions
 
+**Localization & RTL (18 November 2026)**
+- [x] Official Flutter gen-l10n with ARB files (`app_en.arb`, `app_ar.arb`)
+- [x] App UI Language: English + Arabic only (2 languages matching design system)
+- [x] Default Translation Language: 10-language selector under Preferences (Arabic, English, French, Spanish, German, Chinese, Hindi, Urdu, Turkish, Persian)
+- [x] LocaleCubit with SharedPreferences persistence for instant launch
+- [x] Full RTL support: Directionality, EdgeInsetsDirectional, AlignmentDirectional, BorderRadiusDirectional, TextAlign.start/end
+- [x] MaterialApp wired with LocaleCubit via BlocBuilder
+- [x] ProfileScreen: Separate App Language and Default Translation Language dialogs
+- [x] 14 LocaleCubit unit tests (all passing)
+- [x] Widget tests for ProfileScreen localization
+
 **Desktop Support (Windows/macOS/Linux)**
 - [x] **Windows**: Full runner implementation with PerMonitorV2 DPI awareness, console support, dark mode window decorations, command line argument handling
 - [x] **macOS**: Runner with AppDelegate, SceneDelegate, MainFlutterWindow, entitlements, app icons, launch images
@@ -717,5 +727,7 @@ Complete in this order:
 | 2026-11-18 | **Checklist Add/Update Fix (PGRST116 & Error Wipe)** — Fixed two critical issues in `ChecklistRepositoryImpl` and `ChecklistCubit`: (1) **PGRST116 on add**: Added `addChecklistItem()` method doing INSERT (not UPDATE) with explicit authenticated `userId` for RLS compliance. Uses `.maybeSingle()` instead of `.single()` to avoid PGRST116 crash; returns descriptive `ServerFailure` if no rows returned. (2) **Error wipes checklist**: On mutation failure, `ChecklistCubit` now rolls back and emits `ChecklistLoaded(items, errorMessage: failure.message)` instead of `ChecklistError` — keeps list visible, shows error via SnackBar. Updated all mutations (`toggleItem`, `addItem`, `updateItem`, `deleteItem`, `saveChecklist`). Added `errorMessage` to `ChecklistLoaded` state. Updated interface, mock, and all 11 optimistic tests. **`flutter analyze` 0 errors**, **`flutter test` 25/25 pass**. |
 | 2026-11-18 | **Shared Cubit State Overwrite Bug Fix** — Fixed critical bug where opening `DocumentDetailsScreen` and navigating back caused `MyDocumentsScreen` (and `HomeScreen`) to become blank (only AppBar + Upload FAB visible). Root cause: `MyDocumentsScreen` and `DocumentDetailsScreen` shared the same global `DocumentCubit` instance; opening details emitted `DocumentLoaded`, overwriting `DocumentsLoaded`. On back navigation, `BlocBuilder` saw `DocumentLoaded` instead of `DocumentsLoaded` and fell through to `SizedBox.shrink()`. Fix: (1) **Isolated DocumentDetailsScreen State** — Wrapped `/document/:documentId` route in `app_router.dart` with `BlocProvider<DocumentCubit>(create: (_) => getIt<DocumentCubit>()..loadDocumentWithAnalysis(documentId))` so details screen gets its own scoped Cubit instance. (2) **Safety Fallback in MyDocumentsScreen & HomeScreen** — Added `buildWhen: (previous, current) => current is DocumentsLoaded || current is DocumentLoading || current is DocumentError` to `BlocBuilder<DocumentCubit, DocumentState>` to prevent rebuilds on unexpected states. Added fallback rendering from `DocumentCubit.cachedDocuments` when state is unexpected (e.g., `DocumentLoaded` from details screen), ensuring list never goes blank. (3) **Exposed `cachedDocuments` getter** in `DocumentCubit` for fallback access. **`flutter analyze` 0 errors**, **`flutter test` 25/25 pass**. |
 | 2026-11-18 | **HomeScreen Data Contradiction Fix** — Fixed bug where Stats Cards showed `Total Documents: 1, Analyzed: 0` while Recent Documents section displayed `"No documents yet"`. Root causes: (1) Both `HomeScreen` and `HomeCubit` filtered Recent Documents to only `DocumentStatus.analyzed`, hiding uploaded/processing/failed docs. (2) `DocumentRepositoryImpl.saveAnalysis()` didn't update document status to `'analyzed'` after successful analysis. Fix: (1) **HomeScreen** — Removed status filter from Recent Documents; now shows ALL documents (uploaded, processing, analyzed, failed) sorted by `createdAt` desc, take 5. (2) **HomeCubit** — Same change: recent documents now show all statuses, stats still computed correctly from full list. (3) **DocumentRepositoryImpl.saveAnalysis()** — Added explicit `documents` table update to set `status = 'analyzed'` after saving analysis record. (4) Both Stats Cards and Recent Documents now derive from the exact same `List<DocumentModel>` in `HomeLoaded` state, making data contradiction impossible. **`flutter analyze` 0 errors**, **`flutter test` 25/25 pass**. |
+| 2026-11-18 | **Complete Localization (l10n) & RTL System Implementation** — Implemented production-ready localization and RTL support using official Flutter gen-l10n. Changes: (1) **App UI Language (2 languages)** — English and Arabic only, matching design system templates. (2) **Default Translation Language (10 languages)** — Separate setting under Preferences with Arabic, English, French, Spanish, German, Chinese, Hindi, Urdu, Turkish, Persian. (3) **LocaleCubit with SharedPreferences** — Persists locale for instant launch; `changeLocale()`, `toggleLocale()`, `currentLocale`, `isRtl`, `supportedLocales`. (4) **ARB Files** — `lib/core/l10n/app_en.arb` and `app_ar.arb` with 30+ translation keys for profile/settings. (5) **Full RTL Support** — `Directionality` widgets, `EdgeInsetsDirectional`, `AlignmentDirectional`, `BorderRadiusDirectional`, `TextAlign.start/end` throughout. (6) **MaterialApp Wiring** — `supportedLocales`, `localizationsDelegates`, `locale` from LocaleCubit via `BlocBuilder`. (7) **ProfileScreen Refactor** — Two separate language settings: App Language (LocaleCubit) and Default Translation Language (ProfileCubit). (8) **Automated Tests** — 14 LocaleCubit unit tests (all passing), widget tests for ProfileScreen localization. (9) **Static Analysis** — `flutter analyze` 0 errors. |
+| 2026-11-19 | **AI Provider Reliability & Duplicate Fetch Fixes** — Updated Gemini analysis timeout to 90 seconds while retaining 45 seconds for chat/translation; made timeouts retry once before model failover; replaced retired Gemini fallbacks with `gemini-3.5-flash-lite` and `gemini-3.1-pro-preview`; trimmed Kimi API keys and set the default Moonshot endpoint to `https://api.moonshot.ai/v1` while preserving explicit multipart Bearer auth; removed the duplicate details fetch from the route so `DocumentDetailsScreen.initState()` loads once. |
 
 **Maintenance rule:** After each project session, update the date, confirmed decisions, completed items, remaining work, current stage, and next step. Record changed decisions with their dates; do not silently overwrite project history.

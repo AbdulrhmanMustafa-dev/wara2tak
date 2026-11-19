@@ -59,7 +59,7 @@ class _UploadScreenState extends State<UploadScreen> {
       }
     } catch (e) {
       if (mounted) {
-        context.showErrorSnackBar('Failed to pick file: $e');
+        context.showErrorSnackBar(context.l10n.failedToPickFile);
       }
     } finally {
       setState(() => _isPicking = false);
@@ -87,7 +87,7 @@ class _UploadScreenState extends State<UploadScreen> {
       }
     } catch (e) {
       if (mounted) {
-        context.showErrorSnackBar('Failed to pick image: $e');
+        context.showErrorSnackBar(context.l10n.failedToPickImage);
       }
     } finally {
       setState(() => _isPicking = false);
@@ -108,7 +108,7 @@ class _UploadScreenState extends State<UploadScreen> {
           children: [
             ListTile(
               leading: Icon(Symbols.camera_alt, color: context.colors.primary),
-              title: Text('Camera', style: AppTypography.labelLarge),
+              title: Text(context.l10n.camera, style: AppTypography.labelLarge),
               onTap: () {
                 Navigator.pop(context);
                 _pickImage(ImageSource.camera);
@@ -119,7 +119,10 @@ class _UploadScreenState extends State<UploadScreen> {
                 Symbols.photo_library,
                 color: context.colors.primary,
               ),
-              title: Text('Gallery', style: AppTypography.labelLarge),
+              title: Text(
+                context.l10n.gallery,
+                style: AppTypography.labelLarge,
+              ),
               onTap: () {
                 Navigator.pop(context);
                 _pickImage(ImageSource.gallery);
@@ -133,13 +136,13 @@ class _UploadScreenState extends State<UploadScreen> {
 
   Future<void> _uploadDocument() async {
     if (_selectedFile == null) {
-      context.showErrorSnackBar('Please select a file first');
+      context.showErrorSnackBar(context.l10n.selectFileFirst);
       return;
     }
 
     final authState = context.read<AuthCubit>().state;
     if (authState is! AuthAuthenticated) {
-      context.showErrorSnackBar('Please sign in first');
+      context.showErrorSnackBar(context.l10n.signInFirst);
       return;
     }
 
@@ -170,7 +173,7 @@ class _UploadScreenState extends State<UploadScreen> {
                 uploadedDocument == null &&
                 state.documents.first.status == DocumentStatus.uploaded) {
               uploadedDocument = state.documents.first;
-              context.showSnackBar('Document uploaded successfully!');
+              context.showSnackBar(context.l10n.documentUploaded);
               // Trigger AI Analysis with local file path
               final authState = context.read<AuthCubit>().state;
               if (authState is AuthAuthenticated && _selectedFile != null) {
@@ -184,12 +187,17 @@ class _UploadScreenState extends State<UploadScreen> {
               }
             }
           } else if (state is DocumentError) {
-            context.showErrorSnackBar(state.message);
+            context.showErrorSnackBar(
+              context.localizedErrorMessage(state.message),
+            );
           }
         },
         child: Scaffold(
           appBar: AppBar(
-            title: Text('Upload Document', style: AppTypography.titleLarge),
+            title: Text(
+              context.l10n.uploadTitle,
+              style: AppTypography.titleLarge,
+            ),
             leading: AppIconButton(
               icon: Symbols.arrow_back,
               onPressed: () => AppRouter.goToHome(context),
@@ -202,7 +210,10 @@ class _UploadScreenState extends State<UploadScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // File Selection
-                  Text('Select File', style: AppTypography.titleLarge),
+                  Text(
+                    context.l10n.selectFile,
+                    style: AppTypography.titleLarge,
+                  ),
                   const SizedBox(height: AppSpacing.spacingSm),
 
                   _FileDropZone(
@@ -216,12 +227,15 @@ class _UploadScreenState extends State<UploadScreen> {
                   const SizedBox(height: AppSpacing.spacingXl),
 
                   // Document Title
-                  Text('Document Title', style: AppTypography.titleLarge),
+                  Text(
+                    context.l10n.documentTitle,
+                    style: AppTypography.titleLarge,
+                  ),
                   const SizedBox(height: AppSpacing.spacingSm),
                   TextField(
                     controller: _titleController,
                     decoration: InputDecoration(
-                      hintText: 'Enter document title',
+                      hintText: context.l10n.enterDocumentTitle,
                       hintStyle: AppTypography.bodyMedium.copyWith(
                         color: context.colors.onSurfaceVariant,
                       ),
@@ -237,7 +251,10 @@ class _UploadScreenState extends State<UploadScreen> {
                   const SizedBox(height: AppSpacing.spacingXl),
 
                   // Document Type
-                  Text('Document Type', style: AppTypography.titleLarge),
+                  Text(
+                    context.l10n.documentType,
+                    style: AppTypography.titleLarge,
+                  ),
                   const SizedBox(height: AppSpacing.spacingSm),
                   Wrap(
                     spacing: AppSpacing.spacingSm,
@@ -245,7 +262,7 @@ class _UploadScreenState extends State<UploadScreen> {
                     children: DocumentType.values.map((type) {
                       final isSelected = _selectedType == type;
                       return FilterChip(
-                        label: Text(_getTypeLabel(type)),
+                        label: Text(_getTypeLabel(context, type)),
                         selected: isSelected,
                         onSelected: (selected) {
                           if (selected) {
@@ -283,7 +300,7 @@ class _UploadScreenState extends State<UploadScreen> {
                           state is DocumentUploadProgress;
 
                       return PrimaryButton(
-                        label: 'Upload & Analyze',
+                        label: context.l10n.uploadButton,
                         onPressed: isLoading ? null : _uploadDocument,
                         isLoading: isLoading,
                         leadingIcon: Symbols.cloud_upload,
@@ -295,7 +312,7 @@ class _UploadScreenState extends State<UploadScreen> {
                   if (_selectedFile != null) ...[
                     const SizedBox(height: AppSpacing.spacingMd),
                     Text(
-                      'Supported formats: PDF, PNG, JPG (max 50MB)',
+                      context.l10n.supportedFormats,
                       style: AppTypography.bodySmall.copyWith(
                         color: context.colors.onSurfaceVariant,
                       ),
@@ -311,18 +328,18 @@ class _UploadScreenState extends State<UploadScreen> {
     );
   }
 
-  String _getTypeLabel(DocumentType type) {
+  String _getTypeLabel(BuildContext context, DocumentType type) {
     switch (type) {
       case DocumentType.rentalContract:
-        return 'Rental Contract';
+        return context.l10n.documentTypeRental;
       case DocumentType.employmentContract:
-        return 'Employment Contract';
+        return context.l10n.documentTypeEmployment;
       case DocumentType.termsOfService:
-        return 'Terms of Service';
+        return context.l10n.documentTypeTerms;
       case DocumentType.privacyPolicy:
-        return 'Privacy Policy';
+        return context.l10n.documentTypePrivacy;
       case DocumentType.other:
-        return 'Other';
+        return context.l10n.documentTypeOther;
     }
   }
 }
@@ -379,14 +396,14 @@ class _FileDropZone extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.spacingMd),
               Text(
-                'Drag & drop a file here',
+                context.l10n.dragDropFileHere,
                 style: AppTypography.labelLarge.copyWith(
                   color: context.colors.onSurface,
                 ),
               ),
               const SizedBox(height: AppSpacing.spacingXs),
               Text(
-                'or tap to browse',
+                context.l10n.orTapToBrowse,
                 style: AppTypography.bodySmall.copyWith(
                   color: context.colors.onSurfaceVariant,
                 ),
@@ -404,7 +421,10 @@ class _FileDropZone extends StatelessWidget {
               child: OutlinedButton.icon(
                 onPressed: isPicking ? null : onPickFile,
                 icon: Icon(Symbols.insert_drive_file, size: 20),
-                label: Text('Choose File', style: AppTypography.labelMedium),
+                label: Text(
+                  context.l10n.chooseFile,
+                  style: AppTypography.labelMedium,
+                ),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                     vertical: AppSpacing.spacingMd,
@@ -418,7 +438,10 @@ class _FileDropZone extends StatelessWidget {
               child: OutlinedButton.icon(
                 onPressed: isPicking ? null : onPickImage,
                 icon: Icon(Symbols.add_photo_alternate, size: 20),
-                label: Text('Camera/Gallery', style: AppTypography.labelMedium),
+                label: Text(
+                  context.l10n.cameraGallery,
+                  style: AppTypography.labelMedium,
+                ),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                     vertical: AppSpacing.spacingMd,
@@ -449,10 +472,6 @@ class _SelectedFileCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isPdf = fileName.toLowerCase().endsWith('.pdf');
-    final isImage =
-        fileName.toLowerCase().endsWith('.png') ||
-        fileName.toLowerCase().endsWith('.jpg') ||
-        fileName.toLowerCase().endsWith('.jpeg');
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.spacingMd),
@@ -492,7 +511,7 @@ class _SelectedFileCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  isPdf ? 'PDF Document' : 'Image File',
+                  isPdf ? context.l10n.pdfDocument : context.l10n.imageFile,
                   style: AppTypography.bodySmall.copyWith(
                     color: context.colors.onSurfaceVariant,
                   ),
@@ -501,7 +520,7 @@ class _SelectedFileCard extends StatelessWidget {
             ),
           ),
           TertiaryButton(
-            label: 'Change',
+            label: context.l10n.change,
             onPressed: onChange,
             leadingIcon: Symbols.edit,
           ),

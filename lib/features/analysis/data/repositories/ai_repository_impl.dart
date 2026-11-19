@@ -29,17 +29,19 @@ import '../../../documents/domain/models/document_model.dart';
 /// This avoids the Future.any() bug where a fast 404 error would abort all other providers.
 class AIRepositoryImpl implements AIRepository {
   // Timeouts
-  static const Duration _geminiTimeout = Duration(seconds: 30);
+  // Reduced from 90s to 45s per attempt with max 1 retry (total max 90s) so failover
+  // to gemini-3.5-flash-lite / Kimi / Cerebras doesn't stall the user for 1.5+ minutes.
+  static const Duration _geminiAnalysisTimeout = Duration(seconds: 45);
+  static const Duration _geminiInteractiveTimeout = Duration(seconds: 45);
   static const Duration _kimiTimeout = Duration(seconds: 60);
   static const Duration _cerebrasTimeout = Duration(seconds: 30); // Cerebras is ultra-fast
-  static const int _maxRetries = 2; // Max 2 retries on 503/429 before fallback
+  static const int _maxRetries = 1; // Max 1 retry on 503/429 before fallback (was 2)
 
   // Provider models
   static const List<String> _geminiModels = [
-    'gemini-3-flash-preview',   // Primary: working preview model (gemini-3.0-flash returns 404 for new projects)
-    'gemini-3.0-flash',         // Secondary: latest Flash model (required for new projects)
-    'gemini-2.5-pro',           // Tertiary: Pro model for complex analysis
-    'gemini-2.5-flash-lite',    // Quaternary: Lite model as last resort
+    'gemini-3-flash-preview',
+    'gemini-3.5-flash-lite',
+    'gemini-3.1-pro-preview',
   ];
   static const String _kimiModel = 'kimi-k2-0711-preview';
   static const String _cerebrasModel = 'llama-3.3-70b'; // Cerebras default model
@@ -53,7 +55,7 @@ class AIRepositoryImpl implements AIRepository {
     String? kimiApiKey,
     String? cerebrasApiKey,
   })  : _geminiApiKey = geminiApiKey ?? SupabaseConfig.geminiApiKey,
-        _kimiApiKey = kimiApiKey ?? SupabaseConfig.kimiApiKey,
+        _kimiApiKey = (kimiApiKey ?? SupabaseConfig.kimiApiKey).trim(),
         _cerebrasApiKey = cerebrasApiKey ?? SupabaseConfig.cerebrasApiKey;
 
   /// Creates a GenerativeModel for the given model name with analysis schema
@@ -304,7 +306,9 @@ class AIRepositoryImpl implements AIRepository {
       ]);
 
       final response = await _generateContentWithSequentialFallback(
-        geminiFactory: (model) => _createAnalyzerModel(model).generateContent([prompt]).timeout(_geminiTimeout),
+        geminiFactory: (model) => _createAnalyzerModel(model)
+            .generateContent([prompt])
+            .timeout(_geminiAnalysisTimeout),
         onProgress: onProgress,
         kimiPrompt: promptText,
         kimiModel: _kimiModel,
@@ -405,7 +409,9 @@ $historyText
 ''';
 
       final response = await _generateContentWithSequentialFallback(
-        geminiFactory: (model) => _createChatModel(model).generateContent([Content.text(prompt)]).timeout(_geminiTimeout),
+        geminiFactory: (model) => _createChatModel(model)
+            .generateContent([Content.text(prompt)])
+            .timeout(_geminiInteractiveTimeout),
         kimiPrompt: prompt,
         kimiModel: _kimiModel,
         kimiTemperature: 0.3,
@@ -443,7 +449,9 @@ $content
 ''';
 
       final response = await _generateContentWithSequentialFallback(
-        geminiFactory: (model) => _createChatModel(model).generateContent([Content.text(prompt)]).timeout(_geminiTimeout),
+        geminiFactory: (model) => _createChatModel(model)
+            .generateContent([Content.text(prompt)])
+            .timeout(_geminiInteractiveTimeout),
         kimiPrompt: prompt,
         kimiModel: _kimiModel,
         kimiTemperature: 0.2,
@@ -475,17 +483,21 @@ $content
     Future<GenerateContentResponse> Function() request, {
     void Function(int attempt, String message)? onProgress,
   }) async {
+    var timeoutRetries = 0;
     for (var attempt = 1; attempt <= _maxRetries + 1; attempt++) {
       try {
         return await request();
       } catch (error) {
         final isRetryable = _isRetryableGeminiError(error);
+        final shouldStopRetryingTimeout =
+            error is TimeoutException && timeoutRetries >= 1;
         final isLastAttempt = attempt > _maxRetries;
 
-        if (isLastAttempt || !isRetryable) {
+        if (isLastAttempt || !isRetryable || shouldStopRetryingTimeout) {
           developer.log('Gemini failed (attempt $attempt/${_maxRetries + 1}): $error');
           rethrow;
         }
+        if (error is TimeoutException) timeoutRetries++;
 
         // Exponential backoff: 1s, 2s, 4s...
         final delay = Duration(seconds: 1 << (attempt - 1));
@@ -502,6 +514,7 @@ $content
   /// Check if a Gemini error is retryable (503, 429, 500, 502, 504, UNAVAILABLE, RESOURCE_EXHAUSTED)
   /// Returns false for non-retryable errors like 404/model not found, 400, 401, 403, QUOTA_EXCEEDED
   bool _isRetryableGeminiError(Object error) {
+    if (error is TimeoutException || error is SocketException) return true;
     final message = error.toString().toUpperCase();
 
     // Don't retry these non-retryable errors
@@ -542,7 +555,7 @@ $content
       final url = Uri.parse('${SupabaseConfig.kimiBaseUrl}/files');
 
       final request = http.MultipartRequest('POST', url)
-        ..headers['Authorization'] = 'Bearer $_kimiApiKey'
+        ..headers['Authorization'] = 'Bearer ${_kimiApiKey.trim()}'
         ..fields['purpose'] = 'file-extract'
         ..files.add(
           http.MultipartFile.fromBytes(

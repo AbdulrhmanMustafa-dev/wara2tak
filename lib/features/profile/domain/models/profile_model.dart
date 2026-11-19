@@ -8,6 +8,7 @@ class ProfileModel extends Equatable {
   final String? photoUrl;
   final String? phoneNumber;
   final String? preferredLanguage;
+  final String? defaultTranslationLanguage;
   final bool isDarkMode;
   final bool notificationsEnabled;
   final bool biometricEnabled;
@@ -21,6 +22,7 @@ class ProfileModel extends Equatable {
     this.photoUrl,
     this.phoneNumber,
     this.preferredLanguage,
+    this.defaultTranslationLanguage,
     this.isDarkMode = false,
     this.notificationsEnabled = true,
     this.biometricEnabled = false,
@@ -36,6 +38,7 @@ class ProfileModel extends Equatable {
       photoUrl: json['photoUrl'] as String?,
       phoneNumber: json['phoneNumber'] as String?,
       preferredLanguage: json['preferredLanguage'] as String?,
+      defaultTranslationLanguage: json['defaultTranslationLanguage'] as String?,
       isDarkMode: json['isDarkMode'] as bool? ?? false,
       notificationsEnabled: json['notificationsEnabled'] as bool? ?? true,
       biometricEnabled: json['biometricEnabled'] as bool? ?? false,
@@ -54,6 +57,7 @@ class ProfileModel extends Equatable {
       'photoUrl': photoUrl,
       'phoneNumber': phoneNumber,
       'preferredLanguage': preferredLanguage,
+      'defaultTranslationLanguage': defaultTranslationLanguage,
       'isDarkMode': isDarkMode,
       'notificationsEnabled': notificationsEnabled,
       'biometricEnabled': biometricEnabled,
@@ -69,6 +73,7 @@ class ProfileModel extends Equatable {
     String? photoUrl,
     String? phoneNumber,
     String? preferredLanguage,
+    String? defaultTranslationLanguage,
     bool? isDarkMode,
     bool? notificationsEnabled,
     bool? biometricEnabled,
@@ -82,6 +87,8 @@ class ProfileModel extends Equatable {
       photoUrl: photoUrl ?? this.photoUrl,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       preferredLanguage: preferredLanguage ?? this.preferredLanguage,
+      defaultTranslationLanguage:
+          defaultTranslationLanguage ?? this.defaultTranslationLanguage,
       isDarkMode: isDarkMode ?? this.isDarkMode,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       biometricEnabled: biometricEnabled ?? this.biometricEnabled,
@@ -98,6 +105,7 @@ class ProfileModel extends Equatable {
         photoUrl,
         phoneNumber,
         preferredLanguage,
+        defaultTranslationLanguage,
         isDarkMode,
         notificationsEnabled,
         biometricEnabled,

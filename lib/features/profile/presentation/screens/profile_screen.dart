@@ -6,6 +6,7 @@ import '../../../../../features/auth/index.dart';
 import '../../../../../features/profile/index.dart';
 import '../../../../core/design_system/index.dart';
 import '../../../../core/extensions/context_extensions.dart';
+import '../../../../core/l10n/locale_cubit.dart';
 import '../../../../core/navigation/app_router.dart';
 import '../../../../shared/widgets/index.dart';
 
@@ -36,7 +37,7 @@ class ProfileScreen extends StatelessWidget {
         },
         child: Scaffold(
           appBar: AppBar(
-            title: Text('Profile', style: AppTypography.titleLarge),
+            title: Text(context.l10n.profile, style: AppTypography.titleLarge),
             leading: AppIconButton(
               icon: Symbols.arrow_back,
               onPressed: () => AppRouter.goToHome(context),
@@ -53,160 +54,187 @@ class ProfileScreen extends StatelessWidget {
                       padding: AppSpacing.screenPadding,
                       physics: const AlwaysScrollableScrollPhysics(),
                       child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Profile Header
-                        _ProfileHeader(profile: profile),
-                        const SizedBox(height: AppSpacing.spacingXl),
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Profile Header
+                          _ProfileHeader(profile: profile),
+                          const SizedBox(height: AppSpacing.spacingXl),
 
-                        // Settings Sections
-                        _buildSection(
-                          context,
-                          title: 'Preferences',
-                          children: [
-                            _SettingsTile(
-                              icon: Symbols.dark_mode,
-                              title: 'Dark Mode',
-                              subtitle: 'Toggle dark/light theme',
-                              trailing: Switch(
-                                value: profile.isDarkMode,
-                                onChanged: (value) => context
-                                    .read<ProfileCubit>()
-                                    .updateThemePreference(profile.id, value),
-                                activeThumbColor: context.colors.primary,
+                          // Settings Sections
+                          _buildSection(
+                            context,
+                            title: context.l10n.preferences,
+                            children: [
+                              _SettingsTile(
+                                icon: Symbols.dark_mode,
+                                title: context.l10n.darkMode,
+                                subtitle: context.l10n.toggleDarkLightTheme,
+                                trailing: Switch(
+                                  value: profile.isDarkMode,
+                                  onChanged: (value) => context
+                                      .read<ProfileCubit>()
+                                      .updateThemePreference(profile.id, value),
+                                  activeThumbColor: context.colors.primary,
+                                ),
                               ),
-                            ),
-                            _SettingsTile(
-                              icon: Symbols.notifications,
-                              title: 'Notifications',
-                              subtitle: 'Enable push notifications',
-                              trailing: Switch(
-                                value: profile.notificationsEnabled,
-                                onChanged: (value) => context
-                                    .read<ProfileCubit>()
-                                    .updateNotificationPreference(
-                                      profile.id,
-                                      value,
-                                    ),
-                                activeThumbColor: context.colors.primary,
+                              _SettingsTile(
+                                icon: Symbols.notifications,
+                                title: context.l10n.notifications,
+                                subtitle: context.l10n.enablePushNotifications,
+                                trailing: Switch(
+                                  value: profile.notificationsEnabled,
+                                  onChanged: (value) => context
+                                      .read<ProfileCubit>()
+                                      .updateNotificationPreference(
+                                        profile.id,
+                                        value,
+                                      ),
+                                  activeThumbColor: context.colors.primary,
+                                ),
                               ),
-                            ),
-                            _SettingsTile(
-                              icon: Symbols.language,
-                              title: 'Language',
-                              subtitle: profile.preferredLanguage != null
-                                  ? SupportedLanguages.getLanguageName(
-                                      profile.preferredLanguage!,
-                                    )
-                                  : 'System default',
-                              trailing: Icon(
-                                Symbols.chevron_right,
-                                color: context.colors.onSurfaceVariant,
+                              // App Language (en/ar) - using LocaleCubit
+                              _SettingsTile(
+                                icon: Symbols.language,
+                                title: context.l10n.appLanguage,
+                                subtitle:
+                                    context.watch<LocaleCubit>().state
+                                        is LocaleLoaded
+                                    ? (context.watch<LocaleCubit>().state
+                                                      as LocaleLoaded)
+                                                  .locale
+                                                  .languageCode ==
+                                              'ar'
+                                          ? context.l10n.arabic
+                                          : context.l10n.english
+                                    : context.l10n.english,
+                                trailing: Icon(
+                                  Symbols.chevron_right,
+                                  color: context.colors.onSurfaceVariant,
+                                ),
+                                onTap: () => _showAppLanguageDialog(context),
                               ),
-                              onTap: () =>
-                                  _showLanguageDialog(context, profile),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: AppSpacing.spacingLg),
-
-                        _buildSection(
-                          context,
-                          title: 'Account',
-                          children: [
-                            _SettingsTile(
-                              icon: Symbols.person,
-                              title: 'Edit Profile',
-                              subtitle: 'Update your personal information',
-                              trailing: Icon(
-                                Symbols.chevron_right,
-                                color: context.colors.onSurfaceVariant,
+                              // Default Translation Language (10 languages) - using ProfileCubit
+                              _SettingsTile(
+                                icon: Symbols.translate,
+                                title: context.l10n.defaultTranslationLanguage,
+                                subtitle:
+                                    profile.defaultTranslationLanguage != null
+                                    ? TranslationLanguages.getLanguageName(
+                                        context,
+                                        profile.defaultTranslationLanguage!,
+                                      )
+                                    : context.l10n.systemDefault,
+                                trailing: Icon(
+                                  Symbols.chevron_right,
+                                  color: context.colors.onSurfaceVariant,
+                                ),
+                                onTap: () => _showTranslationLanguageDialog(
+                                  context,
+                                  profile,
+                                ),
                               ),
-                              onTap: () =>
-                                  _showEditProfileDialog(context, profile),
-                            ),
-                            _SettingsTile(
-                              icon: Symbols.security,
-                              title: 'Security',
-                              subtitle: 'Manage password and biometric auth',
-                              trailing: Icon(
-                                Symbols.chevron_right,
-                                color: context.colors.onSurfaceVariant,
-                              ),
-                              onTap: () {},
-                            ),
-                            _SettingsTile(
-                              icon: Symbols.delete_forever,
-                              title: 'Delete Account',
-                              subtitle:
-                                  'Permanently delete your account and data',
-                              titleColor: AppColors.error,
-                              trailing: Icon(
-                                Symbols.chevron_right,
-                                color: AppColors.error,
-                              ),
-                              onTap: () =>
-                                  _showDeleteAccountDialog(context, profile),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: AppSpacing.spacingLg),
-
-                        _buildSection(
-                          context,
-                          title: 'About',
-                          children: [
-                            _SettingsTile(
-                              icon: Symbols.info,
-                              title: 'Version',
-                              subtitle: '1.0.0',
-                              trailing: const SizedBox.shrink(),
-                            ),
-                            _SettingsTile(
-                              icon: Symbols.description,
-                              title: 'Terms of Service',
-                              subtitle: 'Read our terms and conditions',
-                              trailing: const SizedBox.shrink(),
-                              onTap: () {},
-                            ),
-                            _SettingsTile(
-                              icon: Symbols.privacy_tip,
-                              title: 'Privacy Policy',
-                              subtitle: 'Learn how we protect your data',
-                              trailing: const SizedBox.shrink(),
-                              onTap: () {},
-                            ),
-                            _SettingsTile(
-                              icon: Symbols.help,
-                              title: 'Help & Support',
-                              subtitle: 'Get help or contact support',
-                              trailing: const SizedBox.shrink(),
-                              onTap: () {},
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: AppSpacing.spacingXl),
-
-                        // Sign Out Button
-                        SizedBox(
-                          width: double.infinity,
-                          child: DestructiveButton(
-                            label: 'Sign Out',
-                            onPressed: () =>
-                                context.read<AuthCubit>().signOut(),
-                            leadingIcon: Symbols.logout,
-                            isFullWidth: true,
+                            ],
                           ),
-                        ),
-                      ],
+
+                          const SizedBox(height: AppSpacing.spacingLg),
+
+                          _buildSection(
+                            context,
+                            title: context.l10n.account,
+                            children: [
+                              _SettingsTile(
+                                icon: Symbols.person,
+                                title: context.l10n.editProfile,
+                                subtitle:
+                                    context.l10n.updatePersonalInformation,
+                                trailing: Icon(
+                                  Symbols.chevron_right,
+                                  color: context.colors.onSurfaceVariant,
+                                ),
+                                onTap: () =>
+                                    _showEditProfileDialog(context, profile),
+                              ),
+                              _SettingsTile(
+                                icon: Symbols.security,
+                                title: context.l10n.security,
+                                subtitle: context.l10n.managePasswordBiometric,
+                                trailing: Icon(
+                                  Symbols.chevron_right,
+                                  color: context.colors.onSurfaceVariant,
+                                ),
+                                onTap: () {},
+                              ),
+                              _SettingsTile(
+                                icon: Symbols.delete_forever,
+                                title: context.l10n.deleteAccount,
+                                subtitle:
+                                    context.l10n.permanentlyDeleteAccountData,
+                                titleColor: AppColors.error,
+                                trailing: Icon(
+                                  Symbols.chevron_right,
+                                  color: AppColors.error,
+                                ),
+                                onTap: () =>
+                                    _showDeleteAccountDialog(context, profile),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: AppSpacing.spacingLg),
+
+                          _buildSection(
+                            context,
+                            title: context.l10n.about,
+                            children: [
+                              _SettingsTile(
+                                icon: Symbols.info,
+                                title: context.l10n.version,
+                                subtitle: '1.0.0',
+                                trailing: const SizedBox.shrink(),
+                              ),
+                              _SettingsTile(
+                                icon: Symbols.description,
+                                title: context.l10n.termsOfService,
+                                subtitle: context.l10n.readTermsConditions,
+                                trailing: const SizedBox.shrink(),
+                                onTap: () {},
+                              ),
+                              _SettingsTile(
+                                icon: Symbols.privacy_tip,
+                                title: context.l10n.privacyPolicy,
+                                subtitle: context.l10n.learnHowWeProtectData,
+                                trailing: const SizedBox.shrink(),
+                                onTap: () {},
+                              ),
+                              _SettingsTile(
+                                icon: Symbols.help,
+                                title: context.l10n.helpSupport,
+                                subtitle: context.l10n.getHelpContactSupport,
+                                trailing: const SizedBox.shrink(),
+                                onTap: () {},
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: AppSpacing.spacingXl),
+
+                          // Sign Out Button
+                          SizedBox(
+                            width: double.infinity,
+                            child: DestructiveButton(
+                              label: context.l10n.signOut,
+                              onPressed: () =>
+                                  context.read<AuthCubit>().signOut(),
+                              leadingIcon: Symbols.logout,
+                              isFullWidth: true,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                );
+                  );
                 } else if (state is ProfileLoading) {
-                  return const LoadingState(message: 'Loading profile...');
+                  return LoadingState(message: context.l10n.loadingProfile);
                 } else if (state is ProfileError) {
                   return RefreshIndicator(
                     onRefresh: () => _onRefresh(context),
@@ -214,19 +242,24 @@ class ProfileScreen extends StatelessWidget {
                       physics: const AlwaysScrollableScrollPhysics(),
                       child: ConstrainedBox(
                         constraints: BoxConstraints(
-                          minHeight: MediaQuery.of(context).size.height -
+                          minHeight:
+                              MediaQuery.of(context).size.height -
                               56.0 -
                               MediaQuery.of(context).padding.top,
                         ),
                         child: ErrorState(
-                          title: 'Failed to load profile',
-                          subtitle: state.message,
-                          actionLabel: 'Retry',
-                          onAction: () => context.read<ProfileCubit>().loadProfile(
-                            (context.read<AuthCubit>().state as AuthAuthenticated)
-                                .user
-                                .id,
+                          title: context.l10n.failedToLoadProfile,
+                          subtitle: context.localizedErrorMessage(
+                            state.message,
                           ),
+                          actionLabel: context.l10n.retry,
+                          onAction: () =>
+                              context.read<ProfileCubit>().loadProfile(
+                                (context.read<AuthCubit>().state
+                                        as AuthAuthenticated)
+                                    .user
+                                    .id,
+                              ),
                         ),
                       ),
                     ),
@@ -277,35 +310,100 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  void _showLanguageDialog(BuildContext context, ProfileModel profile) {
+  // App Language Dialog (en/ar) - uses LocaleCubit
+  void _showAppLanguageDialog(BuildContext context) {
+    final localeCubit = context.read<LocaleCubit>();
+    final currentLocale = localeCubit.currentLocale.languageCode;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Select Language', style: AppTypography.titleLarge),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: SupportedLanguages.languages.entries.map((entry) {
-            final isSelected = profile.preferredLanguage == entry.key;
-            return RadioListTile<String>(
-              title: Text(entry.value, style: AppTypography.bodyMedium),
-              value: entry.key,
-              groupValue: profile.preferredLanguage,
-              activeColor: context.colors.primary,
-              onChanged: (value) {
-                if (value != null) {
-                  context.read<ProfileCubit>().updateLanguagePreference(
-                    profile.id,
-                    value,
-                  );
-                  Navigator.pop(context);
-                }
-              },
-            );
-          }).toList(),
+        title: Text(
+          context.l10n.selectAppLanguage,
+          style: AppTypography.titleLarge,
+        ),
+        content: RadioGroup<String>(
+          groupValue: currentLocale,
+          onChanged: (value) {
+            if (value != null) {
+              localeCubit.changeLocale(value);
+              Navigator.pop(context);
+            }
+          },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RadioListTile<String>(
+                title: Text(
+                  context.l10n.english,
+                  style: AppTypography.bodyMedium,
+                ),
+                value: 'en',
+                activeColor: context.colors.primary,
+              ),
+              RadioListTile<String>(
+                title: Text(
+                  context.l10n.arabic,
+                  style: AppTypography.bodyMedium,
+                ),
+                value: 'ar',
+                activeColor: context.colors.primary,
+              ),
+            ],
+          ),
         ),
         actions: [
           TertiaryButton(
-            label: 'Cancel',
+            label: context.l10n.cancel,
+            onPressed: () => Navigator.pop(context),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Default Translation Language Dialog (10 languages) - uses ProfileCubit
+  void _showTranslationLanguageDialog(
+    BuildContext context,
+    ProfileModel profile,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          context.l10n.selectTranslationLanguage,
+          style: AppTypography.titleLarge,
+        ),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: RadioGroup<String>(
+            groupValue: profile.defaultTranslationLanguage,
+            onChanged: (value) {
+              if (value != null) {
+                context
+                    .read<ProfileCubit>()
+                    .updateTranslationLanguagePreference(profile.id, value);
+                Navigator.pop(context);
+              }
+            },
+            child: ListView(
+              shrinkWrap: true,
+              children: TranslationLanguages.languages.entries.map((entry) {
+                return RadioListTile<String>(
+                  title: Text(
+                    TranslationLanguages.getLanguageName(context, entry.key),
+                    style: AppTypography.bodyMedium,
+                  ),
+                  value: entry.key,
+                  activeColor: context.colors.primary,
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+        actions: [
+          TertiaryButton(
+            label: context.l10n.cancel,
             onPressed: () => Navigator.pop(context),
           ),
         ],
@@ -321,14 +419,14 @@ class ProfileScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Edit Profile', style: AppTypography.titleLarge),
+        title: Text(context.l10n.editProfile, style: AppTypography.titleLarge),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: nameController,
               decoration: InputDecoration(
-                labelText: 'Display Name',
+                labelText: context.l10n.displayName,
                 labelStyle: AppTypography.bodyMedium,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppShapes.radiusMd),
@@ -340,11 +438,11 @@ class ProfileScreen extends StatelessWidget {
         ),
         actions: [
           TertiaryButton(
-            label: 'Cancel',
+            label: context.l10n.cancel,
             onPressed: () => Navigator.pop(context),
           ),
           PrimaryButton(
-            label: 'Save',
+            label: context.l10n.save,
             onPressed: () {
               context.read<ProfileCubit>().updateProfile(
                 profile.copyWith(
@@ -367,21 +465,21 @@ class ProfileScreen extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-          'Delete Account',
+          context.l10n.deleteAccount,
           style: AppTypography.titleLarge.copyWith(color: AppColors.error),
         ),
         content: Text(
-          'This action cannot be undone. All your documents, analyses, and data will be permanently deleted.',
+          context.l10n.deleteAccountConfirmation,
           style: AppTypography.bodyMedium,
         ),
         shape: RoundedRectangleBorder(borderRadius: AppShapes.cardLg),
         actions: [
           TertiaryButton(
-            label: 'Cancel',
+            label: context.l10n.cancel,
             onPressed: () => Navigator.pop(context),
           ),
           FilledDestructiveButton(
-            label: 'Delete Account',
+            label: context.l10n.deleteAccount,
             onPressed: () {
               Navigator.pop(context);
               context.read<ProfileCubit>().deleteAccount(profile.id);
@@ -427,7 +525,7 @@ class _ProfileHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                profile.displayName ?? 'User',
+                profile.displayName ?? context.l10n.user,
                 style: AppTypography.headlineSmall,
               ),
               Text(
@@ -435,12 +533,13 @@ class _ProfileHeader extends StatelessWidget {
                 style: AppTypography.bodyMedium.copyWith(
                   color: context.colors.onSurfaceVariant,
                 ),
+                textDirection: TextDirection.ltr,
               ),
             ],
           ),
         ),
         TertiaryButton(
-          label: 'Edit',
+          label: context.l10n.edit,
           onPressed: () {},
           leadingIcon: Symbols.edit,
         ),
@@ -469,41 +568,48 @@ class _SettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: (titleColor ?? context.colors.primary).withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(AppShapes.radiusMd),
+    // Wrap ListTile in Material to ensure ink splash and background are visible
+    // when used inside an AppCard with a background color
+    return Material(
+      color: Colors.transparent,
+      child: ListTile(
+        leading: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: (titleColor ?? context.colors.primary).withValues(
+              alpha: 0.1,
+            ),
+            borderRadius: BorderRadius.circular(AppShapes.radiusMd),
+          ),
+          child: Icon(
+            icon,
+            color: titleColor ?? context.colors.primary,
+            size: 20,
+          ),
         ),
-        child: Icon(
-          icon,
-          color: titleColor ?? context.colors.primary,
-          size: 20,
+        title: Text(
+          title,
+          style: AppTypography.labelLarge.copyWith(color: titleColor),
         ),
-      ),
-      title: Text(
-        title,
-        style: AppTypography.labelLarge.copyWith(color: titleColor),
-      ),
-      subtitle: Text(
-        subtitle,
-        style: AppTypography.bodySmall.copyWith(
-          color: context.colors.onSurfaceVariant,
+        subtitle: Text(
+          subtitle,
+          style: AppTypography.bodySmall.copyWith(
+            color: context.colors.onSurfaceVariant,
+          ),
         ),
-      ),
-      trailing: trailing,
-      onTap: onTap,
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.spacingMd,
+        trailing: trailing,
+        onTap: onTap,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.spacingMd,
+        ),
       ),
     );
   }
 }
 
-/// Supported languages (re-exported from translation feature)
-class SupportedLanguages {
+/// Translation languages (10 languages for document translation)
+class TranslationLanguages {
   static const Map<String, String> languages = {
     'ar': 'Arabic',
     'en': 'English',
@@ -517,8 +623,20 @@ class SupportedLanguages {
     'fa': 'Persian',
   };
 
-  static String getLanguageName(String code) {
-    return languages[code] ?? code.toUpperCase();
+  static String getLanguageName(BuildContext context, String code) {
+    return switch (code) {
+      'ar' => context.l10n.languageArabic,
+      'en' => context.l10n.languageEnglish,
+      'fr' => context.l10n.languageFrench,
+      'es' => context.l10n.languageSpanish,
+      'de' => context.l10n.languageGerman,
+      'zh' => context.l10n.languageChinese,
+      'hi' => context.l10n.languageHindi,
+      'ur' => context.l10n.languageUrdu,
+      'tr' => context.l10n.languageTurkish,
+      'fa' => context.l10n.languagePersian,
+      _ => code.toUpperCase(),
+    };
   }
 
   static bool isRTL(String code) {

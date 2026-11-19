@@ -1,6 +1,8 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../generated/l10n/app_localizations.dart';
+
 /// Context extensions for easy access to theme, navigation, etc.
 extension AppContextExtensions on BuildContext {
   // Theme
@@ -40,6 +42,22 @@ extension AppContextExtensions on BuildContext {
   Locale get locale => Localizations.localeOf(this);
   String get languageCode => locale.languageCode;
   bool get isArabic => languageCode == 'ar';
+
+  /// Access to localized strings via AppLocalizations
+  AppLocalizations get l10n => AppLocalizations.of(this);
+
+  /// Whether the current locale is RTL (Arabic)
+  bool get isRtl => Directionality.of(this) == TextDirection.rtl;
+
+  /// Keep raw backend errors from appearing in English in the Arabic UI.
+  String localizedErrorMessage(String message) {
+    if (!isArabic ||
+        RegExp(r'[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]')
+            .hasMatch(message)) {
+      return message;
+    }
+    return l10n.errorScreenMessage;
+  }
 
   // Responsive spacing
   double get responsiveGutter => isTablet ? 24 : 16;
@@ -91,7 +109,12 @@ extension WidgetExtensions on Widget {
     double bottom = 0,
   }) =>
       Padding(
-        padding: EdgeInsets.only(left: left, top: top, right: right, bottom: bottom),
+        padding: EdgeInsetsDirectional.only(
+          start: left,
+          top: top,
+          end: right,
+          bottom: bottom,
+        ),
         child: this,
       );
 

@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:dartz/dartz.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../domain/models/checklist_model.dart';
 import '../../domain/repositories/checklist_repository.dart' as checklist_repo;
@@ -14,6 +15,28 @@ class ChecklistRepositoryImpl implements checklist_repo.ChecklistRepository {
   ChecklistRepositoryImpl(this._client);
 
   String? get _currentUserId => _client.auth.currentUser?.id;
+
+  /// Validates if a string is a valid UUID v4.
+  static bool _isValidUuid(String id) {
+    final uuidRegex = RegExp(
+      r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
+      caseSensitive: false,
+    );
+    return uuidRegex.hasMatch(id);
+  }
+
+  /// Ensures the item has a valid UUID v4. If invalid, generates a new one.
+  /// Returns the sanitized item and a flag indicating if the ID was replaced.
+  static (ChecklistItemModel, bool) _ensureValidUuid(ChecklistItemModel item) {
+    if (_isValidUuid(item.id)) {
+      return (item, false);
+    }
+    final newId = const Uuid().v4();
+    log('🔧 [ChecklistRepository] Replacing invalid ID with UUID v4',
+        name: 'ChecklistRepository',
+        error: {'originalId': item.id, 'newId': newId});
+    return (item.copyWith(id: newId), true);
+  }
 
   @override
   Future<Either<Failure, List<ChecklistItemModel>>> getChecklist(
@@ -52,8 +75,20 @@ class ChecklistRepositoryImpl implements checklist_repo.ChecklistRepository {
         return const Left(AuthFailure('User not authenticated'));
       }
 
+      // Defensive: sanitize all item IDs to valid UUID v4 before sending to Supabase.
+      // The `id` column in PostgreSQL is type uuid, so non-UUID strings like "check_1" will fail.
+      final sanitizedItems = items.map((item) {
+        final (sanitizedItem, wasReplaced) = _ensureValidUuid(item);
+        if (wasReplaced) {
+          log('🔧 [saveChecklist] Sanitized item ID for document: $documentId',
+              name: 'ChecklistRepository',
+              error: {'originalId': item.id, 'newId': sanitizedItem.id});
+        }
+        return sanitizedItem;
+      }).toList();
+
       // Prepare items with documentId and userId
-      final itemsData = items.map((item) {
+      final itemsData = sanitizedItems.map((item) {
         final json = item.toJson();
         json['documentId'] = documentId;
         json['userId'] = userId;
@@ -85,13 +120,21 @@ class ChecklistRepositoryImpl implements checklist_repo.ChecklistRepository {
     ChecklistItemModel item,
   ) async {
     try {
-      log('➕ Adding checklist item: ${item.id} for document: $documentId');
+      // Defensive: sanitize item ID to valid UUID v4 before sending to Supabase.
+      final (sanitizedItem, wasReplaced) = _ensureValidUuid(item);
+      if (wasReplaced) {
+        log('🔧 [addChecklistItem] Sanitized item ID for document: $documentId',
+            name: 'ChecklistRepository',
+            error: {'originalId': item.id, 'newId': sanitizedItem.id});
+      }
+
+      log('➕ Adding checklist item: ${sanitizedItem.id} for document: $documentId');
       final userId = _currentUserId;
       if (userId == null) {
         return const Left(AuthFailure('User not authenticated'));
       }
 
-      final insertData = item.toJson();
+      final insertData = sanitizedItem.toJson();
       insertData['documentId'] = documentId;
       insertData['userId'] = userId;
 

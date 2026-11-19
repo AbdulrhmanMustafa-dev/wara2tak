@@ -19,7 +19,9 @@ class AuthScreen extends StatelessWidget {
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state is AuthError) {
-          context.showErrorSnackBar(state.message);
+          context.showErrorSnackBar(
+            context.localizedErrorMessage(state.message),
+          );
         } else if (state is AuthAuthenticated) {
           context.go('/home');
         }
@@ -46,7 +48,7 @@ class AuthScreen extends StatelessWidget {
 
                         // Description
                         Text(
-                          'Sign in to analyze your documents with AI',
+                          context.l10n.signInToAnalyze,
                           style: AppTypography.bodyMedium.copyWith(
                             color: context.colors.onSurfaceVariant,
                           ),
@@ -63,7 +65,7 @@ class AuthScreen extends StatelessWidget {
                                   context.read<AuthCubit>().signInWithGoogle(),
                               isLoading: state is AuthLoading,
                               errorMessage: state is AuthError
-                                  ? state.message
+                                  ? context.localizedErrorMessage(state.message)
                                   : null,
                             );
                           },
@@ -110,8 +112,8 @@ class AuthScreen extends StatelessWidget {
                   context.colors.primary,
                   context.colors.primary.withValues(alpha: 0.7),
                 ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+                begin: AlignmentDirectional.topStart,
+                end: AlignmentDirectional.bottomEnd,
               ),
               borderRadius: BorderRadius.circular(AppShapes.radiusXl * 1.5),
               boxShadow: [
@@ -136,17 +138,17 @@ class AuthScreen extends StatelessWidget {
             colors: [context.colors.primary, context.colors.secondary],
           ).createShader(bounds),
           child: Text(
-            'Wara2tak',
+            context.l10n.appTitle,
             style: AppTypography.displayLargeMobile.copyWith(
               fontWeight: FontWeight.w800,
               color: Colors.white,
-              letterSpacing: -0.5,
+              letterSpacing: context.isArabic ? 0 : -0.5,
             ),
           ),
         ),
         const SizedBox(height: AppSpacing.spacingSm),
         Text(
-          'AI Document Intelligence',
+          context.l10n.aiDocumentIntelligence,
           style: AppTypography.bodyLarge.copyWith(
             color: context.colors.onSurfaceVariant,
             fontWeight: FontWeight.w500,
@@ -172,7 +174,7 @@ class AuthScreen extends StatelessWidget {
               Icon(Symbols.psychology, size: 16, color: context.colors.primary),
               const SizedBox(width: AppSpacing.spacingXs),
               Text(
-                'Extract clauses • Find deadlines • Plan applications',
+                context.l10n.extractClausesFindDeadlines,
                 style: AppTypography.labelMedium.copyWith(
                   color: context.colors.primary,
                   fontWeight: FontWeight.w600,
@@ -193,9 +195,9 @@ class AuthScreen extends StatelessWidget {
           color: context.colors.onSurfaceVariant,
         ),
         children: [
-          const TextSpan(text: 'By continuing, you agree to our '),
+          TextSpan(text: context.l10n.byContinuing),
           TextSpan(
-            text: 'Terms of Service',
+            text: context.l10n.termsOfService,
             style: TextStyle(
               color: context.colors.primary,
               fontWeight: FontWeight.w600,
@@ -203,9 +205,9 @@ class AuthScreen extends StatelessWidget {
               decorationColor: context.colors.primary,
             ),
           ),
-          const TextSpan(text: ' and '),
+          TextSpan(text: context.l10n.and),
           TextSpan(
-            text: 'Privacy Policy',
+            text: context.l10n.privacyPolicy,
             style: TextStyle(
               color: context.colors.primary,
               fontWeight: FontWeight.w600,
@@ -220,7 +222,7 @@ class AuthScreen extends StatelessWidget {
 
   Widget _buildVersionInfo(BuildContext context) {
     return Text(
-      'Version 1.0.0+1',
+      context.l10n.versionInfo,
       style: AppTypography.bodySmall.copyWith(
         color: context.colors.onSurfaceVariant.withValues(alpha: 0.5),
       ),
@@ -378,7 +380,7 @@ class _AuthSignInButtonState extends State<_AuthSignInButton>
         ),
         const SizedBox(width: AppSpacing.spacingMd),
         Text(
-          'Signing in...',
+          context.l10n.signingIn,
           style: AppTypography.labelLarge.copyWith(
             color: context.colors.onSurfaceVariant,
           ),
@@ -395,7 +397,7 @@ class _AuthSignInButtonState extends State<_AuthSignInButton>
         _GoogleLogo(size: 22),
         const SizedBox(width: AppSpacing.spacingMd),
         Text(
-          'Continue with Google',
+          context.l10n.continueWithGoogle,
           style: AppTypography.labelLarge.copyWith(fontWeight: FontWeight.w600),
         ),
       ],

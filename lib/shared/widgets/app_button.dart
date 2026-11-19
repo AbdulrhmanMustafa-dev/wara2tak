@@ -30,17 +30,23 @@ class PrimaryButton extends StatelessWidget {
 
     return SizedBox(
       width: isFullWidth ? double.infinity : null,
-      height: AppSpacing.touchTargetMin,
+      // Use 48px minimum touch target per Material Design guidelines
+      height: 48,
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           padding: padding ??
               const EdgeInsets.symmetric(
-                horizontal: AppSpacing.spacingLg,
-                vertical: AppSpacing.spacingMd,
+                horizontal: 8,
+                vertical: 12,
               ),
-          minimumSize: Size.zero,
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          minimumSize: const Size(0, 48),
+          // Use padded tap target (default) instead of shrinkWrap to ensure
+          // full button area is tappable including icon + text + padding
+          tapTargetSize: MaterialTapTargetSize.padded,
+          shape: RoundedRectangleBorder(
+            borderRadius: AppShapes.button,
+          ),
         ),
         child: child,
       ),
@@ -66,7 +72,19 @@ class PrimaryButton extends StatelessWidget {
       children.add(const SizedBox(width: AppSpacing.spacingSm));
     }
 
-    children.add(Text(label, style: AppTypography.labelLarge));
+    // Wrap label in Flexible with overflow handling to prevent
+    // Arabic text overflow (e.g., "قائمة المهام") on narrow screens
+    children.add(
+      Flexible(
+        child: Text(
+          label,
+          style: AppTypography.labelLarge,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
 
     if (trailingIcon != null) {
       children.add(const SizedBox(width: AppSpacing.spacingSm));
@@ -108,17 +126,23 @@ class SecondaryButton extends StatelessWidget {
 
     return SizedBox(
       width: isFullWidth ? double.infinity : null,
-      height: AppSpacing.touchTargetMin,
+      // Use 48px minimum touch target per Material Design guidelines
+      height: 48,
       child: OutlinedButton(
         onPressed: isLoading ? null : onPressed,
         style: OutlinedButton.styleFrom(
           padding: padding ??
               const EdgeInsets.symmetric(
-                horizontal: AppSpacing.spacingLg,
-                vertical: AppSpacing.spacingMd,
+                horizontal: 8,
+                vertical: 12,
               ),
-          minimumSize: Size.zero,
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          minimumSize: const Size(0, 48),
+          // Use padded tap target (default) instead of shrinkWrap to ensure
+          // full button area is tappable including icon + text + padding
+          tapTargetSize: MaterialTapTargetSize.padded,
+          shape: RoundedRectangleBorder(
+            borderRadius: AppShapes.button,
+          ),
         ),
         child: child,
       ),
@@ -144,7 +168,19 @@ class SecondaryButton extends StatelessWidget {
       children.add(const SizedBox(width: AppSpacing.spacingSm));
     }
 
-    children.add(Text(label, style: AppTypography.labelLarge.copyWith(color: context.colors.primary)));
+    // Wrap label in Flexible with overflow handling to prevent
+    // Arabic text overflow (e.g., "قائمة المهام") on narrow screens
+    children.add(
+      Flexible(
+        child: Text(
+          label,
+          style: AppTypography.labelLarge.copyWith(color: context.colors.primary),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
 
     if (trailingIcon != null) {
       children.add(const SizedBox(width: AppSpacing.spacingSm));

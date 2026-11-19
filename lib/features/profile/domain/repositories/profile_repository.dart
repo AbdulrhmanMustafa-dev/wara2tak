@@ -17,8 +17,12 @@ abstract class ProfileRepository {
   /// Update notification preference
   Future<Either<Failure, void>> updateNotificationPreference(String userId, bool enabled);
 
-  /// Update language preference
+  /// Update language preference (App UI Language: en/ar)
   Future<Either<Failure, void>> updateLanguagePreference(String userId, String language);
+
+  /// Update default translation language preference (10 languages)
+  Future<Either<Failure, void>> updateTranslationLanguagePreference(
+      String userId, String language);
 
   /// Delete account
   Future<Either<Failure, void>> deleteAccount(String userId);

@@ -234,5 +234,11 @@ class MockProfileRepository implements ProfileRepository {
   ) async => const Right(null);
 
   @override
+  Future<Either<Failure, void>> updateTranslationLanguagePreference(
+    String userId,
+    String language,
+  ) async => const Right(null);
+
+  @override
   Stream<ProfileModel?> watchProfile(String userId) => const Stream.empty();
 }

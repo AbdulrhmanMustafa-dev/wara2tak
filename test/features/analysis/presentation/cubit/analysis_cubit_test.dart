@@ -201,7 +201,7 @@ void main() {
             onProgress(10, 'Reading file...');
             onProgress(20, 'File read successfully. Preparing for analysis...');
             onProgress(40, 'Sending to primary AI engine (Gemini)...');
-            onProgress(45, 'Primary model unavailable. Trying Gemini gemini-2.0-flash...');
+            onProgress(45, 'Primary model unavailable. Trying Gemini gemini-3.5-flash-lite...');
             onProgress(60, 'Processing response...');
             onProgress(80, 'Parsing structured analysis...');
             onProgress(100, 'Analysis complete');
@@ -242,7 +242,7 @@ void main() {
       );
 
       blocTest<AnalysisCubit, AnalysisState>(
-        'Test Case 2c: All Gemini models fail (404 on both) -> falls back to Kimi -> succeeds',
+        'Test Case 2c: Gemini model chain fails -> falls back to Kimi -> succeeds',
         build: () {
           when(() => mockAIRepository.analyzeDocument(
             document: any(named: 'document'),
@@ -251,11 +251,11 @@ void main() {
             onProgress: any(named: 'onProgress'),
           )).thenAnswer((invocation) async {
             final onProgress = invocation.namedArguments[#onProgress] as Function(int, String?);
-            // Simulate progress with both Gemini models failing then Kimi fallback
+            // Simulate the Gemini model chain failing, then Kimi fallback.
             onProgress(10, 'Reading file...');
             onProgress(20, 'File read successfully. Preparing for analysis...');
             onProgress(40, 'Sending to primary AI engine (Gemini)...');
-            onProgress(45, 'Primary model unavailable. Trying Gemini gemini-2.0-flash...');
+            onProgress(45, 'Primary model unavailable. Trying Gemini gemini-3.5-flash-lite...');
             onProgress(55, 'All Gemini models failed. Switching to fallback engine (Kimi)...');
             onProgress(57, 'Uploading document to fallback engine...');
             onProgress(60, 'Processing fallback response...');

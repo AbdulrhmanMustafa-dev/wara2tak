@@ -76,7 +76,7 @@ class ProfileCubit extends Cubit<ProfileState> {
     );
   }
 
-  /// Update language preference
+  /// Update language preference (App UI Language: en/ar)
   Future<void> updateLanguagePreference(String userId, String language) async {
     final result = await _profileRepository.updateLanguagePreference(userId, language);
 
@@ -86,6 +86,24 @@ class ProfileCubit extends Cubit<ProfileState> {
         if (state is ProfileLoaded) {
           final currentProfile = (state as ProfileLoaded).profile;
           emit(ProfileLoaded(currentProfile.copyWith(preferredLanguage: language)));
+        }
+      },
+    );
+  }
+
+  /// Update default translation language preference (10 languages)
+  Future<void> updateTranslationLanguagePreference(
+      String userId, String language) async {
+    final result =
+        await _profileRepository.updateTranslationLanguagePreference(userId, language);
+
+    result.fold(
+      (failure) => emit(ProfileError(failure.message, code: failure.code)),
+      (_) {
+        if (state is ProfileLoaded) {
+          final currentProfile = (state as ProfileLoaded).profile;
+          emit(ProfileLoaded(
+              currentProfile.copyWith(defaultTranslationLanguage: language)));
         }
       },
     );

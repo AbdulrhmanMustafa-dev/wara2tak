@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:intl/intl.dart';
 
 import '../../core/design_system/index.dart';
 import '../../core/extensions/context_extensions.dart';
@@ -40,9 +41,12 @@ class AppCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: color ?? context.colors.surface,
         borderRadius: borderRadius ?? AppShapes.card,
-        border: border ??
+        border:
+            border ??
             Border.all(
-              color: context.isDarkMode ? AppColors.darkOutlineVariant : AppColors.lightOutlineVariant,
+              color: context.isDarkMode
+                  ? AppColors.darkOutlineVariant
+                  : AppColors.lightOutlineVariant,
               width: 1,
             ),
         boxShadow: shadows ?? (context.isDarkMode ? [] : AppShapes.cardShadow),
@@ -51,10 +55,7 @@ class AppCard extends StatelessWidget {
     );
 
     // Wrap with Material to provide ancestor for ListTile, InkWell, etc.
-    final withMaterial = Material(
-      color: Colors.transparent,
-      child: card,
-    );
+    final withMaterial = Material(color: Colors.transparent, child: card);
 
     if (onTap != null || isInteractive) {
       return Material(
@@ -102,7 +103,9 @@ class ElevatedCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: color ?? context.colors.surface,
         borderRadius: borderRadius ?? AppShapes.cardLg,
-        boxShadow: context.isDarkMode ? AppShapes.modalShadow : AppShapes.cardShadowElevated,
+        boxShadow: context.isDarkMode
+            ? AppShapes.modalShadow
+            : AppShapes.cardShadowElevated,
       ),
       child: child,
     );
@@ -152,7 +155,11 @@ class ActionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: context.colors.surface,
         borderRadius: AppShapes.cardLg,
-        border: Border.all(color: context.isDarkMode ? AppColors.darkOutlineVariant : AppColors.lightOutlineVariant),
+        border: Border.all(
+          color: context.isDarkMode
+              ? AppColors.darkOutlineVariant
+              : AppColors.lightOutlineVariant,
+        ),
         boxShadow: context.isDarkMode ? [] : AppShapes.cardShadow,
       ),
       child: Column(
@@ -172,10 +179,14 @@ class ActionCard extends StatelessWidget {
                           vertical: AppSpacing.spacing2xs,
                         ),
                         decoration: BoxDecoration(
-                          color: context.isDarkMode ? AppColors.darkSecondary : AppColors.lightSecondary,
+                          color: context.isDarkMode
+                              ? AppColors.darkSecondary
+                              : AppColors.lightSecondary,
                           borderRadius: AppShapes.chip,
                           border: Border.all(
-                            color: context.isDarkMode ? AppColors.darkOutlineVariant : AppColors.lightOutlineVariant,
+                            color: context.isDarkMode
+                                ? AppColors.darkOutlineVariant
+                                : AppColors.lightOutlineVariant,
                           ),
                         ),
                         child: Row(
@@ -188,7 +199,7 @@ class ActionCard extends StatelessWidget {
                             ),
                             const SizedBox(width: AppSpacing.spacing2xs),
                             Text(
-                              'AI Document Intelligence',
+                              context.l10n.aiDocumentIntelligence,
                               style: AppTypography.labelSmall.copyWith(
                                 color: context.colors.primary,
                                 fontWeight: FontWeight.w600,
@@ -212,10 +223,13 @@ class ActionCard extends StatelessWidget {
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
-                    color: (emblemColor ?? context.colors.primaryContainer).withValues(alpha: 0.2),
+                    color: (emblemColor ?? context.colors.primaryContainer)
+                        .withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(AppShapes.radiusXl),
                     border: Border.all(
-                      color: context.isDarkMode ? AppColors.darkOutlineVariant : AppColors.lightOutlineVariant,
+                      color: context.isDarkMode
+                          ? AppColors.darkOutlineVariant
+                          : AppColors.lightOutlineVariant,
                     ),
                   ),
                   child: Stack(
@@ -235,12 +249,16 @@ class ActionCard extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: context.colors.primaryContainer,
                             borderRadius: AppShapes.chip,
-                            boxShadow: context.isDarkMode ? [] : AppShapes.cardShadow,
+                            boxShadow: context.isDarkMode
+                                ? []
+                                : AppShapes.cardShadow,
                           ),
                           child: Icon(
                             Symbols.auto_awesome,
                             size: 12,
-                            color: context.isDarkMode ? AppColors.darkOnPrimary : AppColors.lightOnPrimary,
+                            color: context.isDarkMode
+                                ? AppColors.darkOnPrimary
+                                : AppColors.lightOnPrimary,
                           ),
                         ),
                       ),
@@ -268,6 +286,9 @@ class DocumentCard extends StatelessWidget {
   final String title;
   final String type;
   final String status; // 'analyzed', 'analyzing', 'failed'
+  final DateTime? date;
+  final int? pageCount;
+  final bool wasAnalyzed;
   final String? deadlineText;
   final String? taskProgressText;
   final Color? typeColor;
@@ -281,6 +302,9 @@ class DocumentCard extends StatelessWidget {
     required this.title,
     required this.type,
     required this.status,
+    this.date,
+    this.pageCount,
+    this.wasAnalyzed = false,
     this.deadlineText,
     this.taskProgressText,
     this.typeColor,
@@ -292,6 +316,18 @@ class DocumentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final metadataText = date == null || pageCount == null
+        ? null
+        : wasAnalyzed
+        ? context.l10n.analyzedOn(
+            DateFormat.yMMMd(context.locale.toString()).format(date!),
+            pageCount!,
+          )
+        : context.l10n.uploadedOn(
+            DateFormat.yMMMd(context.locale.toString()).format(date!),
+            pageCount!,
+          );
+
     return AppCard(
       onTap: onTap,
       isInteractive: onTap != null,
@@ -306,10 +342,13 @@ class DocumentCard extends StatelessWidget {
                 width: 40,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: (typeColor ?? context.colors.primaryContainer).withValues(alpha: 0.2),
+                  color: (typeColor ?? context.colors.primaryContainer)
+                      .withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(AppShapes.radiusMd),
                   border: Border.all(
-                    color: context.isDarkMode ? AppColors.darkOutlineVariant : AppColors.lightOutlineVariant,
+                    color: context.isDarkMode
+                        ? AppColors.darkOutlineVariant
+                        : AppColors.lightOutlineVariant,
                   ),
                 ),
                 child: Center(
@@ -333,12 +372,16 @@ class DocumentCard extends StatelessWidget {
                             vertical: AppSpacing.spacing2xs,
                           ),
                           decoration: BoxDecoration(
-                            color: context.isDarkMode ? AppColors.darkSecondary : AppColors.lightSecondary,
+                            color: context.isDarkMode
+                                ? AppColors.darkSecondary
+                                : AppColors.lightSecondary,
                             borderRadius: AppShapes.chip,
                           ),
                           child: Text(
                             type,
-                            style: AppTypography.tinyBold.copyWith(color: context.colors.primary),
+                            style: AppTypography.tinyBold.copyWith(
+                              color: context.colors.primary,
+                            ),
                           ),
                         ),
                         const SizedBox(width: AppSpacing.spacingXs),
@@ -353,10 +396,13 @@ class DocumentCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: AppSpacing.spacing2xs),
-                    Text(
-                      'Analyzed on Nov 12, 2026 • 8 pages',
-                      style: AppTypography.tiny.copyWith(color: context.colors.onSurfaceVariant),
-                    ),
+                    if (metadataText != null)
+                      Text(
+                        metadataText,
+                        style: AppTypography.tiny.copyWith(
+                          color: context.colors.onSurfaceVariant,
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -375,11 +421,15 @@ class DocumentCard extends StatelessWidget {
             Row(
               children: [
                 if (taskProgressText != null) ...[
-                  Text(taskProgressText!, style: AppTypography.tiny.copyWith(color: context.colors.onSurfaceVariant)),
+                  Text(
+                    taskProgressText!,
+                    style: AppTypography.tiny.copyWith(
+                      color: context.colors.onSurfaceVariant,
+                    ),
+                  ),
                 ],
                 const Spacer(),
-                if (deadlineText != null)
-                  _DeadlineBadge(text: deadlineText!),
+                if (deadlineText != null) _DeadlineBadge(text: deadlineText!),
               ],
             ),
           ],
@@ -426,8 +476,10 @@ class _StatusBadge extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.spacing2xs),
               Text(
-                'Analyzed',
-                style: AppTypography.tinyBold.copyWith(color: AppColors.success),
+                context.l10n.statusAnalyzed,
+                style: AppTypography.tinyBold.copyWith(
+                  color: AppColors.success,
+                ),
               ),
             ],
           ),
@@ -462,9 +514,11 @@ class _StatusBadge extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.spacing2xs),
               Text(
-                'Analyzing',
+                context.l10n.statusAnalyzing,
                 style: AppTypography.tinyBold.copyWith(
-                  color: context.isDarkMode ? AppColors.tealHover : AppColors.teal,
+                  color: context.isDarkMode
+                      ? AppColors.tealHover
+                      : AppColors.teal,
                 ),
               ),
             ],
@@ -487,7 +541,7 @@ class _StatusBadge extends StatelessWidget {
               Icon(Symbols.error, size: 10, color: AppColors.error),
               const SizedBox(width: AppSpacing.spacing2xs),
               Text(
-                'Failed',
+                context.l10n.statusFailed,
                 style: AppTypography.tinyBold.copyWith(color: AppColors.error),
               ),
             ],
@@ -500,15 +554,21 @@ class _StatusBadge extends StatelessWidget {
             vertical: AppSpacing.spacing2xs,
           ),
           decoration: BoxDecoration(
-            color: context.isDarkMode ? AppColors.darkSurfaceVariant : AppColors.lightSurfaceVariant,
+            color: context.isDarkMode
+                ? AppColors.darkSurfaceVariant
+                : AppColors.lightSurfaceVariant,
             borderRadius: AppShapes.chip,
             border: Border.all(
-              color: context.isDarkMode ? AppColors.darkOutlineVariant : AppColors.lightOutlineVariant,
+              color: context.isDarkMode
+                  ? AppColors.darkOutlineVariant
+                  : AppColors.lightOutlineVariant,
             ),
           ),
           child: Text(
-            status,
-            style: AppTypography.tiny.copyWith(color: context.colors.onSurfaceVariant),
+            context.l10n.statusUploaded,
+            style: AppTypography.tiny.copyWith(
+              color: context.colors.onSurfaceVariant,
+            ),
           ),
         );
     }
@@ -523,7 +583,8 @@ class _DeadlineBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isUrgent = text.toLowerCase().contains('passed') ||
+    final isUrgent =
+        text.toLowerCase().contains('passed') ||
         text.toLowerCase().contains('overdue') ||
         text.toLowerCase().contains('day');
 
@@ -534,13 +595,19 @@ class _DeadlineBadge extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: isUrgent
-            ? (context.isDarkMode ? AppColors.warningDark.withValues(alpha: 0.2) : AppColors.warningLight)
-            : (context.isDarkMode ? AppColors.darkSurfaceVariant : AppColors.lightSurfaceVariant),
+            ? (context.isDarkMode
+                  ? AppColors.warningDark.withValues(alpha: 0.2)
+                  : AppColors.warningLight)
+            : (context.isDarkMode
+                  ? AppColors.darkSurfaceVariant
+                  : AppColors.lightSurfaceVariant),
         borderRadius: AppShapes.chip,
         border: Border.all(
           color: isUrgent
               ? AppColors.warning
-              : (context.isDarkMode ? AppColors.darkOutlineVariant : AppColors.lightOutlineVariant),
+              : (context.isDarkMode
+                    ? AppColors.darkOutlineVariant
+                    : AppColors.lightOutlineVariant),
         ),
       ),
       child: Row(
@@ -550,7 +617,9 @@ class _DeadlineBadge extends StatelessWidget {
             Icon(
               Symbols.alarm,
               size: 13,
-              color: context.isDarkMode ? AppColors.warning : AppColors.warningText,
+              color: context.isDarkMode
+                  ? AppColors.warning
+                  : AppColors.warningText,
             ),
             const SizedBox(width: AppSpacing.spacing2xs),
           ],
@@ -558,7 +627,9 @@ class _DeadlineBadge extends StatelessWidget {
             text,
             style: AppTypography.tinyBold.copyWith(
               color: isUrgent
-                  ? (context.isDarkMode ? AppColors.warning : AppColors.warningText)
+                  ? (context.isDarkMode
+                        ? AppColors.warning
+                        : AppColors.warningText)
                   : context.colors.onSurfaceVariant,
             ),
           ),
@@ -602,17 +673,25 @@ class EmptyState extends StatelessWidget {
                     : AppColors.lightSecondary,
                 borderRadius: BorderRadius.circular(AppShapes.radiusXl),
                 border: Border.all(
-                  color: context.isDarkMode ? AppColors.darkOutlineVariant : AppColors.lightOutlineVariant,
+                  color: context.isDarkMode
+                      ? AppColors.darkOutlineVariant
+                      : AppColors.lightOutlineVariant,
                 ),
               ),
               child: Icon(icon, size: 32, color: context.colors.primary),
             ),
             const SizedBox(height: AppSpacing.spacingLg),
-            Text(title, style: AppTypography.headlineSmall, textAlign: TextAlign.center),
+            Text(
+              title,
+              style: AppTypography.headlineSmall,
+              textAlign: TextAlign.center,
+            ),
             const SizedBox(height: AppSpacing.spacingSm),
             Text(
               subtitle,
-              style: AppTypography.bodySmall.copyWith(color: context.colors.onSurfaceVariant),
+              style: AppTypography.bodySmall.copyWith(
+                color: context.colors.onSurfaceVariant,
+              ),
               textAlign: TextAlign.center,
             ),
             if (actionLabel != null && onAction != null) ...[
@@ -665,11 +744,16 @@ class ErrorState extends StatelessWidget {
               child: Icon(icon, size: 28, color: AppColors.error),
             ),
             const SizedBox(height: AppSpacing.spacingLg),
-            Text(title, style: AppTypography.labelLarge.copyWith(color: AppColors.error)),
+            Text(
+              title,
+              style: AppTypography.labelLarge.copyWith(color: AppColors.error),
+            ),
             const SizedBox(height: AppSpacing.spacingSm),
             Text(
               subtitle,
-              style: AppTypography.bodySmall.copyWith(color: context.colors.onSurfaceVariant),
+              style: AppTypography.bodySmall.copyWith(
+                color: context.colors.onSurfaceVariant,
+              ),
               textAlign: TextAlign.center,
             ),
             if (actionLabel != null && onAction != null) ...[
@@ -692,11 +776,7 @@ class LoadingState extends StatelessWidget {
   final String? message;
   final double size;
 
-  const LoadingState({
-    super.key,
-    this.message,
-    this.size = 32,
-  });
+  const LoadingState({super.key, this.message, this.size = 32});
 
   @override
   Widget build(BuildContext context) {
@@ -714,7 +794,12 @@ class LoadingState extends StatelessWidget {
           ),
           if (message != null) ...[
             const SizedBox(height: AppSpacing.spacingMd),
-            Text(message!, style: AppTypography.bodySmall.copyWith(color: context.colors.onSurfaceVariant)),
+            Text(
+              message!,
+              style: AppTypography.bodySmall.copyWith(
+                color: context.colors.onSurfaceVariant,
+              ),
+            ),
           ],
         ],
       ),

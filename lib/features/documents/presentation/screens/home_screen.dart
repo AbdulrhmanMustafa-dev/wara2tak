@@ -47,7 +47,7 @@ class HomeScreen extends StatelessWidget {
                   floating: true,
                   snap: true,
                   title: Text(
-                    'Welcome back',
+                    context.l10n.welcomeBack,
                     style: AppTypography.headlineSmall,
                   ),
                   actions: [
@@ -63,25 +63,26 @@ class HomeScreen extends StatelessWidget {
                   ],
                 ),
 
-              // Content
-              SliverPadding(
-                padding: AppSpacing.screenPadding,
-                sliver: SliverList(
-                  delegate: SliverChildListDelegate(
-                    [
+                // Content
+                SliverPadding(
+                  padding: AppSpacing.screenPadding,
+                  sliver: SliverList(
+                    delegate: SliverChildListDelegate([
                       // Action Card
                       BlocBuilder<HomeCubit, HomeState>(
                         builder: (context, state) {
                           if (state is HomeLoaded) {
                             return ActionCard(
-                              title: 'Analyze a new document',
-                              subtitle:
-                                  'Upload a PDF or image to extract key clauses, deadlines, and financial obligations',
-                              buttonLabel: 'Upload Document',
+                              title: context.l10n.analyzeNewDocument,
+                              subtitle: context.l10n.uploadDescription,
+                              buttonLabel: context.l10n.uploadDocument,
                               onPressed: () => AppRouter.goToUpload(context),
                               emblemIcon: Symbols.auto_awesome,
-                              trailingWidget: state.analyzingDocuments.isNotEmpty
-                                  ? _AnalyzingBadge(count: state.analyzingDocuments.length)
+                              trailingWidget:
+                                  state.analyzingDocuments.isNotEmpty
+                                  ? _AnalyzingBadge(
+                                      count: state.analyzingDocuments.length,
+                                    )
                                   : null,
                             );
                           }
@@ -94,8 +95,8 @@ class HomeScreen extends StatelessWidget {
                       // Recent Documents Section
                       _buildSectionHeader(
                         context,
-                        title: 'Recent Documents',
-                        actionLabel: 'View All',
+                        title: context.l10n.recentDocuments,
+                        actionLabel: context.l10n.viewAll,
                         onAction: () => AppRouter.goToMyDocuments(context),
                       ),
 
@@ -111,83 +112,126 @@ class HomeScreen extends StatelessWidget {
                         builder: (context, state) {
                           if (state is DocumentsLoaded) {
                             // Show ALL documents regardless of status, sorted by createdAt desc, take 5
-                            final recentDocs = List<DocumentModel>.from(state.documents)
-                              ..sort((a, b) => b.createdAt.compareTo(a.createdAt))
-                              ..take(5);
+                            final recentDocs =
+                                List<DocumentModel>.from(state.documents)
+                                  ..sort(
+                                    (a, b) =>
+                                        b.createdAt.compareTo(a.createdAt),
+                                  )
+                                  ..take(5);
 
                             if (recentDocs.isEmpty) {
                               return EmptyState(
                                 icon: Symbols.description,
-                                title: 'No documents yet',
-                                subtitle: 'Upload your first document to get started',
-                                actionLabel: 'Upload Document',
+                                title: context.l10n.noDocumentsYet,
+                                subtitle: context.l10n.uploadFirstDocument,
+                                actionLabel: context.l10n.uploadDocument,
                                 onAction: () => AppRouter.goToUpload(context),
                               );
                             }
 
                             return Column(
                               children: recentDocs
-                                  .map((doc) => Padding(
-                                        padding: const EdgeInsets.only(
-                                            bottom: AppSpacing.spacingMd),
-                                        child: DocumentCard(
-                                          title: doc.title,
-                                          type: doc.typeLabel,
-                                          status: doc.status.name,
-                                          typeColor: _getTypeColor(context, doc.type),
-                                          typeIcon: _getTypeIcon(doc.type),
-                                          onTap: () =>
-                                              AppRouter.goToDocumentDetails(context, doc.id),
+                                  .map(
+                                    (doc) => Padding(
+                                      padding: const EdgeInsets.only(
+                                        bottom: AppSpacing.spacingMd,
+                                      ),
+                                      child: DocumentCard(
+                                        title: doc.title,
+                                        type: _getTypeLabel(context, doc.type),
+                                        status: doc.status.name,
+                                        date: doc.analyzedAt ?? doc.createdAt,
+                                        pageCount: doc.pageCount,
+                                        wasAnalyzed:
+                                            doc.status ==
+                                            DocumentStatus.analyzed,
+                                        typeColor: _getTypeColor(
+                                          context,
+                                          doc.type,
                                         ),
-                                      ))
+                                        typeIcon: _getTypeIcon(doc.type),
+                                        onTap: () =>
+                                            AppRouter.goToDocumentDetails(
+                                              context,
+                                              doc.id,
+                                            ),
+                                      ),
+                                    ),
+                                  )
                                   .toList(),
                             );
                           } else if (state is DocumentLoading) {
-                            return const LoadingState(message: 'Loading documents...');
+                            return LoadingState(
+                              message: context.l10n.loadingDocuments,
+                            );
                           } else if (state is DocumentError) {
                             return ErrorState(
-                              title: 'Failed to load documents',
-                              subtitle: state.message,
-                              actionLabel: 'Retry',
-                              onAction: () => context.read<HomeCubit>().loadDashboard(
-                                    context.read<AuthCubit>().state is AuthAuthenticated
-                                        ? (context.read<AuthCubit>().state as AuthAuthenticated)
-                                            .user
-                                            .id
+                              title: context.l10n.failedToLoadDocuments,
+                              subtitle: context.localizedErrorMessage(
+                                state.message,
+                              ),
+                              actionLabel: context.l10n.retry,
+                              onAction: () =>
+                                  context.read<HomeCubit>().loadDashboard(
+                                    context.read<AuthCubit>().state
+                                            is AuthAuthenticated
+                                        ? (context.read<AuthCubit>().state
+                                                  as AuthAuthenticated)
+                                              .user
+                                              .id
                                         : '',
                                   ),
                             );
                           }
                           // Safety fallback: if state is unexpected (e.g., DocumentLoaded from details screen),
                           // render from cached documents instead of showing blank screen
-                          final cachedDocs = context.read<DocumentCubit>().cachedDocuments;
-                          final recentCachedDocs = List<DocumentModel>.from(cachedDocs)
-                            ..sort((a, b) => b.createdAt.compareTo(a.createdAt))
-                            ..take(5);
+                          final cachedDocs = context
+                              .read<DocumentCubit>()
+                              .cachedDocuments;
+                          final recentCachedDocs =
+                              List<DocumentModel>.from(cachedDocs)
+                                ..sort(
+                                  (a, b) => b.createdAt.compareTo(a.createdAt),
+                                )
+                                ..take(5);
                           if (recentCachedDocs.isEmpty) {
                             return EmptyState(
                               icon: Symbols.description,
-                              title: 'No documents yet',
-                              subtitle: 'Upload your first document to get started',
-                              actionLabel: 'Upload Document',
+                              title: context.l10n.noDocumentsYet,
+                              subtitle: context.l10n.uploadFirstDocument,
+                              actionLabel: context.l10n.uploadDocument,
                               onAction: () => AppRouter.goToUpload(context),
                             );
                           }
                           return Column(
                             children: recentCachedDocs
-                                .map((doc) => Padding(
-                                      padding: const EdgeInsets.only(
-                                          bottom: AppSpacing.spacingMd),
-                                      child: DocumentCard(
-                                        title: doc.title,
-                                        type: doc.typeLabel,
-                                        status: doc.status.name,
-                                        typeColor: _getTypeColor(context, doc.type),
-                                        typeIcon: _getTypeIcon(doc.type),
-                                        onTap: () =>
-                                            AppRouter.goToDocumentDetails(context, doc.id),
+                                .map(
+                                  (doc) => Padding(
+                                    padding: const EdgeInsets.only(
+                                      bottom: AppSpacing.spacingMd,
+                                    ),
+                                    child: DocumentCard(
+                                      title: doc.title,
+                                      type: _getTypeLabel(context, doc.type),
+                                      status: doc.status.name,
+                                      date: doc.analyzedAt ?? doc.createdAt,
+                                      pageCount: doc.pageCount,
+                                      wasAnalyzed:
+                                          doc.status == DocumentStatus.analyzed,
+                                      typeColor: _getTypeColor(
+                                        context,
+                                        doc.type,
                                       ),
-                                    ))
+                                      typeIcon: _getTypeIcon(doc.type),
+                                      onTap: () =>
+                                          AppRouter.goToDocumentDetails(
+                                            context,
+                                            doc.id,
+                                          ),
+                                    ),
+                                  ),
+                                )
                                 .toList(),
                           );
                         },
@@ -203,7 +247,7 @@ class HomeScreen extends StatelessWidget {
                               children: [
                                 Expanded(
                                   child: _StatCard(
-                                    label: 'Total Documents',
+                                    label: context.l10n.totalDocuments,
                                     value: state.totalDocuments.toString(),
                                     icon: Symbols.folder,
                                     color: context.colors.primary,
@@ -212,7 +256,7 @@ class HomeScreen extends StatelessWidget {
                                 const SizedBox(width: AppSpacing.spacingMd),
                                 Expanded(
                                   child: _StatCard(
-                                    label: 'Analyzed',
+                                    label: context.l10n.analyzed,
                                     value: state.analyzedCount.toString(),
                                     icon: Symbols.check_circle,
                                     color: AppColors.success,
@@ -221,8 +265,9 @@ class HomeScreen extends StatelessWidget {
                                 const SizedBox(width: AppSpacing.spacingMd),
                                 Expanded(
                                   child: _StatCard(
-                                    label: 'Processing',
-                                    value: state.analyzingDocuments.length.toString(),
+                                    label: context.l10n.processing,
+                                    value: state.analyzingDocuments.length
+                                        .toString(),
                                     icon: Symbols.hourglass_top,
                                     color: AppColors.warning,
                                   ),
@@ -233,14 +278,13 @@ class HomeScreen extends StatelessWidget {
                           return const SizedBox.shrink();
                         },
                       ),
-                    ],
+                    ]),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
         bottomNavigationBar: _buildBottomNav(context),
       ),
     );
@@ -285,29 +329,44 @@ class HomeScreen extends StatelessWidget {
             break;
         }
       },
-      destinations: const [
+      destinations: [
         NavigationDestination(
           icon: Icon(Symbols.home),
           selectedIcon: Icon(Symbols.home),
-          label: 'Home',
+          label: context.l10n.home,
         ),
         NavigationDestination(
           icon: Icon(Symbols.folder),
           selectedIcon: Icon(Symbols.folder),
-          label: 'Documents',
+          label: context.l10n.documents,
         ),
         NavigationDestination(
           icon: Icon(Symbols.add_circle),
           selectedIcon: Icon(Symbols.add_circle),
-          label: 'Upload',
+          label: context.l10n.upload,
         ),
         NavigationDestination(
           icon: Icon(Symbols.person),
           selectedIcon: Icon(Symbols.person),
-          label: 'Profile',
+          label: context.l10n.profile,
         ),
       ],
     );
+  }
+
+  String _getTypeLabel(BuildContext context, DocumentType type) {
+    switch (type) {
+      case DocumentType.rentalContract:
+        return context.l10n.rentalContract;
+      case DocumentType.employmentContract:
+        return context.l10n.employmentContract;
+      case DocumentType.termsOfService:
+        return context.l10n.termsOfServiceType;
+      case DocumentType.privacyPolicy:
+        return context.l10n.privacyPolicyType;
+      case DocumentType.other:
+        return context.l10n.otherType;
+    }
   }
 
   Color _getTypeColor(BuildContext context, DocumentType type) {
@@ -377,7 +436,7 @@ class _AnalyzingBadge extends StatelessWidget {
           ),
           const SizedBox(width: AppSpacing.spacing2xs),
           Text(
-            '$count analyzing',
+            context.l10n.analyzingCount(count),
             style: AppTypography.tinyBold.copyWith(
               color: isDark ? AppColors.warning : AppColors.warningText,
             ),
@@ -411,7 +470,9 @@ class _StatCard extends StatelessWidget {
         color: context.colors.surface,
         borderRadius: AppShapes.card,
         border: Border.all(
-          color: isDark ? AppColors.darkOutlineVariant : AppColors.lightOutlineVariant,
+          color: isDark
+              ? AppColors.darkOutlineVariant
+              : AppColors.lightOutlineVariant,
         ),
       ),
       child: Column(
@@ -428,7 +489,9 @@ class _StatCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.spacing2xs),
           Text(
             label,
-            style: AppTypography.labelSmall.copyWith(color: context.colors.onSurfaceVariant),
+            style: AppTypography.labelSmall.copyWith(
+              color: context.colors.onSurfaceVariant,
+            ),
             textAlign: TextAlign.center,
           ),
         ],

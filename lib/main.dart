@@ -1,16 +1,19 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:supabase_flutter/supabase_flutter.dart'
-    hide AuthState; // Hide Supabase's AuthState to avoid conflict with our AuthCubit's AuthState
+import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState; // Hide Supabase's AuthState to avoid conflict with our AuthCubit's AuthState
 
 import 'core/design_system/index.dart';
 import 'core/di/injection.dart';
+import 'core/l10n/locale_cubit.dart';
 import 'core/navigation/app_router.dart';
 import 'features/index.dart';
+import 'generated/l10n/app_localizations.dart';
 import 'supabase_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting();
 
   // Initialize Supabase (optional for development without Supabase project)
   bool supabaseInitialized = false;
@@ -23,6 +26,7 @@ void main() async {
     );
     supabaseInitialized = true;
     debugPrint('Supabase initialized successfully');
+
   } catch (e) {
     debugPrint('Supabase initialization failed (expected in development): $e');
   }
@@ -41,13 +45,10 @@ class Wara2takApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        BlocProvider<LocaleCubit>.value(value: getIt<LocaleCubit>()),
         BlocProvider<AuthCubit>.value(value: getIt<AuthCubit>()),
-        BlocProvider<DocumentCubit>(
-          create: (_) => getIt<DocumentCubit>(),
-        ),
-        BlocProvider<HomeCubit>(
-          create: (_) => getIt<HomeCubit>(),
-        ),
+        BlocProvider<DocumentCubit>(create: (_) => getIt<DocumentCubit>()),
+        BlocProvider<HomeCubit>(create: (_) => getIt<HomeCubit>()),
         BlocProvider<AnalysisCubit>(create: (_) => getIt<AnalysisCubit>()),
         BlocProvider<ChecklistCubit>(create: (_) => getIt<ChecklistCubit>()),
         BlocProvider<ChatCubit>(create: (_) => getIt<ChatCubit>()),
@@ -72,34 +73,40 @@ class Wara2takApp extends StatelessWidget {
           builder: (context, profileState) {
             // Determine theme mode from profile
             ThemeMode themeMode = ThemeMode.system;
-            Locale? locale;
 
             if (profileState is ProfileLoaded) {
               final profile = profileState.profile;
               themeMode = profile.isDarkMode ? ThemeMode.dark : ThemeMode.light;
-              if (profile.preferredLanguage != null &&
-                  profile.preferredLanguage!.isNotEmpty) {
-                locale = Locale(profile.preferredLanguage!);
-              }
             }
 
-            return MaterialApp.router(
-              title: 'Wara2tak',
-              debugShowCheckedModeBanner: false,
-              theme: AppTheme.lightTheme,
-              darkTheme: AppTheme.darkTheme,
-              themeMode: themeMode,
-              locale: locale,
-              routerConfig: AppRouter.router,
-              builder: (context, child) {
-                // Apply Google Fonts globally
-                return MediaQuery(
-                  data: MediaQuery.of(context).copyWith(
-                    textScaler: TextScaler.linear(
-                      MediaQuery.of(context).textScaler.scale(1.0),
-                    ),
-                  ),
-                  child: child!,
+            return BlocBuilder<LocaleCubit, LocaleState>(
+              builder: (context, localeState) {
+                return MaterialApp.router(
+                  title: 'Wara2tak',
+                  debugShowCheckedModeBanner: false,
+                  theme: AppTheme.lightTheme,
+                  darkTheme: AppTheme.darkTheme,
+                  themeMode: themeMode,
+                  locale: localeState is LocaleLoaded ? localeState.locale : null,
+                  supportedLocales: AppLocalizations.supportedLocales,
+                  // Use material_ui's delegates so MaterialLocalizations matches
+                  // the Material widgets imported from that package.
+                  localizationsDelegates: [
+                    AppLocalizations.delegate,
+                    ...GlobalMaterialLocalizations.delegates,
+                  ],
+                  routerConfig: AppRouter.router,
+                  builder: (context, child) {
+                    // Apply Google Fonts globally
+                    return MediaQuery(
+                      data: MediaQuery.of(context).copyWith(
+                        textScaler: TextScaler.linear(
+                          MediaQuery.of(context).textScaler.scale(1.0),
+                        ),
+                      ),
+                      child: child!,
+                    );
+                  },
                 );
               },
             );

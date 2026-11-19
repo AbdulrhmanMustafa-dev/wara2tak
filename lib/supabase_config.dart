@@ -33,7 +33,7 @@ class SupabaseConfig {
   );
 
   // Kimi (Moonshot AI) API Key - OpenAI compatible endpoint
-  // Get your key from: https://platform.moonshot.cn/console/api-keys
+  // Get your key from the Moonshot AI console.
   static const String _kimiApiKeyConst = String.fromEnvironment(
     'KIMI_API_KEY',
     defaultValue: 'sk-hQ8DzKiot6xfhuKY5WbOLUdzOEHWJjx3OCXd0kGgVlKDLQAm',
@@ -42,7 +42,7 @@ class SupabaseConfig {
   // Kimi API Base URL (OpenAI compatible)
   static const String _kimiBaseUrlConst = String.fromEnvironment(
     'KIMI_BASE_URL',
-    defaultValue: 'https://api.moonshot.cn/v1',
+    defaultValue: 'https://api.moonshot.ai/v1',
   );
 
   // Cerebras API Key - Ultra-fast inference
@@ -65,7 +65,11 @@ class SupabaseConfig {
   static String get geminiApiKey => _runtimeValues['GEMINI_API_KEY'] ?? _geminiApiKeyConst;
 
   /// Get Kimi API Key (runtime value from .env takes precedence)
-  static String get kimiApiKey => _runtimeValues['KIMI_API_KEY'] ?? _runtimeValues['kimi_api_key'] ?? _kimiApiKeyConst;
+  static String get kimiApiKey =>
+      (_runtimeValues['KIMI_API_KEY'] ??
+              _runtimeValues['kimi_api_key'] ??
+              _kimiApiKeyConst)
+          .trim();
 
   /// Get Kimi API Base URL
   static String get kimiBaseUrl => _runtimeValues['KIMI_BASE_URL'] ?? _kimiBaseUrlConst;

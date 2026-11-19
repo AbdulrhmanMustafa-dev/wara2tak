@@ -3,10 +3,12 @@ import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/services/supabase_database_service.dart';
 import '../../core/services/supabase_storage_service.dart';
+import '../../core/l10n/locale_cubit.dart';
 import '../../features/analysis/data/repositories/ai_repository_impl.dart';
 import '../../features/analysis/domain/repositories/ai_repository.dart';
 import '../../features/analysis/presentation/cubit/analysis_cubit.dart';
@@ -53,6 +55,10 @@ Future<void> initializeDependencies({required bool supabaseAvailable}) async {
 
 /// Register core services (Supabase, API clients, etc.)
 Future<void> _registerCoreServices({required bool supabaseAvailable}) async {
+  // Register SharedPreferences (needed for LocaleCubit)
+  final prefs = await SharedPreferences.getInstance();
+  getIt.registerLazySingleton<SharedPreferences>(() => prefs);
+
   if (supabaseAvailable) {
     try {
       getIt.registerLazySingleton<SupabaseClient>(
@@ -189,6 +195,9 @@ void _registerRepositories() {
 
 /// Register Cubits/Blocs
 void _registerCubits() {
+  // Locale cubit (must be registered first for app initialization)
+  getIt.registerLazySingleton<LocaleCubit>(() => LocaleCubit(getIt<SharedPreferences>()));
+
   // Auth cubit
   // استخدمنا LazySingleton عشان تكون نسخة واحدة بس مشتركة بين الـ UI والـ Router
   getIt.registerLazySingleton<AuthCubit>(() => AuthCubit(getIt()));
@@ -205,7 +214,7 @@ void _registerCubits() {
   );
 
   // Checklist cubit
-  getIt.registerFactory<ChecklistCubit>(() => ChecklistCubit(getIt()));
+  getIt.registerFactory<ChecklistCubit>(() => ChecklistCubit(getIt(), getIt()));
 
   // Chat cubit
   getIt.registerFactory<ChatCubit>(() => ChatCubit(getIt()));
